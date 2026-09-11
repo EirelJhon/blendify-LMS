@@ -525,7 +525,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchErrorModal = document.getElementById('searchErrorModal');
   const modalCloseSearchError = document.getElementById('modalCloseSearchError');
   const btnDismissSearchError = document.getElementById('btnDismissSearchError');
-  const btnResetFromSearchError = document.getElementById('btnResetFromSearchError');
 
   // Upload modal elements
   const uploadMaterialModal = document.getElementById('uploadMaterialModal');
@@ -882,19 +881,6 @@ document.addEventListener('DOMContentLoaded', () => {
     closeSearchErrorModal();
     searchCommunityMaterialsInput?.focus();
     searchCommunityMaterialsInput?.select();
-  });
-
-  btnResetFromSearchError?.addEventListener('click', () => {
-    if (searchCommunityMaterialsInput) searchCommunityMaterialsInput.value = '';
-    activeMaterialSearchQuery = '';
-    if (btnClearMaterialSearch) btnClearMaterialSearch.style.display = 'none';
-    activeMaterialCategory = 'all';
-    materialsCategoryPills?.querySelectorAll('.cat-pill').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.category === 'all');
-    });
-    renderCommunityMaterials('', 'all');
-    closeSearchErrorModal();
-    document.getElementById('userMaterialsSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
   searchErrorModal?.addEventListener('click', (e) => {
