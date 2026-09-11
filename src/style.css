@@ -1632,7 +1632,7 @@ ul {
 .workplaces-container {
   max-width: 1320px;
   margin: 0 auto;
-  padding: 0 40px 60px;
+  padding: 30px 40px 60px;
   display: flex;
   flex-direction: column;
   gap: 28px;

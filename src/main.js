@@ -809,19 +809,19 @@ document.addEventListener('DOMContentLoaded', () => {
       currentShareLink.value = `https://blendify.edu/portal/join?tag=${formattedTag.replace('#', '')}`;
     }
 
-    // Update Learning Materials Hero to match current classroom
-    const materialsHeroTitle = document.getElementById('materialsHeroTitle');
-    const materialsHeroTag = document.getElementById('materialsHeroTag');
-    const materialsHeroDesc = document.getElementById('materialsHeroDesc');
-    const materialsInstructorCredit = document.getElementById('materialsInstructorCredit');
+    // Update Classroom Portal Hero at top of viewWorkplaces
+    const portalHeroTitle = document.getElementById('portalHeroTitle');
+    const portalHeroTag = document.getElementById('portalHeroTag');
+    const portalHeroDesc = document.getElementById('portalHeroDesc');
+    const portalInstructorCredit = document.getElementById('portalInstructorCredit');
 
-    if (materialsHeroTitle) materialsHeroTitle.textContent = existing.name;
-    if (materialsHeroTag) materialsHeroTag.textContent = existing.tag;
-    if (materialsHeroDesc) {
-      materialsHeroDesc.innerHTML = `Active Portal: <strong>${existing.tag}</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.`;
+    if (portalHeroTitle) portalHeroTitle.textContent = existing.name;
+    if (portalHeroTag) portalHeroTag.textContent = existing.tag;
+    if (portalHeroDesc) {
+      portalHeroDesc.innerHTML = `Active Portal: <strong>${existing.tag}</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.`;
     }
-    if (materialsInstructorCredit) {
-      materialsInstructorCredit.textContent = `${existing.instructor || 'Blendify Faculty'} · ${existing.topic || 'Classroom'}`;
+    if (portalInstructorCredit) {
+      portalInstructorCredit.textContent = `${existing.instructor || 'Blendify Faculty'} · ${existing.topic || 'Classroom'}`;
     }
 
     renderJoinedPortals(filterJoinedPortalsInput ? filterJoinedPortalsInput.value : '');

@@ -166,16 +166,24 @@
            VIEW 1: CLASSROOM WORKPLACES (TAGS & SHAREABLE LINKS) - PRIMARY
            =================================================================== -->
       <main class="page-content" id="viewWorkplaces">
-        <div class="view-header-row">
-          <div>
-            <h2 class="view-title">Classroom Workplaces</h2>
-            <p class="view-sub">Participate in live collaborative portals by sharing links or entering generated tags.
+        <!-- CLASSROOM WORKPLACES HERO BANNER (TRANSFERRED FROM LEARNING MATERIALS) -->
+        <section class="hero-banner" id="portalHeroBanner">
+          <div class="hero-container">
+            <div class="hero-top-meta">
+              <span class="instructor-credit" id="portalInstructorCredit">
+                Vativa Hub · UI/UX Design
+              </span>
+            </div>
+
+            <h1 class="course-main-title" id="portalHeroTitle">
+              UI/UX Cohort 4 — Webflow Breakpoints Lab
+            </h1>
+
+            <p class="hero-intro-description" id="portalHeroDesc">
+              Active Portal: <strong id="portalHeroTag">#PORTAL-FIGMA-101</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.
             </p>
           </div>
-          <button class="btn-primary" id="btnOpenCreatePortalModal">
-            Generate New Workplace Tag
-          </button>
-        </div>
+        </section>
 
         <div class="workplaces-container">
           <!-- Tag Join & Share Box -->
@@ -254,31 +262,6 @@
            VIEW 2: LEARNING MATERIALS (EDUCATIONAL CONTENT & FILE DOWNLOADS)
            =================================================================== -->
       <section class="page-content view-hidden" id="viewMaterials">
-        <!-- DARK HERO / SHORT INTRODUCTION ON HOW IT WORKS -->
-        <section class="hero-banner" id="heroIntroBanner">
-          <div class="hero-container">
-            <div class="hero-top-meta">
-              <button type="button" class="btn-back-to-portals" id="btnBackToPortals" title="Return to Joined Class Portals">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-                <span>Back to All Classrooms</span>
-              </button>
-              <span class="instructor-credit" id="materialsInstructorCredit">
-                Vativa Hub · UI/UX Design
-              </span>
-            </div>
-
-            <h1 class="course-main-title" id="materialsHeroTitle">
-              UI/UX Cohort 4 — Webflow Breakpoints Lab
-            </h1>
-
-            <p class="hero-intro-description" id="materialsHeroDesc">
-              Active Portal: <strong id="materialsHeroTag">#PORTAL-FIGMA-101</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.
-            </p>
-          </div>
-        </section>
-
         <!-- MAIN LAYOUT: MATERIALS COLUMN + SIDEBAR CARD (PRICE REMOVED) -->
         <div class="course-body-container">
           <div class="main-column">
@@ -291,6 +274,12 @@
                   <span>ACTIVE EDUCATIONAL MATERIAL</span>
                 </div>
                 <div class="workspace-actions">
+                  <button type="button" class="btn-ghost-sm" id="btnBackToPortals" title="Return to Joined Class Portals">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <span>All Classrooms</span>
+                  </button>
                   <button class="btn-ghost-sm" id="btnAskAIAboutLesson">
                     Ask AI Agent
                   </button>
