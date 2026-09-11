@@ -38,9 +38,9 @@
       <nav class="sidebar-nav">
         <div class="nav-section-title">LEARNER PORTAL</div>
         <ul class="nav-list">
-          <!-- 1. Home & Classroom Workplaces -->
+          <!-- 1. Home -->
           <li class="nav-item">
-            <button class="nav-link active" data-view="workplaces" id="nav-workplaces">
+            <button class="nav-link active" data-view="home" id="nav-home">
               <span class="nav-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -48,7 +48,23 @@
                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
               </span>
-              <span class="nav-label">Home &amp; Portals</span>
+              <span class="nav-label">Home</span>
+            </button>
+          </li>
+
+          <!-- 2. Classroom Portals -->
+          <li class="nav-item">
+            <button class="nav-link" data-view="workplaces" id="nav-workplaces">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </span>
+              <span class="nav-label">Classroom Portals</span>
             </button>
           </li>
 
@@ -161,9 +177,9 @@
       </header>
 
       <!-- ===================================================================
-           VIEW 1: HOME, WEBSITE INTRODUCTION, COMMUNITY MATERIALS & PORTALS
+           VIEW 1: HOME PAGE (INTRODUCTION & USER MATERIALS REPOSITORY)
            =================================================================== -->
-      <main class="page-content" id="viewWorkplaces">
+      <main class="page-content" id="viewHome">
         <!-- HOME PAGE WEBSITE INTRODUCTION & COMMUNITY SEARCH BANNER -->
         <section class="home-hero-banner" id="homeHeroBanner">
           <div class="home-hero-container">
@@ -172,10 +188,11 @@
                 <span class="pulse-gold-dot"></span>
                 <span>WELCOME TO BLENDIFY LMS</span>
               </div>
-              <div class="active-portal-pill-indicator" id="activePortalIndicator">
+              <button type="button" class="active-portal-pill-indicator" id="activePortalIndicator" title="Click to open Classroom Portals">
                 <span class="pulse-dot"></span>
-                <span class="portal-indicator-text">Active Portal: <strong id="portalHeroTag">#PORTAL-FIGMA-101</strong> · <span id="portalHeroTitle">UI/UX Cohort 4</span></span>
-              </div>
+                <span class="portal-indicator-text">Active Classroom: <strong id="homeActiveTag">#PORTAL-FIGMA-101</strong> · <span id="homeActiveTitle">UI/UX Cohort 4</span></span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:4px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
             </div>
 
             <h1 class="home-hero-title">
@@ -222,7 +239,8 @@
           </div>
         </section>
 
-        <div class="workplaces-container">
+        <!-- HOME MATERIALS CONTAINER -->
+        <div class="home-materials-container">
           <!-- SECTION 1: USER-UPLOADED LEARNING MATERIALS DISCOVERY -->
           <section class="user-materials-section" id="userMaterialsSection">
             <div class="user-materials-header">
@@ -257,7 +275,60 @@
             </div>
           </section>
 
-          <!-- SECTION 2: CLASSROOM ACCESS & PORTALS -->
+          <!-- QUICK CLASSROOM PORTALS BANNER CARD -->
+          <div class="home-portal-callout-card">
+            <div class="callout-left">
+              <div class="callout-badge">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>COLLABORATIVE CLASSROOMS</span>
+              </div>
+              <h4 class="callout-title">Looking for your enrolled class portals?</h4>
+              <p class="callout-desc">
+                Access your cohort workplaces, join live study groups using portal tags, or invite fellow learners with your active classroom link.
+              </p>
+            </div>
+            <div class="callout-action">
+              <button type="button" class="btn-primary" id="btnHomeToPortals">
+                <span>Go to Classroom Portals</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===================================================================
+           VIEW 2: CLASSROOM PORTALS (JOIN BY TAG & JOINED CLASSES LIST)
+           =================================================================== -->
+      <section class="page-content view-hidden" id="viewWorkplaces">
+        <!-- CLASSROOM WORKPLACES HERO BANNER -->
+        <section class="hero-banner" id="portalHeroBanner">
+          <div class="hero-container">
+            <div class="hero-top-meta">
+              <span class="instructor-credit" id="portalInstructorCredit">
+                Vativa Hub · UI/UX Design
+              </span>
+            </div>
+
+            <h1 class="course-main-title" id="portalHeroTitle">
+              UI/UX Cohort 4 — Webflow Breakpoints Lab
+            </h1>
+
+            <p class="hero-intro-description" id="portalHeroDesc">
+              Active Portal: <strong id="portalHeroTag">#PORTAL-FIGMA-101</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.
+            </p>
+          </div>
+        </section>
+
+        <div class="workplaces-container">
           <!-- Tag Join & Share Box -->
           <div class="portal-access-card">
             <div class="portal-access-col">
@@ -328,7 +399,7 @@
             </div>
           </div>
         </div>
-      </main>
+      </section>
 
       <!-- ===================================================================
            VIEW 2: LEARNING MATERIALS (EDUCATIONAL CONTENT & FILE DOWNLOADS)
@@ -1062,16 +1133,16 @@
       </div>
       <div class="modal-search-results" id="searchResults">
         <div class="search-category-title">Core Features</div>
-        <div class="search-result-item" data-action="view-materials">
+        <div class="search-result-item" data-action="view-home">
           <span class="sr-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
             </svg>
           </span>
           <div>
-            <strong>Access Learning Materials</strong>
-            <p>20 educational modules, design kits, and guides</p>
+            <strong>Home &amp; Community Materials</strong>
+            <p>Platform introduction, community uploads, templates &amp; search</p>
           </div>
         </div>
         <div class="search-result-item" data-action="view-workplaces">
@@ -1084,10 +1155,20 @@
             </svg>
           </span>
           <div>
-            <strong>Classroom Workplaces &amp; Tags</strong>
+            <strong>Classroom Portals &amp; Tags</strong>
             <p>Join portal #PORTAL-FIGMA-101 or share invite link</p>
           </div>
         </div>
+        <div class="search-result-item" data-action="view-materials">
+          <span class="sr-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </span>
+          <div>
+            <strong>Access Learning Materials</strong>
+            <p>20 educational modules, design kits, and guides</p>
         <div class="search-result-item" data-action="view-ai-agent">
           <span class="sr-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

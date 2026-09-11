@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // STATE MANAGEMENT
   // =========================================================================
   const state = {
-    activeView: 'workplaces',
+    activeView: 'home',
     activeTag: '#PORTAL-FIGMA-101',
     activePortalName: 'UI/UX Cohort 4 — Webflow Breakpoints Lab',
     completedMaterials: 9,
@@ -47,19 +47,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // NAVIGATION & VIEW ROUTING (3 CORE PILLARS)
+  // NAVIGATION & VIEW ROUTING (HOME, WORKPLACES, MATERIALS, AI AGENT)
   // =========================================================================
-  const navMaterials = document.getElementById('nav-materials');
+  const navHome = document.getElementById('nav-home');
   const navWorkplaces = document.getElementById('nav-workplaces');
+  const navMaterials = document.getElementById('nav-materials');
   const navAIAgent = document.getElementById('nav-ai-agent');
 
-  const viewMaterials = document.getElementById('viewMaterials');
+  const viewHome = document.getElementById('viewHome');
   const viewWorkplaces = document.getElementById('viewWorkplaces');
+  const viewMaterials = document.getElementById('viewMaterials');
   const viewAIAgent = document.getElementById('viewAIAgent');
 
   const views = {
-    materials: { link: navMaterials, section: viewMaterials },
+    home: { link: navHome, section: viewHome },
     workplaces: { link: navWorkplaces, section: viewWorkplaces },
+    materials: { link: navMaterials, section: viewMaterials },
     'ai-agent': { link: navAIAgent, section: viewAIAgent }
   };
 
@@ -75,15 +78,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sidebar')?.classList.remove('open');
   }
 
-  navMaterials?.addEventListener('click', () => switchView('materials'));
+  navHome?.addEventListener('click', () => switchView('home'));
   navWorkplaces?.addEventListener('click', () => switchView('workplaces'));
+  navMaterials?.addEventListener('click', () => switchView('materials'));
   navAIAgent?.addEventListener('click', () => switchView('ai-agent'));
 
   document.getElementById('brandLogo')?.addEventListener('click', (e) => {
     e.preventDefault();
-    switchView('workplaces');
+    switchView('home');
   });
 
+  document.getElementById('activePortalIndicator')?.addEventListener('click', () => switchView('workplaces'));
+  document.getElementById('btnHomeToPortals')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnOpenClassroomAction')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnSidebarSwitchPortal')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnBackToPortals')?.addEventListener('click', () => switchView('workplaces'));
@@ -1241,9 +1247,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const portalHeroTag = document.getElementById('portalHeroTag');
     const portalHeroDesc = document.getElementById('portalHeroDesc');
     const portalInstructorCredit = document.getElementById('portalInstructorCredit');
+    const homeActiveTag = document.getElementById('homeActiveTag');
+    const homeActiveTitle = document.getElementById('homeActiveTitle');
 
     if (portalHeroTitle) portalHeroTitle.textContent = existing.name;
     if (portalHeroTag) portalHeroTag.textContent = existing.tag;
+    if (homeActiveTag) homeActiveTag.textContent = existing.tag;
+    if (homeActiveTitle) homeActiveTitle.textContent = existing.name;
     if (portalHeroDesc) {
       portalHeroDesc.innerHTML = `Active Portal: <strong>${existing.tag}</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.`;
     }
@@ -1517,6 +1527,7 @@ document.addEventListener('DOMContentLoaded', () => {
     item.addEventListener('click', () => {
       const action = item.dataset.action;
       closeSearch();
+      if (action === 'view-home') switchView('home');
       if (action === 'view-materials') switchView('materials');
       if (action === 'view-workplaces') switchView('workplaces');
       if (action === 'view-ai-agent') switchView('ai-agent');

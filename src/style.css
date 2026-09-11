@@ -2522,11 +2522,22 @@ ul {
   align-items: center;
   gap: 8px;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 5px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
   font-size: 0.8rem;
   color: #D1D5DB;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.active-portal-pill-indicator:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(197, 154, 83, 0.45);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .home-hero-title {
@@ -2921,6 +2932,66 @@ ul {
   max-width: 360px;
 }
 
+/* Home Materials Container & Classroom Portals Callout */
+.home-materials-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 32px 40px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.home-portal-callout-card {
+  background: linear-gradient(135deg, rgba(197, 154, 83, 0.08) 0%, rgba(37, 99, 235, 0.05) 100%), var(--bg-surface);
+  border: 1px solid rgba(197, 154, 83, 0.28);
+  border-radius: var(--radius-lg);
+  padding: 26px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.home-portal-callout-card .callout-left {
+  flex: 1;
+  min-width: 280px;
+}
+
+.home-portal-callout-card .callout-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.home-portal-callout-card .callout-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+
+.home-portal-callout-card .callout-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 720px;
+}
+
+.home-portal-callout-card .callout-action {
+  flex-shrink: 0;
+}
+
 /* Modal Overlay & Upload Modal Box */
 .modal-overlay {
   position: fixed;
@@ -3143,10 +3214,11 @@ ul {
   .sidebar.open { left: 0; }
   .mobile-toggle { display: flex; }
   .top-header { padding: 0 16px; }
-  .course-body-container, .workplaces-container, .ai-agent-workspace { padding: 16px; }
+  .course-body-container, .workplaces-container, .home-materials-container, .ai-agent-workspace { padding: 16px; }
   .hero-banner, .home-hero-banner { padding: 24px 16px; }
   .course-main-title, .home-hero-title { font-size: 1.6rem; }
   .materials-search-bar { flex-direction: column; align-items: stretch; }
+  .home-portal-callout-card { flex-direction: column; align-items: flex-start; gap: 16px; }
   .form-row-cols { grid-template-columns: 1fr; }
   .active-lesson-hero { grid-template-columns: 1fr; }
 }
