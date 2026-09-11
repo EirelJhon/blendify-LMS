@@ -112,6 +112,7 @@ ul {
 /* Layout */
 .app-layout {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   width: 100%;
 }
@@ -239,6 +240,7 @@ ul {
   flex: 1;
   display: flex;
   flex-direction: column;
+  width: 100%;
   min-width: 0;
 }
 
@@ -246,6 +248,7 @@ ul {
    RESTORED TOP HEADER WITH ALL CORE SIDE FEATURES INTEGRATED
    ========================================================================== */
 .top-header {
+  width: 100%;
   height: 68px;
   background: rgba(13, 14, 18, 0.94);
   backdrop-filter: blur(16px);
@@ -259,6 +262,7 @@ ul {
   top: 0;
   z-index: 100;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
 }
 
 .header-left {
