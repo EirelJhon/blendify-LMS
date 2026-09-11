@@ -153,12 +153,12 @@ ul {
 }
 
 .brand-logo-img {
-  height: 38px;
+  height: 50px;
   width: auto;
-  max-width: 48px;
+  max-width: 75px;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -263,7 +263,7 @@ ul {
    ========================================================================== */
 .top-header {
   width: 100%;
-  height: 68px;
+  height: 72px;
   background: rgba(13, 14, 18, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
