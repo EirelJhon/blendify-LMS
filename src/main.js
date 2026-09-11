@@ -47,47 +47,55 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
+  // =========================================================================
   // NAVIGATION & VIEW ROUTING (HOME, WORKPLACES, MATERIALS, AI AGENT)
   // =========================================================================
-  const navHome = document.getElementById('nav-home');
-  const navWorkplaces = document.getElementById('nav-workplaces');
-  const navMaterials = document.getElementById('nav-materials');
-  const navAIAgent = document.getElementById('nav-ai-agent');
-
   const viewHome = document.getElementById('viewHome');
   const viewWorkplaces = document.getElementById('viewWorkplaces');
   const viewMaterials = document.getElementById('viewMaterials');
   const viewAIAgent = document.getElementById('viewAIAgent');
 
   const views = {
-    home: { link: navHome, section: viewHome },
-    workplaces: { link: navWorkplaces, section: viewWorkplaces },
-    materials: { link: navMaterials, section: viewMaterials },
-    'ai-agent': { link: navAIAgent, section: viewAIAgent }
+    home: { section: viewHome },
+    workplaces: { section: viewWorkplaces },
+    materials: { section: viewMaterials },
+    'ai-agent': { section: viewAIAgent }
   };
 
   function switchView(viewName) {
-    Object.keys(views).forEach(key => {
-      const isTarget = key === viewName;
-      views[key].link?.classList.toggle('active', isTarget);
-      views[key].section?.classList.toggle('view-hidden', !isTarget);
+    state.activeView = viewName;
+
+    // Toggle active state across all nav links (in top header & mobile drawer)
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const isTarget = link.getAttribute('data-view') === viewName;
+      link.classList.toggle('active', isTarget);
     });
 
-    state.activeView = viewName;
-    const topNavActions = document.getElementById('topNavActions');
-    const isDarkHero = viewName === 'home' || viewName === 'workplaces';
-    topNavActions?.classList.toggle('light-nav-theme', !isDarkHero);
+    // Toggle section visibility
+    Object.keys(views).forEach(key => {
+      views[key].section?.classList.toggle('view-hidden', key !== viewName);
+    });
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('sidebar')?.classList.remove('open');
+    document.getElementById('mobileDrawerOverlay')?.classList.remove('open');
   }
 
-  navHome?.addEventListener('click', () => switchView('home'));
-  navWorkplaces?.addEventListener('click', () => switchView('workplaces'));
-  navMaterials?.addEventListener('click', () => switchView('materials'));
-  navAIAgent?.addEventListener('click', () => switchView('ai-agent'));
+  // Attach listener to all navigation links (header and mobile drawer)
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const view = link.getAttribute('data-view');
+      if (view) switchView(view);
+    });
+  });
 
   document.getElementById('brandLogo')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchView('home');
+  });
+
+  document.getElementById('drawerBrandLogo')?.addEventListener('click', (e) => {
     e.preventDefault();
     switchView('home');
   });
@@ -1577,11 +1585,23 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnSignOutAccount')?.addEventListener('click', handleSignOutOrSwitch);
   document.getElementById('btnSwitchAccountDropdown')?.addEventListener('click', handleSignOutOrSwitch);
 
-  // Mobile sidebar toggle
+  // Mobile drawer controls
   const sidebar = document.getElementById('sidebar');
-  document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-    sidebar?.classList.toggle('open');
-  });
+  const mobileDrawerOverlay = document.getElementById('mobileDrawerOverlay');
+
+  function openMobileDrawer() {
+    sidebar?.classList.add('open');
+    mobileDrawerOverlay?.classList.add('open');
+  }
+
+  function closeMobileDrawer() {
+    sidebar?.classList.remove('open');
+    mobileDrawerOverlay?.classList.remove('open');
+  }
+
+  document.getElementById('sidebarToggle')?.addEventListener('click', openMobileDrawer);
+  document.getElementById('mobileDrawerClose')?.addEventListener('click', closeMobileDrawer);
+  mobileDrawerOverlay?.addEventListener('click', closeMobileDrawer);
 
   console.log('Blendify LMS active: Learning Materials, Classroom Workplaces & AI Agent ready.');
 });
