@@ -498,6 +498,39 @@ ul {
   align-items: center;
   gap: 14px;
   margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-back-to-portals {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back-to-portals:hover {
+  background: rgba(197, 154, 83, 0.22);
+  border-color: var(--primary);
+  color: #F7EFE6;
+  transform: translateX(-3px);
+  box-shadow: 0 0 12px rgba(197, 154, 83, 0.3);
+}
+
+.btn-back-to-portals svg {
+  transition: transform 0.2s ease;
+}
+
+.btn-back-to-portals:hover svg {
+  transform: translateX(-2px);
 }
 
 .category-tag {
@@ -1565,8 +1598,23 @@ ul {
 }
 
 /* ==========================================================================
-   VIEW 2: CLASSROOM WORKPLACES (TAGS & SHAREABLE LINKS)
+   VIEW ROUTING & TRANSITIONS
    ========================================================================== */
+.page-content {
+  animation: fadeInView 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInView {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .view-hidden { display: none !important; }
 
 .view-header-row {
@@ -1777,6 +1825,7 @@ ul {
   flex-direction: column;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .joined-portal-card:hover {

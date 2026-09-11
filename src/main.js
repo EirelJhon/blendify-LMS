@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // STATE MANAGEMENT
   // =========================================================================
   const state = {
-    activeView: 'materials',
+    activeView: 'workplaces',
     activeTag: '#PORTAL-FIGMA-101',
     activePortalName: 'UI/UX Cohort 4 — Webflow Breakpoints Lab',
     completedMaterials: 9,
@@ -81,11 +81,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('brandLogo')?.addEventListener('click', (e) => {
     e.preventDefault();
-    switchView('materials');
+    switchView('workplaces');
   });
 
   document.getElementById('btnOpenClassroomAction')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnSidebarSwitchPortal')?.addEventListener('click', () => switchView('workplaces'));
+  document.getElementById('btnBackToPortals')?.addEventListener('click', () => switchView('workplaces'));
+  document.getElementById('btnNewClassWorkspace')?.addEventListener('click', () => {
+    switchView('workplaces');
+    const input = document.getElementById('portalTagInput');
+    if (input) {
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
   document.getElementById('btnViewMyPortals')?.addEventListener('click', () => {
     switchView('workplaces');
     document.getElementById('userPanel')?.classList.remove('show');
@@ -688,7 +697,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle interactions on joined portal cards (Event delegation)
   joinedPortalsList?.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
-    if (!btn) return;
+    if (!btn) {
+      const card = e.target.closest('.joined-portal-card');
+      if (card && !e.target.closest('.portal-card-secondary-btns')) {
+        const cardTag = card.dataset.tag;
+        const portal = joinedPortals.find(p => p.tag.toUpperCase() === cardTag.toUpperCase());
+        if (portal) {
+          setClassroomPortal(portal.tag, portal.name);
+          switchView('materials');
+          showToast(`Entered ${portal.name}! Loading curriculum...`);
+        }
+      }
+      return;
+    }
 
     const action = btn.dataset.action;
     const tag = btn.dataset.tag;
@@ -697,6 +718,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'enter') {
       if (portal) {
         setClassroomPortal(portal.tag, portal.name);
+        switchView('materials');
+        showToast(`Entered ${portal.name}! Loading curriculum...`);
       }
     } else if (action === 'copy-tag') {
       if (navigator.clipboard) {
@@ -786,6 +809,21 @@ document.addEventListener('DOMContentLoaded', () => {
       currentShareLink.value = `https://blendify.edu/portal/join?tag=${formattedTag.replace('#', '')}`;
     }
 
+    // Update Learning Materials Hero to match current classroom
+    const materialsHeroTitle = document.getElementById('materialsHeroTitle');
+    const materialsHeroTag = document.getElementById('materialsHeroTag');
+    const materialsHeroDesc = document.getElementById('materialsHeroDesc');
+    const materialsInstructorCredit = document.getElementById('materialsInstructorCredit');
+
+    if (materialsHeroTitle) materialsHeroTitle.textContent = existing.name;
+    if (materialsHeroTag) materialsHeroTag.textContent = existing.tag;
+    if (materialsHeroDesc) {
+      materialsHeroDesc.innerHTML = `Active Portal: <strong>${existing.tag}</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.`;
+    }
+    if (materialsInstructorCredit) {
+      materialsInstructorCredit.textContent = `${existing.instructor || 'Blendify Faculty'} · ${existing.topic || 'Classroom'}`;
+    }
+
     renderJoinedPortals(filterJoinedPortalsInput ? filterJoinedPortalsInput.value : '');
     showToast(`Switched active classroom: ${existing.name}!`);
   }
@@ -802,12 +840,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setClassroomPortal(entered);
     portalTagInput.value = '';
+    switchView('materials');
+    showToast(`Joined and entered ${entered}!`);
   });
 
   // Preset tag buttons
   document.querySelectorAll('.tag-pill-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       setClassroomPortal(btn.dataset.tag);
+      switchView('materials');
     });
   });
 
@@ -855,6 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const name = newWorkplaceNameInput.value.trim() || `Classroom Study Group (${tag})`;
     setClassroomPortal(tag, name);
     closeCreatePortalModal();
+    switchView('materials');
   });
 
   // =========================================================================

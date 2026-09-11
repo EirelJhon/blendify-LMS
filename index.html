@@ -38,23 +38,9 @@
       <nav class="sidebar-nav">
         <div class="nav-section-title">LEARNER PORTAL</div>
         <ul class="nav-list">
-          <!-- 1. Learning Materials -->
+          <!-- 1. Classroom Workplaces (Tags & Links) -->
           <li class="nav-item">
-            <button class="nav-link active" data-view="materials" id="nav-materials">
-              <span class="nav-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                </svg>
-              </span>
-              <span class="nav-label">Learning Materials</span>
-            </button>
-          </li>
-
-          <!-- 2. Classroom Workplaces (Tags & Links) -->
-          <li class="nav-item">
-            <button class="nav-link" data-view="workplaces" id="nav-workplaces">
+            <button class="nav-link active" data-view="workplaces" id="nav-workplaces">
               <span class="nav-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -64,7 +50,21 @@
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </span>
-              <span class="nav-label">Workplaces</span>
+              <span class="nav-label">Classroom Portals</span>
+            </button>
+          </li>
+
+          <!-- 2. Learning Materials -->
+          <li class="nav-item">
+            <button class="nav-link" data-view="materials" id="nav-materials">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+              </span>
+              <span class="nav-label">Learning Materials</span>
             </button>
           </li>
 
@@ -163,27 +163,118 @@
       </header>
 
       <!-- ===================================================================
-           VIEW 1: LEARNING MATERIALS (EDUCATIONAL CONTENT)
-           Preserves Reference Design with Video & Price removed
+           VIEW 1: CLASSROOM WORKPLACES (TAGS & SHAREABLE LINKS) - PRIMARY
            =================================================================== -->
-      <main class="page-content" id="viewMaterials">
+      <main class="page-content" id="viewWorkplaces">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">Classroom Workplaces</h2>
+            <p class="view-sub">Participate in live collaborative portals by sharing links or entering generated tags.
+            </p>
+          </div>
+          <button class="btn-primary" id="btnOpenCreatePortalModal">
+            Generate New Workplace Tag
+          </button>
+        </div>
+
+        <div class="workplaces-container">
+          <!-- Tag Join & Share Box -->
+          <div class="portal-access-card">
+            <div class="portal-access-col">
+              <h3>Join a Classroom by Tag</h3>
+              <p>Enter the generated portal tag provided by your instructor or peer:</p>
+              <div class="tag-input-group">
+                <input type="text" class="tag-input-field" id="portalTagInput" placeholder="e.g. #PORTAL-FIGMA-101" />
+                <button class="btn-primary" id="btnJoinPortalByTag">Enter Portal</button>
+              </div>
+              <div class="preset-tags">
+                <span>Quick demo tags:</span>
+                <button class="tag-pill-btn" data-tag="#PORTAL-FIGMA-101">#PORTAL-FIGMA-101</button>
+                <button class="tag-pill-btn" data-tag="#WEBFLOW-LAB-44">#WEBFLOW-LAB-44</button>
+                <button class="tag-pill-btn" data-tag="#STUDY-ROOM-B">#STUDY-ROOM-B</button>
+              </div>
+            </div>
+
+            <div class="portal-divider-v"></div>
+
+            <div class="portal-access-col">
+              <h3>Share Current Workplace Link</h3>
+              <p>Invite fellow students to collaborate in your active learning portal:</p>
+              <div class="share-link-group">
+                <input type="text" class="share-link-field" id="currentShareLink" readonly
+                  value="https://blendify.edu/portal/join?tag=PORTAL-FIGMA-101" />
+                <button class="btn-secondary" id="btnCopyPortalLink">
+                  Copy Link
+                </button>
+              </div>
+              <span class="tag-info-note">Active Tag: <strong id="activeTagBadge">#PORTAL-FIGMA-101</strong> · Shareable
+                with unlimited classmates</span>
+            </div>
+          </div>
+
+          <!-- Joined Class Portals Column / Grid -->
+          <div class="joined-portals-section">
+            <div class="joined-portals-header-bar">
+              <div class="joined-portals-title-area">
+                <div class="joined-title-row">
+                  <h3 class="joined-section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    Joined Class Portals
+                  </h3>
+                  <span class="joined-count-badge" id="joinedPortalsCountBadge">4 Classrooms Enrolled</span>
+                </div>
+                <p class="joined-section-sub">
+                  Browse and access the different class portals you have joined in the website. Enter any classroom or copy its tag and invite links.
+                </p>
+              </div>
+
+              <div class="joined-portals-filter-area">
+                <div class="joined-search-box">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="filterJoinedPortalsInput" placeholder="Filter joined portals by name or tag..." />
+                </div>
+              </div>
+            </div>
+
+            <!-- Column of Different Class Portals Joined in the Website -->
+            <div class="joined-portals-grid" id="joinedPortalsList">
+              <!-- Dynamically populated from state / localStorage -->
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===================================================================
+           VIEW 2: LEARNING MATERIALS (EDUCATIONAL CONTENT & FILE DOWNLOADS)
+           =================================================================== -->
+      <section class="page-content view-hidden" id="viewMaterials">
         <!-- DARK HERO / SHORT INTRODUCTION ON HOW IT WORKS -->
         <section class="hero-banner" id="heroIntroBanner">
           <div class="hero-container">
             <div class="hero-top-meta">
-              <span class="instructor-credit">
-                Blendify LMS
+              <button type="button" class="btn-back-to-portals" id="btnBackToPortals" title="Return to Joined Class Portals">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Back to All Classrooms</span>
+              </button>
+              <span class="instructor-credit" id="materialsInstructorCredit">
+                Vativa Hub · UI/UX Design
               </span>
             </div>
 
-            <h1 class="course-main-title">
-              Welcome to Blendify
+            <h1 class="course-main-title" id="materialsHeroTitle">
+              UI/UX Cohort 4 — Webflow Breakpoints Lab
             </h1>
 
-            <p class="hero-intro-description">
-              Blendify connects your learning in 3 simple steps: study hands-on curriculum materials, join collaborative
-              classroom workplaces using shared portal tags, and get instant answers from your 24/7 personalized AI
-              mentor.
+            <p class="hero-intro-description" id="materialsHeroDesc">
+              Active Portal: <strong id="materialsHeroTag">#PORTAL-FIGMA-101</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.
             </p>
           </div>
         </section>
@@ -673,94 +764,6 @@
               </div>
             </div>
           </aside>
-        </div>
-      </main>
-
-      <!-- ===================================================================
-           VIEW 2: CLASSROOM WORKPLACES (TAGS & SHAREABLE LINKS)
-           =================================================================== -->
-      <section class="page-content view-hidden" id="viewWorkplaces">
-        <div class="view-header-row">
-          <div>
-            <h2 class="view-title">Classroom Workplaces</h2>
-            <p class="view-sub">Participate in live collaborative portals by sharing links or entering generated tags.
-            </p>
-          </div>
-          <button class="btn-primary" id="btnOpenCreatePortalModal">
-            Generate New Workplace Tag
-          </button>
-        </div>
-
-        <div class="workplaces-container">
-          <!-- Tag Join & Share Box -->
-          <div class="portal-access-card">
-            <div class="portal-access-col">
-              <h3>Join a Classroom by Tag</h3>
-              <p>Enter the generated portal tag provided by your instructor or peer:</p>
-              <div class="tag-input-group">
-                <input type="text" class="tag-input-field" id="portalTagInput" placeholder="e.g. #PORTAL-FIGMA-101" />
-                <button class="btn-primary" id="btnJoinPortalByTag">Enter Portal</button>
-              </div>
-              <div class="preset-tags">
-                <span>Quick demo tags:</span>
-                <button class="tag-pill-btn" data-tag="#PORTAL-FIGMA-101">#PORTAL-FIGMA-101</button>
-                <button class="tag-pill-btn" data-tag="#WEBFLOW-LAB-44">#WEBFLOW-LAB-44</button>
-                <button class="tag-pill-btn" data-tag="#STUDY-ROOM-B">#STUDY-ROOM-B</button>
-              </div>
-            </div>
-
-            <div class="portal-divider-v"></div>
-
-            <div class="portal-access-col">
-              <h3>Share Current Workplace Link</h3>
-              <p>Invite fellow students to collaborate in your active learning portal:</p>
-              <div class="share-link-group">
-                <input type="text" class="share-link-field" id="currentShareLink" readonly
-                  value="https://blendify.edu/portal/join?tag=PORTAL-FIGMA-101" />
-                <button class="btn-secondary" id="btnCopyPortalLink">
-                  Copy Link
-                </button>
-              </div>
-              <span class="tag-info-note">Active Tag: <strong id="activeTagBadge">#PORTAL-FIGMA-101</strong> · Shareable
-                with unlimited classmates</span>
-            </div>
-          </div>
-
-          <!-- Joined Class Portals Column / Grid -->
-          <div class="joined-portals-section">
-            <div class="joined-portals-header-bar">
-              <div class="joined-portals-title-area">
-                <div class="joined-title-row">
-                  <h3 class="joined-section-title">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
-                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                    </svg>
-                    Joined Class Portals
-                  </h3>
-                  <span class="joined-count-badge" id="joinedPortalsCountBadge">4 Classrooms Enrolled</span>
-                </div>
-                <p class="joined-section-sub">
-                  Browse and access the different class portals you have joined in the website. Enter any classroom or copy its tag and invite links.
-                </p>
-              </div>
-
-              <div class="joined-portals-filter-area">
-                <div class="joined-search-box">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                  <input type="text" id="filterJoinedPortalsInput" placeholder="Filter joined portals by name or tag..." />
-                </div>
-              </div>
-            </div>
-
-            <!-- Column of Different Class Portals Joined in the Website -->
-            <div class="joined-portals-grid" id="joinedPortalsList">
-              <!-- Dynamically populated from state / localStorage -->
-            </div>
-          </div>
         </div>
       </section>
 
