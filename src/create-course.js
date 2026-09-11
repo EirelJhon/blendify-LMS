@@ -132,8 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   // ACTIVE PORTAL SYNCHRONIZATION
   // =========================================================================
-  const sidebarActivePortalTag = document.getElementById('sidebarActivePortalTag');
-  const sidebarActivePortalName = document.getElementById('sidebarActivePortalName');
   const headerPortalSelect = document.getElementById('headerPortalSelect');
   const currentUploadPortalName = document.getElementById('currentUploadPortalName');
   const currentQuizPortalName = document.getElementById('currentQuizPortalName');
@@ -145,9 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
     state.activePortal.cohort = cohort || 'COHORT-2026';
     state.activePortal.shareUrl = `https://blendify.edu/portal/join?tag=${tag.replace('#', '')}`;
 
-    // Update UI elements across all modules
-    if (sidebarActivePortalTag) sidebarActivePortalTag.textContent = tag;
-    if (sidebarActivePortalName) sidebarActivePortalName.textContent = state.activePortal.name;
     if (currentUploadPortalName) currentUploadPortalName.textContent = tag;
     if (currentQuizPortalName) currentQuizPortalName.textContent = tag;
     if (printPortalTag) printPortalTag.textContent = tag;
@@ -193,7 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSubmitCreatePortal = document.getElementById('btnSubmitCreatePortal');
   const portalsListGrid = document.getElementById('portalsListGrid');
   const portalsCount = document.getElementById('portalsCount');
-  const btnQuickCreatePortal = document.getElementById('btnQuickCreatePortal');
 
   function generateRandomTagCode() {
     const prefixes = ['FIGMA', 'UIUX', 'WEBFLOW', 'TOKENS', 'DEV', 'REACT', 'DESIGN'];
@@ -222,13 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
       newPortalCohortInput.value = newTag.replace('#PORTAL-', '');
     }
     showToast(`New portal tag generated: ${newTag}`);
-  });
-
-  // Quick button in header jumps to portal creation form
-  btnQuickCreatePortal?.addEventListener('click', () => {
-    switchView('workspaces');
-    newPortalTitleInput?.focus();
-    newPortalTitleInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
   // Copy portal link to clipboard helper
