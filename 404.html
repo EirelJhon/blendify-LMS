@@ -7,14 +7,26 @@
   <title>Blendify LMS | Redirecting</title>
   <script>
     (function () {
-      var path = window.location.pathname.toLowerCase();
-      if (path.includes('create-course') || path.includes('studio')) {
-        window.location.replace('./create-course.html');
-      } else if (path.includes('login')) {
-        window.location.replace('./login.html');
-      } else {
-        window.location.replace('./index.html');
+      var pathname = window.location.pathname;
+      var search = window.location.search || '';
+      var hash = window.location.hash || '';
+      var pathParts = pathname.split('/').filter(Boolean);
+
+      // Dynamically detect GitHub Pages repository subpath (e.g. username.github.io/repo-name/...)
+      var base = '/';
+      if (window.location.hostname.endsWith('github.io') && pathParts.length > 0) {
+        base = '/' + pathParts[0] + '/';
       }
+
+      var lower = pathname.toLowerCase();
+      var target = 'index.html';
+      if (lower.includes('create-course') || lower.includes('studio')) {
+        target = 'create-course.html';
+      } else if (lower.includes('login')) {
+        target = 'login.html';
+      }
+
+      window.location.replace(base + target + search + hash);
     })();
   </script>
 </head>

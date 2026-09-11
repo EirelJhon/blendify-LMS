@@ -1,0 +1,4 @@
+/login          /login.html         200
+/create-course  /create-course.html 200
+/studio         /create-course.html 200
+/*              /index.html         200
