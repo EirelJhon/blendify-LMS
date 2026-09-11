@@ -152,6 +152,20 @@ ul {
   opacity: 0.9;
 }
 
+.brand-logo-img {
+  height: 38px;
+  width: auto;
+  max-width: 48px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brand-logo:hover .brand-logo-img {
+  transform: scale(1.06);
+}
+
 .brand-symbol {
   width: 34px;
   height: 34px;
