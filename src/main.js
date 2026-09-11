@@ -526,7 +526,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalCloseSearchError = document.getElementById('modalCloseSearchError');
   const btnDismissSearchError = document.getElementById('btnDismissSearchError');
   const btnResetFromSearchError = document.getElementById('btnResetFromSearchError');
-  const searchErrorQueryText = document.getElementById('searchErrorQueryText');
 
   // Upload modal elements
   const uploadMaterialModal = document.getElementById('uploadMaterialModal');
@@ -788,10 +787,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   // SEARCH CONFIRMATION & ERROR POPUP SCREEN LOGIC
   // =========================================================================
-  function showSearchErrorModal(queryTerm) {
-    if (searchErrorQueryText) {
-      searchErrorQueryText.textContent = `"${queryTerm}"`;
-    }
+  function showSearchErrorModal() {
     searchErrorModal?.classList.add('open');
   }
 
@@ -905,18 +901,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === searchErrorModal) {
       closeSearchErrorModal();
     }
-  });
-
-  // Suggestion tags within error modal
-  searchErrorModal?.querySelectorAll('.search-quick-tag').forEach(tagBtn => {
-    tagBtn.addEventListener('click', () => {
-      const tag = tagBtn.dataset.tag || tagBtn.textContent.trim();
-      if (searchCommunityMaterialsInput) {
-        searchCommunityMaterialsInput.value = tag;
-      }
-      closeSearchErrorModal();
-      performCommunitySearch();
-    });
   });
 
   document.addEventListener('keydown', (e) => {
