@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btnHomeToPortals')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnOpenClassroomAction')?.addEventListener('click', () => switchView('workplaces'));
-  document.getElementById('btnSidebarSwitchPortal')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnBackToPortals')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnNewClassWorkspace')?.addEventListener('click', () => {
     switchView('workplaces');
@@ -932,7 +931,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // PILLAR 2: CLASSROOM WORKPLACES & JOINED CLASS PORTALS
   // =========================================================================
   const activeTagBadge = document.getElementById('activeTagBadge');
-  const sidebarActiveTag = document.getElementById('sidebarActiveTag');
   const currentShareLink = document.getElementById('currentShareLink');
   const portalTagInput = document.getElementById('portalTagInput');
   const btnJoinPortalByTag = document.getElementById('btnJoinPortalByTag');
@@ -1180,7 +1178,6 @@ document.addEventListener('DOMContentLoaded', () => {
             state.activeTag = '#PORTAL-NONE';
             state.activePortalName = 'No Active Classroom';
             if (activeTagBadge) activeTagBadge.textContent = state.activeTag;
-            if (sidebarActiveTag) sidebarActiveTag.textContent = state.activeTag;
           }
         }
         renderJoinedPortals(filterJoinedPortalsInput ? filterJoinedPortalsInput.value : '');
@@ -1240,7 +1237,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update UI elements
     if (activeTagBadge) activeTagBadge.textContent = formattedTag;
-    if (sidebarActiveTag) sidebarActiveTag.textContent = formattedTag;
     if (currentShareLink) {
       currentShareLink.value = `https://blendify.edu/portal/join?tag=${formattedTag.replace('#', '')}`;
     }
