@@ -493,6 +493,433 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
+  // COMMUNITY LEARNING MATERIALS (USER UPLOADS & SEARCH)
+  // =========================================================================
+  const searchCommunityMaterialsInput = document.getElementById('searchCommunityMaterialsInput');
+  const btnClearMaterialSearch = document.getElementById('btnClearMaterialSearch');
+  const materialsCategoryPills = document.getElementById('materialsCategoryPills');
+  const communityUploadsGrid = document.getElementById('communityUploadsGrid');
+  const searchResultsCounter = document.getElementById('searchResultsCounter');
+  const totalUploadsCount = document.getElementById('totalUploadsCount');
+  const emptyMaterialsState = document.getElementById('emptyMaterialsState');
+  const btnResetMaterialSearch = document.getElementById('btnResetMaterialSearch');
+
+  // Upload modal elements
+  const uploadMaterialModal = document.getElementById('uploadMaterialModal');
+  const btnOpenUploadModal = document.getElementById('btnOpenUploadModal');
+  const modalCloseUploadMaterial = document.getElementById('modalCloseUploadMaterial');
+  const btnCancelUploadMaterial = document.getElementById('btnCancelUploadMaterial');
+  const formUploadMaterial = document.getElementById('formUploadMaterial');
+  const uploadTitleInput = document.getElementById('uploadTitleInput');
+  const uploadCategorySelect = document.getElementById('uploadCategorySelect');
+  const uploadAuthorInput = document.getElementById('uploadAuthorInput');
+  const uploadDescInput = document.getElementById('uploadDescInput');
+  const materialFileInput = document.getElementById('materialFileInput');
+  const materialDropzone = document.getElementById('materialDropzone');
+  const dropzoneText = document.getElementById('dropzoneText');
+
+  let selectedUserFile = null;
+  let activeMaterialCategory = 'all';
+  let activeMaterialSearchQuery = '';
+
+  const DEFAULT_COMMUNITY_MATERIALS = [
+    {
+      id: 'comm-mat-1',
+      title: 'Figma Responsive Wireframe Starter Kit v2.4',
+      desc: 'Complete auto-layout wireframing component system, responsive 1440px/768px/375px frames, and 8pt spatial tokens.',
+      category: 'ui-ux',
+      categoryLabel: 'UI/UX & Figma',
+      ext: 'FIG',
+      size: '34.2 MB',
+      downloads: 1420,
+      author: 'Elena Rostova',
+      authorRole: 'UI Lead',
+      time: '2 days ago',
+      filename: 'Figma-Wireframe-Starter-v2.4.fig',
+      content: 'Figma Document Bundle: Blendify UI Wireframe Kit v2.4 with auto-layout constraints and tokens.'
+    },
+    {
+      id: 'comm-mat-2',
+      title: 'Webflow Fluid Breakpoints & CSS Flexbox Guide',
+      desc: 'Detailed conversion formulas translating strict desktop mockups into fluid CSS Grid and Webflow container rules.',
+      category: 'webflow',
+      categoryLabel: 'Webflow & CSS',
+      ext: 'PDF',
+      size: '4.8 MB',
+      downloads: 2890,
+      author: 'Kavita Patel',
+      authorRole: 'Frontend Systems',
+      time: '3 days ago',
+      filename: 'Webflow-Fluid-Breakpoints-Guide.pdf',
+      content: '%PDF-1.4\nBlendify Webflow Fluid Breakpoints and CSS flexbox formula reference sheet.'
+    },
+    {
+      id: 'comm-mat-3',
+      title: 'Design Token Architecture & Spacing Formulas',
+      desc: 'Formulas for rem spacing scales, modular typography clamping, and CSS variable architecture for teams.',
+      category: 'guides',
+      categoryLabel: 'Study Guides',
+      ext: 'PDF',
+      size: '1.2 MB',
+      downloads: 940,
+      author: 'Harsh Vardhan',
+      authorRole: 'Student Pro',
+      time: '5 days ago',
+      filename: 'Design-Token-Architecture-Notes.pdf',
+      content: '%PDF-1.4\nBlendify Design Token Architecture: Spacing tokens, color aliases, and rem clamp formulas.'
+    },
+    {
+      id: 'comm-mat-4',
+      title: 'Modern CSS Grid & Flexbox Quick Cheat Sheet',
+      desc: 'Visual reference sheet showing layout behavior for grid-template-areas, minmax(), justify-content, and align-items.',
+      category: 'cheatsheets',
+      categoryLabel: 'Cheat Sheets',
+      ext: 'PDF',
+      size: '850 KB',
+      downloads: 3150,
+      author: 'Alex Rivera',
+      authorRole: 'Design Mentor',
+      time: '1 week ago',
+      filename: 'CSS-Grid-Flexbox-Cheatsheet.pdf',
+      content: '%PDF-1.4\nBlendify CSS Grid and Flexbox Visual Cheatsheet with syntax examples.'
+    },
+    {
+      id: 'comm-mat-5',
+      title: 'Accessible Web Typography Scales & Rem Units',
+      desc: 'Pre-calculated fluid clamp() type scales, WCAG 2.1 AA contrast pairings, and responsive reading rhythm tokens.',
+      category: 'guides',
+      categoryLabel: 'Study Guides',
+      ext: 'ZIP',
+      size: '2.1 MB',
+      downloads: 810,
+      author: 'Marcus Chen',
+      authorRole: 'A11y Advocate',
+      time: '1 week ago',
+      filename: 'Accessible-Typography-Scales.zip',
+      content: 'Blendify Archive: Accessible typography scales, font pairings, and CSS clamp() calculation tables.'
+    },
+    {
+      id: 'comm-mat-6',
+      title: 'React Component State & Hook Patterns Pack',
+      desc: 'Clean reusable hooks for local storage sync, media queries, keyboard navigation, and debounced search filters.',
+      category: 'code',
+      categoryLabel: 'Code & Repos',
+      ext: 'CODE',
+      size: '3.5 MB',
+      downloads: 1220,
+      author: 'Kavita Patel',
+      authorRole: 'Frontend Systems',
+      time: '2 weeks ago',
+      filename: 'React-Custom-Hooks-Pack.zip',
+      content: 'Blendify Code Package: Production ready React hooks for state sync, search debouncing, and keyboard listeners.'
+    }
+  ];
+
+  function getStoredCommunityMaterials() {
+    try {
+      const stored = localStorage.getItem('blendify_community_materials');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {}
+    try {
+      localStorage.setItem('blendify_community_materials', JSON.stringify(DEFAULT_COMMUNITY_MATERIALS));
+    } catch (e) {}
+    return DEFAULT_COMMUNITY_MATERIALS;
+  }
+
+  function saveCommunityMaterials(list) {
+    try {
+      localStorage.setItem('blendify_community_materials', JSON.stringify(list));
+    } catch (e) {}
+  }
+
+  let communityMaterials = getStoredCommunityMaterials();
+
+  function renderCommunityMaterials(query = '', category = 'all') {
+    if (!communityUploadsGrid) return;
+
+    const q = query.trim().toLowerCase();
+    const filtered = communityMaterials.filter(mat => {
+      const matchCat = category === 'all' || mat.category === category;
+      const matchQuery = !q ||
+        mat.title.toLowerCase().includes(q) ||
+        mat.desc.toLowerCase().includes(q) ||
+        mat.author.toLowerCase().includes(q) ||
+        mat.categoryLabel.toLowerCase().includes(q) ||
+        mat.ext.toLowerCase().includes(q);
+      return matchCat && matchQuery;
+    });
+
+    if (totalUploadsCount) {
+      totalUploadsCount.textContent = communityMaterials.length;
+    }
+
+    if (searchResultsCounter) {
+      if (q || category !== 'all') {
+        searchResultsCounter.textContent = `${filtered.length} Material${filtered.length === 1 ? '' : 's'} Found`;
+      } else {
+        searchResultsCounter.textContent = `${communityMaterials.length} Materials Available`;
+      }
+    }
+
+    if (emptyMaterialsState) {
+      emptyMaterialsState.style.display = filtered.length === 0 ? 'flex' : 'none';
+    }
+
+    communityUploadsGrid.innerHTML = filtered.map(mat => {
+      const extClass = mat.ext.toLowerCase().replace('.', '');
+      const initial = mat.author ? mat.author.charAt(0).toUpperCase() : 'U';
+
+      return `
+        <div class="community-upload-card" data-id="${mat.id}">
+          <div class="upload-card-top">
+            <span class="file-ext-badge ${extClass}">.${mat.ext}</span>
+            <div class="card-downloads-count">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>${(mat.downloads || 0).toLocaleString()} downloads</span>
+            </div>
+          </div>
+
+          <div class="upload-card-content">
+            <h4 class="upload-card-title">${mat.title}</h4>
+            <p class="upload-card-desc">${mat.desc}</p>
+          </div>
+
+          <div class="upload-card-author-row">
+            <div class="author-mini-avatar">${initial}</div>
+            <div class="author-meta-info">
+              <span class="author-name-text">${mat.author}</span>
+              <span class="author-sub-text">${mat.authorRole || 'Community Contributor'} · ${mat.time || 'Recently'}</span>
+            </div>
+          </div>
+
+          <div class="upload-card-actions-bar">
+            <span class="card-file-size">${mat.size || '1.5 MB'}</span>
+            <button type="button" class="btn-card-download" data-action="download-community-file" data-id="${mat.id}">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Download</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function downloadCommunityMaterial(mat) {
+    showToast(`Downloading "${mat.title}" (${mat.size})...`);
+    try {
+      const mimeTypes = {
+        pdf: 'application/pdf',
+        fig: 'application/octet-stream',
+        zip: 'application/zip',
+        css: 'text/css',
+        js: 'text/javascript'
+      };
+      const ext = mat.ext.toLowerCase().replace('.', '');
+      const mime = mimeTypes[ext] || 'application/octet-stream';
+      const content = mat.content || `${mat.title}\nUploaded by: ${mat.author}\nCategory: ${mat.categoryLabel || mat.category}\n\nBlendify Educational Community Material\nDescription: ${mat.desc}`;
+      const filename = mat.filename || `${mat.title.replace(/[^a-zA-Z0-9-_]/g, '_')}.${ext}`;
+
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 800);
+
+      mat.downloads = (mat.downloads || 0) + 1;
+      saveCommunityMaterials(communityMaterials);
+      renderCommunityMaterials(activeMaterialSearchQuery, activeMaterialCategory);
+      showToast(`Saved "${filename}" directly to your computer!`);
+    } catch (e) {
+      console.error('Community download error:', e);
+    }
+  }
+
+  // Handle download click in grid
+  communityUploadsGrid?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="download-community-file"]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const mat = communityMaterials.find(m => m.id === id);
+    if (mat) {
+      downloadCommunityMaterial(mat);
+    }
+  });
+
+  // Search input events
+  searchCommunityMaterialsInput?.addEventListener('input', (e) => {
+    activeMaterialSearchQuery = e.target.value;
+    if (btnClearMaterialSearch) {
+      btnClearMaterialSearch.style.display = activeMaterialSearchQuery ? 'flex' : 'none';
+    }
+    renderCommunityMaterials(activeMaterialSearchQuery, activeMaterialCategory);
+  });
+
+  btnClearMaterialSearch?.addEventListener('click', () => {
+    if (searchCommunityMaterialsInput) searchCommunityMaterialsInput.value = '';
+    activeMaterialSearchQuery = '';
+    btnClearMaterialSearch.style.display = 'none';
+    renderCommunityMaterials('', activeMaterialCategory);
+    searchCommunityMaterialsInput?.focus();
+  });
+
+  btnResetMaterialSearch?.addEventListener('click', () => {
+    if (searchCommunityMaterialsInput) searchCommunityMaterialsInput.value = '';
+    activeMaterialSearchQuery = '';
+    if (btnClearMaterialSearch) btnClearMaterialSearch.style.display = 'none';
+    activeMaterialCategory = 'all';
+    materialsCategoryPills?.querySelectorAll('.cat-pill').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.category === 'all');
+    });
+    renderCommunityMaterials('', 'all');
+  });
+
+  // Category filter pills
+  materialsCategoryPills?.addEventListener('click', (e) => {
+    const pill = e.target.closest('.cat-pill');
+    if (!pill) return;
+    materialsCategoryPills.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeMaterialCategory = pill.dataset.category || 'all';
+    renderCommunityMaterials(activeMaterialSearchQuery, activeMaterialCategory);
+  });
+
+  // Modal: Upload Learning Material
+  btnOpenUploadModal?.addEventListener('click', () => {
+    uploadMaterialModal?.classList.add('open');
+    uploadTitleInput?.focus();
+  });
+
+  function closeUploadModal() {
+    uploadMaterialModal?.classList.remove('open');
+    if (formUploadMaterial) formUploadMaterial.reset();
+    selectedUserFile = null;
+    if (dropzoneText) {
+      dropzoneText.innerHTML = 'Drag &amp; drop file here, or <span class="dropzone-browse">browse computer</span>';
+    }
+  }
+
+  modalCloseUploadMaterial?.addEventListener('click', closeUploadModal);
+  btnCancelUploadMaterial?.addEventListener('click', closeUploadModal);
+
+  // File Dropzone handling
+  materialFileInput?.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) {
+      selectedUserFile = e.target.files[0];
+      if (dropzoneText) {
+        dropzoneText.innerHTML = `Attached: <strong>${selectedUserFile.name}</strong> (${(selectedUserFile.size / (1024 * 1024)).toFixed(1)} MB)`;
+      }
+      if (uploadTitleInput && !uploadTitleInput.value) {
+        uploadTitleInput.value = selectedUserFile.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      }
+    }
+  });
+
+  materialDropzone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    materialDropzone.classList.add('dragover');
+  });
+
+  materialDropzone?.addEventListener('dragleave', () => {
+    materialDropzone.classList.remove('dragover');
+  });
+
+  materialDropzone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    materialDropzone.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      selectedUserFile = e.dataTransfer.files[0];
+      if (dropzoneText) {
+        dropzoneText.innerHTML = `Attached: <strong>${selectedUserFile.name}</strong> (${(selectedUserFile.size / (1024 * 1024)).toFixed(1)} MB)`;
+      }
+      if (uploadTitleInput && !uploadTitleInput.value) {
+        uploadTitleInput.value = selectedUserFile.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      }
+    }
+  });
+
+  // Form submit: Publish Material
+  formUploadMaterial?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = uploadTitleInput?.value.trim();
+    if (!title) {
+      showToast('Please enter a Material Title.');
+      uploadTitleInput?.focus();
+      return;
+    }
+
+    const category = uploadCategorySelect?.value || 'ui-ux';
+    const author = uploadAuthorInput?.value.trim() || 'Harsh Vardhan';
+    const desc = uploadDescInput?.value.trim() || 'Helpful community study notes and learning guide uploaded by student.';
+    
+    let ext = 'PDF';
+    let size = '2.4 MB';
+    let filename = `${title.replace(/[^a-zA-Z0-9-_]/g, '_')}.pdf`;
+    let content = `Blendify Community Upload: ${title}\nAuthor: ${author}\nCategory: ${category}\n\n${desc}`;
+
+    if (selectedUserFile) {
+      const parts = selectedUserFile.name.split('.');
+      if (parts.length > 1) {
+        ext = parts.pop().toUpperCase();
+      }
+      size = `${(selectedUserFile.size / (1024 * 1024)).toFixed(1)} MB`;
+      filename = selectedUserFile.name;
+    } else {
+      if (category === 'ui-ux') ext = 'FIG';
+      else if (category === 'code') ext = 'ZIP';
+      else if (category === 'webflow') ext = 'PDF';
+    }
+
+    const categoryLabels = {
+      'ui-ux': 'UI/UX & Figma',
+      'webflow': 'Webflow & CSS',
+      'guides': 'Study Guides',
+      'cheatsheets': 'Cheat Sheets',
+      'code': 'Code & Repos'
+    };
+
+    const newMaterial = {
+      id: `user-mat-${Date.now()}`,
+      title,
+      desc,
+      category,
+      categoryLabel: categoryLabels[category] || 'Community Resource',
+      ext,
+      size,
+      downloads: 1,
+      author,
+      authorRole: 'Community Contributor',
+      time: 'Just now',
+      filename,
+      content
+    };
+
+    communityMaterials.unshift(newMaterial);
+    saveCommunityMaterials(communityMaterials);
+    renderCommunityMaterials(activeMaterialSearchQuery, activeMaterialCategory);
+    closeUploadModal();
+    showToast(`Published "${title}" to Community Learning Materials!`);
+  });
+
+  // Initial render of community materials
+  renderCommunityMaterials();
+
+  // =========================================================================
   // PILLAR 2: CLASSROOM WORKPLACES & JOINED CLASS PORTALS
   // =========================================================================
   const activeTagBadge = document.getElementById('activeTagBadge');

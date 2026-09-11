@@ -38,19 +38,17 @@
       <nav class="sidebar-nav">
         <div class="nav-section-title">LEARNER PORTAL</div>
         <ul class="nav-list">
-          <!-- 1. Classroom Workplaces (Tags & Links) -->
+          <!-- 1. Home & Classroom Workplaces -->
           <li class="nav-item">
             <button class="nav-link active" data-view="workplaces" id="nav-workplaces">
               <span class="nav-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
               </span>
-              <span class="nav-label">Classroom Portals</span>
+              <span class="nav-label">Home &amp; Portals</span>
             </button>
           </li>
 
@@ -163,29 +161,103 @@
       </header>
 
       <!-- ===================================================================
-           VIEW 1: CLASSROOM WORKPLACES (TAGS & SHAREABLE LINKS) - PRIMARY
+           VIEW 1: HOME, WEBSITE INTRODUCTION, COMMUNITY MATERIALS & PORTALS
            =================================================================== -->
       <main class="page-content" id="viewWorkplaces">
-        <!-- CLASSROOM WORKPLACES HERO BANNER (TRANSFERRED FROM LEARNING MATERIALS) -->
-        <section class="hero-banner" id="portalHeroBanner">
-          <div class="hero-container">
-            <div class="hero-top-meta">
-              <span class="instructor-credit" id="portalInstructorCredit">
-                Vativa Hub · UI/UX Design
-              </span>
+        <!-- HOME PAGE WEBSITE INTRODUCTION & COMMUNITY SEARCH BANNER -->
+        <section class="home-hero-banner" id="homeHeroBanner">
+          <div class="home-hero-container">
+            <div class="home-intro-top-meta">
+              <div class="home-intro-badge">
+                <span class="pulse-gold-dot"></span>
+                <span>WELCOME TO BLENDIFY LMS</span>
+              </div>
+              <div class="active-portal-pill-indicator" id="activePortalIndicator">
+                <span class="pulse-dot"></span>
+                <span class="portal-indicator-text">Active Portal: <strong id="portalHeroTag">#PORTAL-FIGMA-101</strong> · <span id="portalHeroTitle">UI/UX Cohort 4</span></span>
+              </div>
             </div>
 
-            <h1 class="course-main-title" id="portalHeroTitle">
-              UI/UX Cohort 4 — Webflow Breakpoints Lab
+            <h1 class="home-hero-title">
+              Empowering Education Through Shared Materials &amp; Collaborative Workplaces
             </h1>
 
-            <p class="hero-intro-description" id="portalHeroDesc">
-              Active Portal: <strong id="portalHeroTag">#PORTAL-FIGMA-101</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.
+            <p class="home-hero-desc">
+              Blendify is an open learning platform connecting students and mentors. Explore hands-on curriculum modules, search and download educational materials uploaded by community users, and collaborate in live classroom portals using simple tags.
             </p>
+
+            <!-- LIVE SEARCH BAR FOR USER-UPLOADED LEARNING MATERIALS -->
+            <div class="materials-search-box-wrap">
+              <div class="materials-search-bar">
+                <div class="search-input-inner">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="searchCommunityMaterialsInput" placeholder="Search learning materials from user uploads (e.g. Figma wireframes, CSS cheat sheets, study notes)..." autocomplete="off" />
+                  <button type="button" class="btn-clear-search" id="btnClearMaterialSearch" title="Clear search" style="display:none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+                <button type="button" class="btn-primary btn-upload-hero-action" id="btnOpenUploadModal">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span>Upload Material</span>
+                </button>
+              </div>
+
+              <!-- Quick category filter chips -->
+              <div class="materials-category-pills" id="materialsCategoryPills">
+                <button type="button" class="cat-pill active" data-category="all">All Uploads (<span id="totalUploadsCount">6</span>)</button>
+                <button type="button" class="cat-pill" data-category="ui-ux">UI/UX &amp; Figma</button>
+                <button type="button" class="cat-pill" data-category="webflow">Webflow &amp; CSS</button>
+                <button type="button" class="cat-pill" data-category="guides">Study Guides</button>
+                <button type="button" class="cat-pill" data-category="cheatsheets">Cheat Sheets</button>
+                <button type="button" class="cat-pill" data-category="code">Code &amp; Repos</button>
+              </div>
+            </div>
           </div>
         </section>
 
         <div class="workplaces-container">
+          <!-- SECTION 1: USER-UPLOADED LEARNING MATERIALS DISCOVERY -->
+          <section class="user-materials-section" id="userMaterialsSection">
+            <div class="user-materials-header">
+              <div class="section-title-wrap">
+                <div class="section-badge-row">
+                  <span class="section-kicker">COMMUNITY REPOSITORY</span>
+                  <span class="materials-counter-badge" id="searchResultsCounter">6 Materials Available</span>
+                </div>
+                <h3 class="user-materials-heading">
+                  Learning Materials from User Uploads
+                </h3>
+                <p class="user-materials-sub">
+                  Free educational guides, templates, and project resources uploaded and maintained by learners and instructors.
+                </p>
+              </div>
+            </div>
+
+            <!-- Grid of User-Uploaded Learning Materials -->
+            <div class="community-uploads-grid" id="communityUploadsGrid">
+              <!-- Dynamically populated from state / localStorage -->
+            </div>
+
+            <!-- Empty Search State -->
+            <div class="empty-materials-state" id="emptyMaterialsState" style="display: none;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <h4>No learning materials found</h4>
+              <p>No community uploads matched your search query. Try other keywords or reset the filter.</p>
+              <button type="button" class="btn-secondary-sm" id="btnResetMaterialSearch">Show All Uploads</button>
+            </div>
+          </section>
+
+          <!-- SECTION 2: CLASSROOM ACCESS & PORTALS -->
           <!-- Tag Join & Share Box -->
           <div class="portal-access-card">
             <div class="portal-access-col">
@@ -896,6 +968,84 @@
         <button class="btn-secondary" id="btnCancelCreatePortal">Cancel</button>
         <button class="btn-primary" id="btnConfirmCreatePortal">Create &amp; Enter Workplace</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: UPLOAD NEW LEARNING MATERIAL TO COMMUNITY -->
+  <div class="modal-overlay" id="uploadMaterialModal">
+    <div class="modal-box upload-modal-box">
+      <div class="modal-header-row">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Upload Learning Material</h3>
+            <p class="modal-sub">Share educational guides, templates, or notes with other students and teachers.</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" id="modalCloseUploadMaterial">&times;</button>
+      </div>
+
+      <form id="formUploadMaterial" class="upload-modal-form" onsubmit="event.preventDefault();">
+        <div class="form-field-group">
+          <label for="uploadTitleInput" class="form-label">Material Title <span class="required-star">*</span></label>
+          <input type="text" id="uploadTitleInput" class="form-text-input" placeholder="e.g. Master CSS Flexbox &amp; Grid Cheatsheet v3" required />
+        </div>
+
+        <div class="form-row-cols">
+          <div class="form-field-group">
+            <label for="uploadCategorySelect" class="form-label">Category</label>
+            <select id="uploadCategorySelect" class="form-select-input">
+              <option value="ui-ux">UI/UX &amp; Figma</option>
+              <option value="webflow">Webflow &amp; CSS</option>
+              <option value="guides">Study Guides</option>
+              <option value="cheatsheets">Cheat Sheets</option>
+              <option value="code">Code &amp; Repos</option>
+            </select>
+          </div>
+          <div class="form-field-group">
+            <label for="uploadAuthorInput" class="form-label">Your Name / Author</label>
+            <input type="text" id="uploadAuthorInput" class="form-text-input" value="Harsh Vardhan" placeholder="Author name" />
+          </div>
+        </div>
+
+        <div class="form-field-group">
+          <label for="uploadDescInput" class="form-label">Description</label>
+          <textarea id="uploadDescInput" class="form-textarea-input" rows="2" placeholder="Briefly explain what students can learn or build from this material..."></textarea>
+        </div>
+
+        <!-- File attachment dropzone -->
+        <div class="form-field-group">
+          <label class="form-label">Attach File (.pdf, .fig, .zip, .css, .js)</label>
+          <div class="material-dropzone" id="materialDropzone">
+            <input type="file" id="materialFileInput" class="hidden-file-input" accept=".pdf,.fig,.zip,.css,.js,.html,.png,.jpg" />
+            <div class="dropzone-inner" id="dropzoneContent">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <p class="dropzone-text" id="dropzoneText">Drag &amp; drop file here, or <span class="dropzone-browse">browse computer</span></p>
+              <span class="dropzone-hint">Supports PDF, FIG, ZIP, CSS, JS up to 50MB</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" class="btn-secondary" id="btnCancelUploadMaterial">Cancel</button>
+          <button type="submit" class="btn-primary" id="btnSubmitUploadMaterial">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Publish to Community</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
