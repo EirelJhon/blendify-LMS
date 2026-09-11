@@ -114,67 +114,71 @@
 
     <!-- MAIN APP WRAPPER -->
     <div class="main-wrapper">
-      <!-- TOP BAR -->
-      <header class="top-header" id="topHeader">
-        <div class="header-left">
-          <button class="mobile-toggle" id="sidebarToggle" aria-label="Toggle navigation menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
+      <!-- INTEGRATED TOP SWITCH ACCOUNT & MOBILE ACTIONS (NO SEPARATE HEADER BAR) -->
+      <div class="top-integrated-actions" id="topNavActions">
+        <button class="mobile-toggle" id="sidebarToggle" aria-label="Toggle navigation menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- User Profile & Switch Account Button -->
+        <div class="user-profile-wrapper">
+          <button class="user-profile-btn" id="userProfileBtn" aria-label="Switch account and profile menu">
+            <div class="user-avatar-wrap">
+              <div class="user-avatar">
+                <span>H</span>
+              </div>
+            </div>
+            <span class="user-name">Harsh</span>
+            <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
-        </div>
-
-        <div class="header-right">
-          <!-- User Profile -->
-          <div class="user-profile-wrapper">
-            <button class="user-profile-btn" id="userProfileBtn">
-              <div class="user-avatar-wrap">
-                <div class="user-avatar">
-                  <span>H</span>
-                </div>
-              </div>
-              <span class="user-name">Harsh</span>
-              <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
-            <div class="dropdown-panel user-panel" id="userPanel">
-              <div class="user-panel-info">
-                <div class="user-panel-name">Harsh Vardhan</div>
-                <div class="user-panel-role">Student · Blendify Pro</div>
-              </div>
-              <hr class="panel-divider" />
-              <button class="panel-item" id="btnOpenAIFromProfile">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path
-                    d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
-                  </path>
-                </svg>
-                My AI Tutor History
-              </button>
-              <button class="panel-item" id="btnViewMyPortals">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                </svg>
-                Joined Workplaces
-              </button>
-              <button class="panel-item text-danger" id="btnSignOutAccount" style="color: #EF4444;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Sign Out of Google
-              </button>
+          <div class="dropdown-panel user-panel" id="userPanel">
+            <div class="user-panel-info">
+              <div class="user-panel-name">Harsh Vardhan</div>
+              <div class="user-panel-role">Student · Blendify Pro</div>
             </div>
+            <hr class="panel-divider" />
+            <button class="panel-item" id="btnOpenAIFromProfile">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
+                </path>
+              </svg>
+              My AI Tutor History
+            </button>
+            <button class="panel-item" id="btnViewMyPortals">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+              </svg>
+              Joined Workplaces
+            </button>
+            <button class="panel-item" id="btnSwitchAccountDropdown">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
+              Switch Account
+            </button>
+            <button class="panel-item text-danger" id="btnSignOutAccount" style="color: #EF4444;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Sign Out of Google
+            </button>
           </div>
         </div>
-      </header>
+      </div>
 
       <!-- ===================================================================
            VIEW 1: HOME PAGE (INTRODUCTION & USER MATERIALS REPOSITORY)

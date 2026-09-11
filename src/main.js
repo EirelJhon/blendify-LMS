@@ -74,6 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     state.activeView = viewName;
+    const topNavActions = document.getElementById('topNavActions');
+    const isDarkHero = viewName === 'home' || viewName === 'workplaces';
+    topNavActions?.classList.toggle('light-nav-theme', !isDarkHero);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('sidebar')?.classList.remove('open');
   }
@@ -1568,11 +1572,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch (e) {}
 
-  document.getElementById('btnSignOutAccount')?.addEventListener('click', () => {
+  function handleSignOutOrSwitch() {
     localStorage.removeItem('blendify_auth_user');
     localStorage.removeItem('blendify_role');
     window.location.href = 'login.html';
-  });
+  }
+
+  document.getElementById('btnSignOutAccount')?.addEventListener('click', handleSignOutOrSwitch);
+  document.getElementById('btnSwitchAccountDropdown')?.addEventListener('click', handleSignOutOrSwitch);
 
   // Mobile sidebar toggle
   const sidebar = document.getElementById('sidebar');
