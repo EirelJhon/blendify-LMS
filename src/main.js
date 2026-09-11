@@ -111,14 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
       input.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   });
-  document.getElementById('btnViewMyPortals')?.addEventListener('click', () => {
-    switchView('workplaces');
-    document.getElementById('userPanel')?.classList.remove('show');
-  });
-  document.getElementById('btnOpenAIFromProfile')?.addEventListener('click', () => {
-    switchView('ai-agent');
-    document.getElementById('userPanel')?.classList.remove('show');
-  });
+
 
   // =========================================================================
   // PILLAR 1: LEARNING MATERIALS INTERACTIONS
