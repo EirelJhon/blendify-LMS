@@ -2517,28 +2517,6 @@ ul {
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(197, 154, 83, 0); }
 }
 
-.active-portal-pill-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  color: #D1D5DB;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.active-portal-pill-indicator:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(197, 154, 83, 0.45);
-  color: #FFFFFF;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
 
 .home-hero-title {
   font-size: 2.25rem;

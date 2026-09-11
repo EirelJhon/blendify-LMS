@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     switchView('home');
   });
 
-  document.getElementById('activePortalIndicator')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnHomeToPortals')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnOpenClassroomAction')?.addEventListener('click', () => switchView('workplaces'));
   document.getElementById('btnSidebarSwitchPortal')?.addEventListener('click', () => switchView('workplaces'));
@@ -1247,13 +1246,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const portalHeroTag = document.getElementById('portalHeroTag');
     const portalHeroDesc = document.getElementById('portalHeroDesc');
     const portalInstructorCredit = document.getElementById('portalInstructorCredit');
-    const homeActiveTag = document.getElementById('homeActiveTag');
-    const homeActiveTitle = document.getElementById('homeActiveTitle');
 
     if (portalHeroTitle) portalHeroTitle.textContent = existing.name;
     if (portalHeroTag) portalHeroTag.textContent = existing.tag;
-    if (homeActiveTag) homeActiveTag.textContent = existing.tag;
-    if (homeActiveTitle) homeActiveTitle.textContent = existing.name;
     if (portalHeroDesc) {
       portalHeroDesc.innerHTML = `Active Portal: <strong>${existing.tag}</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.`;
     }
