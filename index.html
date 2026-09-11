@@ -601,136 +601,40 @@
 
           <!-- RIGHT COLUMN: RECENTLY VISITED MATERIALS & NEW CLASS WORKSPACE -->
           <aside class="sidebar-column" id="sidebarRightColumn">
-            <!-- SECTION 1: TOP CORNER - RECENTLY VISITED MATERIALS OF FILES -->
-            <div class="sidebar-widget-card recent-materials-card" id="recentMaterialsCard">
+            <!-- SECTION 1: TOP CORNER - FILE DOWNLOADS (SAVED TO COMPUTER) -->
+            <div class="sidebar-widget-card download-materials-card" id="downloadMaterialsCard">
               <div class="widget-header">
                 <div class="widget-title-wrap">
-                  <div class="widget-icon recent-clock-icon">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  <div class="widget-icon download-widget-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                       stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 16 14"></polyline>
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                   </div>
                   <div>
-                    <h3 class="widget-heading">Recently Visited</h3>
-                    <span class="widget-sub">Materials &amp; Study Files</span>
+                    <h3 class="widget-heading">File Downloads</h3>
+                    <span class="widget-sub">Save to your computer</span>
                   </div>
                 </div>
-                <span class="badge-count" id="recentCountBadge">4 Files</span>
+                <span class="badge-count download-status-badge" id="downloadCountBadge">4 Files</span>
               </div>
 
-              <!-- List of recently visited materials & files -->
-              <div class="recent-materials-list" id="recentMaterialsList">
-                <!-- Item 1: Guide PDF -->
-                <button class="recent-file-item" data-action="open-guide" data-file="Module 2 Interactive Guide"
-                  data-tab="materials-curriculum" data-target="syllabusAccordion" title="Open Module 2 Guide">
-                  <div class="file-icon-box file-pdf">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                      <line x1="16" y1="17" x2="8" y2="17"></line>
-                    </svg>
-                  </div>
-                  <div class="file-info">
-                    <span class="file-name">Fluid Breakpoints &amp; Grid Guide</span>
-                    <div class="file-meta">
-                      <span class="file-type-pill pill-pdf">PDF</span>
-                      <span class="file-dot">•</span>
-                      <span class="file-time">12 mins ago</span>
-                    </div>
-                  </div>
-                  <div class="file-action-arrow">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2.5">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </div>
-                </button>
-
-                <!-- Item 2: Figma Asset -->
-                <button class="recent-file-item" data-action="download-figma" data-file="Responsive Starter Pack (.fig)"
-                  data-tab="materials-downloads" title="Download Figma Assets">
-                  <div class="file-icon-box file-figma">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M12 2a4 4 0 0 0-4 4v4h4a4 4 0 0 0 0-8z"></path>
-                      <path d="M12 10H8a4 4 0 0 0 0 8h4v-8z"></path>
-                      <path d="M12 10h4a4 4 0 0 0 0-8h-4v8z"></path>
-                      <path d="M12 18H8a4 4 0 0 0 4 4 4 4 0 0 0 4-4v-4h-4v4z"></path>
-                    </svg>
-                  </div>
-                  <div class="file-info">
-                    <span class="file-name">Responsive Design Starter Pack</span>
-                    <div class="file-meta">
-                      <span class="file-type-pill pill-figma">.FIG</span>
-                      <span class="file-dot">•</span>
-                      <span class="file-time">34.2 MB · 1 hr ago</span>
-                    </div>
-                  </div>
-                  <div class="file-action-arrow">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2.5">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </div>
-                </button>
-
-                <!-- Item 3: Webflow CSS Tokens -->
-                <button class="recent-file-item" data-action="inspect-tokens" data-file="Webflow CSS Tokens"
-                  data-tab="materials-downloads" title="Inspect Webflow Tokens">
-                  <div class="file-icon-box file-code">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="16 18 22 12 16 6"></polyline>
-                      <polyline points="8 6 2 12 8 18"></polyline>
-                    </svg>
-                  </div>
-                  <div class="file-info">
-                    <span class="file-name">Fluid Breakpoints Stylesheet</span>
-                    <div class="file-meta">
-                      <span class="file-type-pill pill-code">.CSS</span>
-                      <span class="file-dot">•</span>
-                      <span class="file-time">3 hrs ago</span>
-                    </div>
-                  </div>
-                  <div class="file-action-arrow">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2.5">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </div>
-                </button>
-
-                <!-- Item 4: Study Notes -->
-                <button class="recent-file-item" data-action="open-notes" data-file="Module 1 Notes"
-                  data-tab="materials-study-guide" title="View Study Notes">
-                  <div class="file-icon-box file-notes">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                    </svg>
-                  </div>
-                  <div class="file-info">
-                    <span class="file-name">Visual Hierarchy &amp; Scales</span>
-                    <div class="file-meta">
-                      <span class="file-type-pill pill-notes">NOTES</span>
-                      <span class="file-dot">•</span>
-                      <span class="file-time">Yesterday</span>
-                    </div>
-                  </div>
-                  <div class="file-action-arrow">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2.5">
-                      <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                  </div>
-                </button>
+              <!-- List of downloadable files with live download progress -->
+              <div class="download-files-list" id="downloadFilesList">
+                <!-- Dynamically rendered and interactive from state -->
               </div>
 
-              <div class="recent-card-footer">
-                <button class="btn-ghost-xs" id="btnBrowseAllFiles">
-                  <span>Browse All 20 Curriculum Files</span>
+              <div class="download-card-footer">
+                <button type="button" class="btn-download-all-files" id="btnDownloadAllFiles">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Download All 4 Files to Computer</span>
                 </button>
               </div>
             </div>

@@ -204,64 +204,250 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
-  // RECENTLY VISITED MATERIALS & FILES HANDLERS
+  // FILE DOWNLOADS SECTION (LIVE DOWNLOADING TO COMPUTER)
   // =========================================================================
-  const recentItems = document.querySelectorAll('.recent-file-item');
-  recentItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const fileName = item.dataset.file || 'Educational Resource';
-      const action = item.dataset.action;
-      const targetTab = item.dataset.tab;
-      const targetElementId = item.dataset.target;
+  const downloadFilesList = document.getElementById('downloadFilesList');
+  const downloadCountBadge = document.getElementById('downloadCountBadge');
+  const btnDownloadAllFiles = document.getElementById('btnDownloadAllFiles');
 
-      // Switch to relevant tab if specified
-      if (targetTab) {
-        const tabBtn = document.querySelector(`#viewMaterials .tab-btn[data-tab="${targetTab}"]`);
-        if (tabBtn) tabBtn.click();
+  const DOWNLOADABLE_FILES = [
+    {
+      id: 'file-guide-pdf',
+      name: 'Fluid Breakpoints & Grid Guide',
+      ext: 'PDF',
+      pillClass: 'pill-pdf',
+      iconClass: 'file-pdf',
+      size: '4.8 MB',
+      speed: '2.8 MB/s',
+      status: 'ready', // 'ready', 'downloading', 'completed'
+      progress: 0,
+      filename: 'Blendify-Fluid-Breakpoints-Guide.pdf',
+      mime: 'application/pdf',
+      iconSvg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`,
+      content: '%PDF-1.4\n1 0 obj\n<< /Title (Blendify LMS: Fluid Breakpoints & Layout Constraints Guide) /Author (Blendify Academy) >>\nendobj\nBlendify Educational Curriculum: Fluid Breakpoints, Responsive Design Hierarchy, CSS Locks, and Constraint Solving Guide.'
+    },
+    {
+      id: 'file-starter-fig',
+      name: 'Responsive Design Starter Pack',
+      ext: '.FIG',
+      pillClass: 'pill-figma',
+      iconClass: 'file-figma',
+      size: '34.2 MB',
+      speed: '4.5 MB/s',
+      status: 'ready',
+      progress: 0,
+      filename: 'Blendify-Responsive-Design-Starter-Pack.fig',
+      mime: 'application/octet-stream',
+      iconSvg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 2a4 4 0 0 0-4 4v4h4a4 4 0 0 0 0-8z"></path><path d="M12 10H8a4 4 0 0 0 0 8h4v-8z"></path><path d="M12 10h4a4 4 0 0 0 0-8h-4v8z"></path><path d="M12 18H8a4 4 0 0 0 4 4 4 4 0 0 0 4-4v-4h-4v4z"></path></svg>`,
+      content: 'Figma-Document-Bundle: Blendify Responsive UI Components, 1440px Desktop, 768px Tablet, 390px Mobile auto-layout frames and spatial rem design tokens.'
+    },
+    {
+      id: 'file-stylesheet-css',
+      name: 'Fluid Breakpoints Stylesheet',
+      ext: '.CSS',
+      pillClass: 'pill-code',
+      iconClass: 'file-code',
+      size: '184 KB',
+      speed: '1.4 MB/s',
+      status: 'ready',
+      progress: 0,
+      filename: 'fluid-breakpoints.css',
+      mime: 'text/css',
+      iconSvg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+      content: `/* ==========================================================================\n   BLENDIFY LMS: Fluid Breakpoints & CSS Architecture Tokens\n   ========================================================================== */\n:root {\n  --bp-mobile: 390px;\n  --bp-tablet: 768px;\n  --bp-desktop: 1440px;\n  --fluid-font-hero: clamp(2rem, 5vw + 1rem, 3.5rem);\n  --fluid-font-body: clamp(0.95rem, 1.2vw + 0.5rem, 1.15rem);\n  --container-max: 1280px;\n}\n\n@media (min-width: 768px) {\n  .grid-responsive {\n    display: grid;\n    grid-template-columns: repeat(2, 1fr);\n    gap: 24px;\n  }\n}\n\n@media (min-width: 1440px) {\n  .grid-responsive {\n    grid-template-columns: repeat(3, 1fr);\n    gap: 32px;\n  }\n}\n`
+    },
+    {
+      id: 'file-hierarchy-notes',
+      name: 'Visual Hierarchy & Scales',
+      ext: 'NOTES',
+      pillClass: 'pill-notes',
+      iconClass: 'file-notes',
+      size: '1.2 MB',
+      speed: '2.1 MB/s',
+      status: 'ready',
+      progress: 0,
+      filename: 'Visual-Hierarchy-and-Scales-Guide.txt',
+      mime: 'text/plain',
+      iconSvg: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
+      content: `BLENDIFY EDUCATIONAL LMS: VISUAL HIERARCHY & SCALES STUDY NOTES\n\n1. Type Scales (Major Third - 1.250):\n   - Display: 48px\n   - H1: 38px\n   - H2: 30px\n   - H3: 24px\n   - Body: 16px\n   - Small: 13px\n\n2. Spatial 8-point Rhythm:\n   - 4px, 8px, 16px, 24px, 32px, 48px, 64px.\n\n3. Contrast Requirements:\n   - Body Text: 4.5:1 WCAG AA minimum\n   - Large Display: 3:1 WCAG AA minimum\n`
+    }
+  ];
+
+  // Render downloading files list
+  function renderDownloadFiles() {
+    if (!downloadFilesList) return;
+
+    const completedCount = DOWNLOADABLE_FILES.filter(f => f.status === 'completed').length;
+    if (downloadCountBadge) {
+      downloadCountBadge.textContent = completedCount > 0 ? `${completedCount}/4 Saved` : '4 Files';
+    }
+
+    downloadFilesList.innerHTML = DOWNLOADABLE_FILES.map(file => {
+      const isDownloading = file.status === 'downloading';
+      const isDone = file.status === 'completed';
+
+      let statusLabel = 'Click to download';
+      if (isDownloading) statusLabel = `${file.progress}% · Downloading...`;
+      if (isDone) statusLabel = 'Saved to computer';
+
+      return `
+        <div class="download-file-item ${isDownloading ? 'is-downloading' : ''} ${isDone ? 'is-completed' : ''}" data-id="${file.id}">
+          <div class="download-item-main">
+            <div class="file-icon-box ${file.iconClass}">
+              ${file.iconSvg}
+            </div>
+            <div class="download-item-info">
+              <div class="download-item-name-row">
+                <span class="download-file-name" title="${file.name}">${file.name}</span>
+              </div>
+              <div class="download-meta-row">
+                <span class="file-type-pill ${file.pillClass}">${file.ext}</span>
+                <span class="file-dot">•</span>
+                <span class="download-size-text">${file.size}</span>
+                <span class="file-dot">•</span>
+                <span class="download-status-text ${isDone ? 'status-saved' : ''} ${isDownloading ? 'status-active' : ''}" id="status-text-${file.id}">
+                  ${statusLabel}
+                </span>
+              </div>
+            </div>
+
+            <button type="button" class="btn-download-action ${isDone ? 'btn-download-done' : ''}" data-action="download-file" data-id="${file.id}" title="${isDone ? 'Download Again to Computer' : 'Download to Computer'}">
+              ${isDownloading ? `
+                <span class="download-spinner"></span>
+              ` : (isDone ? `
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              ` : `
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              `)}
+            </button>
+          </div>
+
+          <!-- Real-time Progress Bar -->
+          <div class="download-progress-container ${isDownloading ? 'show-progress' : ''}" id="progress-container-${file.id}">
+            <div class="download-progress-bar">
+              <div class="download-progress-fill" id="progress-fill-${file.id}" style="width: ${file.progress}%"></div>
+            </div>
+            <div class="download-live-stats">
+              <span id="progress-stat-${file.id}">${file.progress}% · Saving to disk</span>
+              <span>${file.speed}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Actual Browser File Saver: Creates Blob and triggers computer download
+  function triggerRealComputerDownload(file) {
+    try {
+      const blob = new Blob([file.content], { type: file.mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 800);
+    } catch (e) {
+      console.error('Download error:', e);
+    }
+  }
+
+  // Start animated download with live percentage and computer file save
+  function startFileDownload(fileId, callback = null) {
+    const file = DOWNLOADABLE_FILES.find(f => f.id === fileId);
+    if (!file) return;
+    if (file.status === 'downloading') return;
+
+    file.status = 'downloading';
+    file.progress = 5;
+    renderDownloadFiles();
+    showToast(`Downloading "${file.name}" into your computer...`);
+
+    const fillEl = document.getElementById(`progress-fill-${file.id}`);
+    const statEl = document.getElementById(`progress-stat-${file.id}`);
+    const statusTextEl = document.getElementById(`status-text-${file.id}`);
+
+    let currentProgress = 5;
+    const interval = setInterval(() => {
+      currentProgress += Math.floor(Math.random() * 18) + 12;
+      if (currentProgress > 95) currentProgress = 95;
+
+      file.progress = currentProgress;
+      if (fillEl) fillEl.style.width = `${currentProgress}%`;
+      if (statEl) statEl.textContent = `${currentProgress}% · Saving to disk`;
+      if (statusTextEl) statusTextEl.textContent = `${currentProgress}% · Downloading...`;
+
+      if (currentProgress >= 95) {
+        clearInterval(interval);
+        setTimeout(() => {
+          file.progress = 100;
+          file.status = 'completed';
+          renderDownloadFiles();
+
+          // Actually download the file to the user's computer
+          triggerRealComputerDownload(file);
+          showToast(`✓ Downloaded "${file.filename}" to your computer!`);
+
+          if (callback) callback();
+        }, 400);
       }
+    }, 160);
+  }
 
-      // Action-specific feedback and scrolling
-      if (action === 'download-figma') {
-        showToast(`Accessing recently visited file: ${fileName} (.fig)...`);
-      } else if (action === 'inspect-tokens') {
-        showToast(`Opening recently visited stylesheet: ${fileName}...`);
-        document.querySelector('#viewMaterials .tabs-container')?.scrollIntoView({ behavior: 'smooth' });
-      } else if (action === 'open-notes') {
-        showToast(`Opening recently visited study notes: ${fileName}...`);
-        document.querySelector('#viewMaterials .tabs-container')?.scrollIntoView({ behavior: 'smooth' });
+  // Initial render of download files list
+  renderDownloadFiles();
+
+  // Click on a file or download button to start downloading
+  downloadFilesList?.addEventListener('click', (e) => {
+    const item = e.target.closest('.download-file-item');
+    if (!item) return;
+    const fileId = item.dataset.id;
+    startFileDownload(fileId);
+  });
+
+  // Download All Files Button
+  btnDownloadAllFiles?.addEventListener('click', () => {
+    showToast('Downloading all 4 curriculum assets into your computer...');
+    let index = 0;
+    function downloadNext() {
+      if (index < DOWNLOADABLE_FILES.length) {
+        const file = DOWNLOADABLE_FILES[index];
+        index++;
+        startFileDownload(file.id, downloadNext);
       } else {
-        showToast(`Opening recently visited material: ${fileName}...`);
-        if (targetElementId) {
-          const targetEl = document.getElementById(targetElementId);
-          if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
-        }
+        showToast('✓ All curriculum assets downloaded to your computer!');
+      }
+    }
+    downloadNext();
+  });
+
+  // Hook curriculum download triggers to start download in the widget
+  document.querySelectorAll('.download-trigger').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const name = trigger.dataset.name || '';
+      if (name.includes('Figma') || name.includes('Starter Pack')) {
+        startFileDownload('file-starter-fig');
+      } else if (name.includes('CSS') || name.includes('Stylesheet')) {
+        startFileDownload('file-stylesheet-css');
+      } else {
+        startFileDownload('file-guide-pdf');
       }
     });
   });
 
-  // Browse all files link
-  document.getElementById('btnBrowseAllFiles')?.addEventListener('click', () => {
-    const tabCurriculum = document.querySelector('#viewMaterials .tab-btn[data-tab="materials-curriculum"]');
-    if (tabCurriculum) tabCurriculum.click();
-    document.querySelector('#viewMaterials .tabs-container')?.scrollIntoView({ behavior: 'smooth' });
-    showToast('Browsing full curriculum modules and downloadable assets');
-  });
-
-  // Lesson list buttons update recent materials feedback
-  document.querySelectorAll('.lesson-action-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const lessonItem = btn.closest('.lesson-item');
-      const lessonName = lessonItem?.querySelector('.lesson-name')?.textContent?.trim() || 'Lesson Material';
-      showToast(`Opened: ${lessonName}`);
-      // Update top item in recent files visually
-      const firstRecentName = document.querySelector('.recent-file-item .file-name');
-      if (firstRecentName) {
-        firstRecentName.textContent = lessonName.length > 32 ? lessonName.substring(0, 32) + '...' : lessonName;
-        const firstRecentTime = document.querySelector('.recent-file-item .file-time');
-        if (firstRecentTime) firstRecentTime.textContent = 'Just now';
-      }
-    });
+  document.getElementById('btnDownloadAssets')?.addEventListener('click', () => {
+    startFileDownload('file-starter-fig');
+    setTimeout(() => startFileDownload('file-stylesheet-css'), 500);
   });
 
   // =========================================================================
