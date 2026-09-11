@@ -822,153 +822,39 @@
             </div>
           </div>
 
-          <!-- Active Workplace Live Board -->
-          <div class="active-workplace-board">
-            <div class="workplace-board-header">
-              <div>
-                <div class="workplace-title-row">
-                  <h3 id="currentPortalName">UI/UX Cohort 4 — Webflow Breakpoints Lab</h3>
-                  <span class="live-portal-pill"><span class="green-dot"></span> Live Portal</span>
+          <!-- Joined Class Portals Column / Grid -->
+          <div class="joined-portals-section">
+            <div class="joined-portals-header-bar">
+              <div class="joined-portals-title-area">
+                <div class="joined-title-row">
+                  <h3 class="joined-section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    Joined Class Portals
+                  </h3>
+                  <span class="joined-count-badge" id="joinedPortalsCountBadge">4 Classrooms Enrolled</span>
                 </div>
-                <p class="workplace-meta-sub">Portal Tag: <strong id="activePortalTagLabel">#PORTAL-FIGMA-101</strong> ·
-                  Instructor: Vativa Hub · 18 Learners Online</p>
+                <p class="joined-section-sub">
+                  Browse and access the different class portals you have joined in the website. Enter any classroom or copy its tag and invite links.
+                </p>
               </div>
-              <div class="board-actions">
-                <button class="btn-outline-sm" id="btnCopyTagOnly">Copy Tag Only</button>
+
+              <div class="joined-portals-filter-area">
+                <div class="joined-search-box">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="filterJoinedPortalsInput" placeholder="Filter joined portals by name or tag..." />
+                </div>
               </div>
             </div>
 
-            <div class="workplace-grid">
-              <!-- Left: Pinned Classroom Resources & Live Links -->
-              <div class="workplace-left-col">
-                <div class="board-section-card">
-                  <h4 class="card-title-sm">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
-                      <line x1="12" y1="17" x2="12" y2="22"></line>
-                      <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
-                    </svg>
-                    Pinned Classroom Links
-                  </h4>
-                  <div class="pinned-links-list">
-                    <a href="#" class="pinned-link-item" onclick="return false;">
-                      <div class="pinned-link-icon vector-icon-box">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="12" cy="12" r="3"></circle>
-                          <path d="M12 2a4 4 0 0 0-4 4v4h4a4 4 0 0 0 0-8z"></path>
-                          <path d="M12 10H8a4 4 0 0 0 0 8h4v-8z"></path>
-                          <path d="M12 10h4a4 4 0 0 0 0-8h-4v8z"></path>
-                          <path d="M12 18H8a4 4 0 0 0 4 4 4 4 0 0 0 4-4v-4h-4v4z"></path>
-                        </svg>
-                      </div>
-                      <div>
-                        <strong>Collaborative Figma Canvas (Sprint 2)</strong>
-                        <span>figma.com/@blendify/cohort4-live-sandbox</span>
-                      </div>
-                    </a>
-                    <a href="#" class="pinned-link-item" onclick="return false;">
-                      <div class="pinned-link-icon vector-icon-box">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="16 18 22 12 16 6"></polyline>
-                          <polyline points="8 6 2 12 8 18"></polyline>
-                        </svg>
-                      </div>
-                      <div>
-                        <strong>Webflow Shared Staging Dashboard</strong>
-                        <span>preview.webflow.com/preview/blendify-lab4</span>
-                      </div>
-                    </a>
-                    <a href="#" class="pinned-link-item" onclick="return false;">
-                      <div class="pinned-link-icon vector-icon-box">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <polygon points="23 7 16 12 23 17 23 7"></polygon>
-                          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-                        </svg>
-                      </div>
-                      <div>
-                        <strong>Classroom Audio/Video Huddle</strong>
-                        <span>huddle.blendify.edu/portal-figma-101 (Open)</span>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-
-                <div class="board-section-card">
-                  <h4 class="card-title-sm">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    Active Learners in this Portal
-                  </h4>
-                  <div class="peers-list">
-                    <div class="peer-item">
-                      <div class="peer-avatar">AM</div>
-                      <div class="peer-info">
-                        <strong>Aria Montgomery</strong>
-                        <span>Working on Module 2.2 auto-layout</span>
-                      </div>
-                      <span class="online-indicator">Active</span>
-                    </div>
-                    <div class="peer-item">
-                      <div class="peer-avatar">RC</div>
-                      <div class="peer-info">
-                        <strong>Rahim Chowdhury</strong>
-                        <span>Reviewing mobile breakpoint CSS</span>
-                      </div>
-                      <span class="online-indicator">Active</span>
-                    </div>
-                    <div class="peer-item">
-                      <div class="peer-avatar user-me">H</div>
-                      <div class="peer-info">
-                        <strong>Harsh (You)</strong>
-                        <span>Connected to portal</span>
-                      </div>
-                      <span class="online-indicator">You</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right: Classroom Portal Activity & Link Sharing -->
-              <div class="workplace-right-col">
-                <div class="board-section-card stream-card">
-                  <h4 class="card-title-sm">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    Classroom Portal Feed
-                  </h4>
-                  <div class="portal-messages" id="portalMessages">
-                    <div class="msg-bubble instructor-msg">
-                      <div class="msg-author">
-                        <strong>Vativa Hub (Instructor)</strong>
-                        <span>10 mins ago</span>
-                      </div>
-                      <p>Welcome everyone to <code>#PORTAL-FIGMA-101</code>! Remember to check out the fluid constraints
-                        formula in Learning Materials before editing the Webflow grid.</p>
-                    </div>
-
-                    <div class="msg-bubble">
-                      <div class="msg-author">
-                        <strong>Aria Montgomery</strong>
-                        <span>4 mins ago</span>
-                      </div>
-                      <p>Just shared my responsive card variant into the Figma canvas! Anyone want to review the tablet
-                        breakpoint?</p>
-                    </div>
-                  </div>
-
-                  <!-- Send classroom message/link -->
-                  <div class="portal-send-box">
-                    <input type="text" id="portalMsgInput"
-                      placeholder="Share a link, question, or note in this portal..." />
-                    <button class="btn-primary-sm" id="btnSendPortalMsg">Send</button>
-                  </div>
-                </div>
-              </div>
-
+            <!-- Column of Different Class Portals Joined in the Website -->
+            <div class="joined-portals-grid" id="joinedPortalsList">
+              <!-- Dynamically populated from state / localStorage -->
             </div>
           </div>
         </div>

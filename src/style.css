@@ -1592,33 +1592,170 @@ ul {
 
 .tag-info-note strong { color: var(--primary); }
 
-/* Active Workplace Board */
-.active-workplace-board {
+/* ==========================================================================
+   JOINED CLASS PORTALS (COLUMN / GRID)
+   ========================================================================== */
+.joined-portals-section {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: 26px 30px;
+  padding: 28px 30px;
   box-shadow: var(--shadow-sm);
 }
 
-.workplace-board-header {
+.joined-portals-header-bar {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding-bottom: 20px;
+  gap: 20px;
+  padding-bottom: 22px;
   border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 24px;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
 }
 
-.workplace-title-row {
+.joined-portals-title-area {
+  flex: 1;
+  min-width: 280px;
+}
+
+.joined-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.joined-section-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+}
+
+.joined-count-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  background-color: var(--primary-light);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.2px;
+}
+
+.joined-section-sub {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.joined-portals-filter-area {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.workplace-title-row h3 { font-size: 1.35rem; }
+.joined-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  transition: var(--transition);
+}
 
-.live-portal-pill {
+.joined-search-box:focus-within {
+  border-color: var(--primary);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(197, 154, 88, 0.15);
+}
+
+.joined-search-box svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.joined-search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  min-width: 220px;
+}
+
+/* Joined Portals Responsive Columns / Grid */
+.joined-portals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 22px;
+}
+
+.joined-portal-card {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+
+.joined-portal-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(197, 154, 88, 0.4);
+}
+
+.joined-portal-card.active-class-card {
+  border-color: var(--primary);
+  background-color: #fffdfa;
+  box-shadow: 0 6px 20px rgba(197, 154, 88, 0.14);
+}
+
+.portal-card-top-stripe {
+  height: 6px;
+  width: 100%;
+}
+
+.portal-card-inner {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.portal-card-header {
+  margin-bottom: 16px;
+}
+
+.portal-card-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.portal-topic-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.active-live-indicator {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1630,192 +1767,217 @@ ul {
   border-radius: var(--radius-pill);
 }
 
-.workplace-meta-sub {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 4px;
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--success);
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+  animation: pulseGreen 1.8s infinite;
 }
 
-.workplace-meta-sub strong { color: var(--text-main); font-family: monospace; }
+@keyframes pulseGreen {
+  0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
 
-.btn-outline-sm {
-  font-size: 0.8rem;
+.enrolled-status-pill {
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 6px 12px;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+}
+
+.portal-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.portal-card-instructor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
   color: var(--text-secondary);
 }
 
-.btn-outline-sm:hover { background-color: var(--bg-muted); color: var(--text-main); }
-
-.workplace-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 24px;
-}
-
-.board-section-card {
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 18px;
-  margin-bottom: 16px;
-}
-
-.card-title-sm {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 14px;
-}
-
-.pinned-links-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.pinned-link-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  transition: var(--transition);
-}
-
-.pinned-link-item:hover {
-  border-color: var(--primary);
-  transform: translateX(2px);
-}
-
-.pinned-link-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-light);
-  color: var(--text-main);
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.pinned-link-item:hover .pinned-link-icon {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-.inline-vector-icon {
-  display: inline-block;
-  vertical-align: -2px;
-  margin-right: 6px;
-  color: var(--text-main);
-}
-
-.pinned-link-item strong { font-size: 0.85rem; display: block; }
-.pinned-link-item span { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
-
-.peers-list { display: flex; flex-direction: column; gap: 8px; }
-
-.peer-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  background-color: var(--bg-surface);
-  border-radius: var(--radius-sm);
-}
-
-.peer-avatar {
-  width: 30px;
-  height: 30px;
+.instructor-avatar-mini {
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background-color: var(--primary-light);
   color: var(--primary);
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.peer-avatar.user-me { background: #1F2937; color: white; }
-
-.peer-info { flex: 1; }
-.peer-info strong { font-size: 0.82rem; display: block; }
-.peer-info span { font-size: 0.72rem; color: var(--text-muted); }
-
-.online-indicator {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--success);
-  background: var(--success-bg);
-  padding: 2px 7px;
-  border-radius: var(--radius-pill);
-}
-
-/* Classroom Chat Stream */
-.stream-card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.portal-messages {
-  flex: 1;
-  min-height: 240px;
-  max-height: 360px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-right: 6px;
-  margin-bottom: 14px;
-}
-
-.msg-bubble {
+.portal-card-meta-box {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin-bottom: 16px;
 }
 
-.instructor-msg {
-  border-left: 3px solid var(--primary);
-  background-color: #FCFAF6;
+.portal-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.msg-author {
+.meta-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.meta-tag-code {
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.meta-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.portal-card-progress {
+  margin-bottom: 18px;
+}
+
+.portal-progress-labels {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
 }
 
-.msg-author strong { font-size: 0.82rem; }
-.msg-author span { font-size: 0.7rem; color: var(--text-muted); }
+.portal-progress-labels strong {
+  color: var(--text-main);
+  font-weight: 600;
+}
 
-.msg-bubble p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; }
+.portal-progress-track {
+  width: 100%;
+  height: 6px;
+  background-color: var(--border-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
 
-.portal-send-box {
+.portal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, #D4AF37 100%);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.portal-card-actions {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.portal-send-box input {
+.btn-enter-portal {
   flex: 1;
-  padding: 10px 14px;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  font-size: 0.85rem;
-  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
 }
 
-.portal-send-box input:focus { border-color: var(--primary); }
+.btn-enter-portal.btn-is-current {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  font-weight: 700;
+  border: 1px solid rgba(197, 154, 88, 0.4);
+  cursor: default;
+}
+
+.portal-card-secondary-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-icon-action {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-icon-action:hover {
+  background-color: var(--bg-muted);
+  color: var(--text-main);
+  border-color: var(--border-subtle);
+  transform: translateY(-1px);
+}
+
+.btn-icon-action.btn-danger-action:hover {
+  background-color: #FEE2E2;
+  color: #DC2626;
+  border-color: #FCA5A5;
+}
+
+.empty-portals-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 24px;
+  background-color: var(--bg-subtle);
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-md);
+}
+
+.empty-portals-state h4 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+.empty-portals-state p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 420px;
+  margin: 0 auto 18px;
+}
 
 /* ==========================================================================
    VIEW 3: PERSONALIZED AI LEARNING AGENT
@@ -2179,7 +2341,7 @@ ul {
   .course-body-container { grid-template-columns: 1fr; }
   .portal-access-card { flex-direction: column; gap: 20px; }
   .portal-divider-v { display: none; }
-  .workplace-grid { grid-template-columns: 1fr; }
+  .joined-portals-grid { grid-template-columns: 1fr; }
   .ai-agent-workspace { grid-template-columns: 1fr; }
 }
 

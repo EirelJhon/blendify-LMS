@@ -298,52 +298,314 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
-  // PILLAR 2: CLASSROOM WORKPLACES (TAGS & SHAREABLE LINKS)
+  // PILLAR 2: CLASSROOM WORKPLACES & JOINED CLASS PORTALS
   // =========================================================================
-  const currentPortalName = document.getElementById('currentPortalName');
-  const activePortalTagLabel = document.getElementById('activePortalTagLabel');
   const activeTagBadge = document.getElementById('activeTagBadge');
   const sidebarActiveTag = document.getElementById('sidebarActiveTag');
   const currentShareLink = document.getElementById('currentShareLink');
   const portalTagInput = document.getElementById('portalTagInput');
   const btnJoinPortalByTag = document.getElementById('btnJoinPortalByTag');
   const btnCopyPortalLink = document.getElementById('btnCopyPortalLink');
-  const btnCopyTagOnly = document.getElementById('btnCopyTagOnly');
-  const portalMessages = document.getElementById('portalMessages');
-  const portalMsgInput = document.getElementById('portalMsgInput');
-  const btnSendPortalMsg = document.getElementById('btnSendPortalMsg');
+  const joinedPortalsList = document.getElementById('joinedPortalsList');
+  const joinedPortalsCountBadge = document.getElementById('joinedPortalsCountBadge');
+  const filterJoinedPortalsInput = document.getElementById('filterJoinedPortalsInput');
 
-  const portalDirectory = {
-    '#PORTAL-FIGMA-101': {
+  // Initial catalog of default joined class portals
+  const DEFAULT_JOINED_PORTALS = [
+    {
+      tag: '#PORTAL-FIGMA-101',
       name: 'UI/UX Cohort 4 — Webflow Breakpoints Lab',
-      instructor: 'Vativa Hub'
+      instructor: 'Vativa Hub',
+      topic: 'UI/UX Design',
+      schedule: 'Mon & Wed · 10:00 AM',
+      learners: '18 Online · 24 Total',
+      materialsCount: '12 Modules',
+      progress: 75,
+      accentColor: '#E11D48'
     },
-    '#WEBFLOW-LAB-44': {
+    {
+      tag: '#WEBFLOW-LAB-44',
       name: 'Interactive Webflow CMS & Animations Workshop',
-      instructor: 'Elena Rostova'
+      instructor: 'Elena Rostova',
+      topic: 'Webflow & CMS',
+      schedule: 'Tue & Thu · 2:00 PM',
+      learners: '22 Enrolled · 3 Active',
+      materialsCount: '8 Modules',
+      progress: 50,
+      accentColor: '#2563EB'
     },
-    '#STUDY-ROOM-B': {
+    {
+      tag: '#STUDY-ROOM-B',
       name: 'Peer Design Review & Token Architecture Room',
-      instructor: 'Harsh Vardhan (Host)'
+      instructor: 'Harsh Vardhan (Host)',
+      topic: 'Design Systems',
+      schedule: 'Fri · 4:00 PM',
+      learners: '8 Enrolled · Open Discussion',
+      materialsCount: '6 Modules',
+      progress: 90,
+      accentColor: '#D97706'
+    },
+    {
+      tag: '#REACT-SYSTEMS-08',
+      name: 'Frontend Systems & Next.js Architecture',
+      instructor: 'Kavita Patel',
+      topic: 'Web Systems',
+      schedule: 'Sat · 1:00 PM',
+      learners: '32 Enrolled · 6 Active',
+      materialsCount: '15 Modules',
+      progress: 35,
+      accentColor: '#059669'
     }
+  ];
+
+  // Retrieve or initialize joined portals in localStorage
+  function getStoredJoinedPortals() {
+    try {
+      const stored = localStorage.getItem('blendify_joined_portals');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {}
+    try {
+      localStorage.setItem('blendify_joined_portals', JSON.stringify(DEFAULT_JOINED_PORTALS));
+    } catch (e) {}
+    return DEFAULT_JOINED_PORTALS;
+  }
+
+  function saveJoinedPortals(portals) {
+    try {
+      localStorage.setItem('blendify_joined_portals', JSON.stringify(portals));
+    } catch (e) {}
+  }
+
+  let joinedPortals = getStoredJoinedPortals();
+
+  // Render the column of different class portals joined
+  function renderJoinedPortals(filterQuery = '') {
+    if (!joinedPortalsList) return;
+
+    const query = filterQuery.trim().toLowerCase();
+    const filtered = query
+      ? joinedPortals.filter(p =>
+          p.name.toLowerCase().includes(query) ||
+          p.tag.toLowerCase().includes(query) ||
+          p.instructor.toLowerCase().includes(query) ||
+          p.topic.toLowerCase().includes(query)
+        )
+      : joinedPortals;
+
+    if (joinedPortalsCountBadge) {
+      joinedPortalsCountBadge.textContent = `${joinedPortals.length} Classroom${joinedPortals.length === 1 ? '' : 's'} Enrolled`;
+    }
+
+    if (filtered.length === 0) {
+      joinedPortalsList.innerHTML = `
+        <div class="empty-portals-state">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted);margin-bottom:12px;display:inline-block;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <h4>No class portals found</h4>
+          <p>${query ? `No joined class portals matched "${query}". Try a different search.` : 'You have not joined any classroom portals yet. Enter a portal tag above to enroll.'}</p>
+        </div>
+      `;
+      return;
+    }
+
+    joinedPortalsList.innerHTML = filtered.map(portal => {
+      const isCurrent = portal.tag.toUpperCase() === state.activeTag.toUpperCase();
+      const initial = portal.instructor ? portal.instructor.charAt(0).toUpperCase() : 'C';
+
+      return `
+        <div class="joined-portal-card ${isCurrent ? 'active-class-card' : ''}" data-tag="${portal.tag}">
+          <div class="portal-card-top-stripe" style="background: ${portal.accentColor || 'var(--primary)'}"></div>
+          <div class="portal-card-inner">
+            <div class="portal-card-header">
+              <div class="portal-card-badge-row">
+                <span class="portal-topic-tag">${portal.topic || 'Classroom'}</span>
+                ${isCurrent ? `
+                  <span class="active-live-indicator">
+                    <span class="pulse-dot"></span> Active Class
+                  </span>
+                ` : `
+                  <span class="enrolled-status-pill">Enrolled</span>
+                `}
+              </div>
+              <h4 class="portal-card-title">${portal.name}</h4>
+              <div class="portal-card-instructor">
+                <div class="instructor-avatar-mini">${initial}</div>
+                <span>${portal.instructor || 'Blendify Faculty'}</span>
+              </div>
+            </div>
+
+            <div class="portal-card-meta-box">
+              <div class="portal-meta-item">
+                <span class="meta-label">Portal Tag</span>
+                <span class="meta-tag-code">${portal.tag}</span>
+              </div>
+              <div class="portal-meta-item">
+                <span class="meta-label">Class Schedule</span>
+                <span class="meta-value">${portal.schedule || 'Flexible'}</span>
+              </div>
+              <div class="portal-meta-item">
+                <span class="meta-label">Learners</span>
+                <span class="meta-value">${portal.learners || 'Active Cohort'}</span>
+              </div>
+              <div class="portal-meta-item">
+                <span class="meta-label">Curriculum</span>
+                <span class="meta-value">${portal.materialsCount || '10 Modules'}</span>
+              </div>
+            </div>
+
+            <div class="portal-card-progress">
+              <div class="portal-progress-labels">
+                <span>Course Progression</span>
+                <strong>${portal.progress || 60}%</strong>
+              </div>
+              <div class="portal-progress-track">
+                <div class="portal-progress-fill" style="width: ${portal.progress || 60}%"></div>
+              </div>
+            </div>
+
+            <div class="portal-card-actions">
+              <button type="button" class="btn-enter-portal ${isCurrent ? 'btn-is-current' : 'btn-primary-sm'}" data-action="enter" data-tag="${portal.tag}">
+                ${isCurrent ? 'Current Classroom' : 'Enter Classroom'}
+              </button>
+              <div class="portal-card-secondary-btns">
+                <button type="button" class="btn-icon-action" data-action="copy-tag" data-tag="${portal.tag}" title="Copy Tag (${portal.tag})">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+                <button type="button" class="btn-icon-action" data-action="copy-link" data-tag="${portal.tag}" title="Copy Shareable Link">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                </button>
+                <button type="button" class="btn-icon-action btn-danger-action" data-action="leave" data-tag="${portal.tag}" title="Leave this Classroom">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Handle interactions on joined portal cards (Event delegation)
+  joinedPortalsList?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+
+    const action = btn.dataset.action;
+    const tag = btn.dataset.tag;
+    const portal = joinedPortals.find(p => p.tag.toUpperCase() === tag.toUpperCase());
+
+    if (action === 'enter') {
+      if (portal) {
+        setClassroomPortal(portal.tag, portal.name);
+      }
+    } else if (action === 'copy-tag') {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(tag);
+      }
+      showToast(`Classroom tag ${tag} copied to clipboard!`);
+    } else if (action === 'copy-link') {
+      const link = `https://blendify.edu/portal/join?tag=${tag.replace('#', '')}`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(link);
+      }
+      showToast(`Invite link for ${tag} copied!`);
+    } else if (action === 'leave') {
+      if (confirm(`Are you sure you want to leave ${portal ? portal.name : tag}?`)) {
+        joinedPortals = joinedPortals.filter(p => p.tag.toUpperCase() !== tag.toUpperCase());
+        saveJoinedPortals(joinedPortals);
+
+        if (state.activeTag.toUpperCase() === tag.toUpperCase()) {
+          if (joinedPortals.length > 0) {
+            setClassroomPortal(joinedPortals[0].tag, joinedPortals[0].name);
+          } else {
+            state.activeTag = '#PORTAL-NONE';
+            state.activePortalName = 'No Active Classroom';
+            if (activeTagBadge) activeTagBadge.textContent = state.activeTag;
+            if (sidebarActiveTag) sidebarActiveTag.textContent = state.activeTag;
+          }
+        }
+        renderJoinedPortals(filterJoinedPortalsInput ? filterJoinedPortalsInput.value : '');
+        showToast(`Left classroom portal: ${tag}`);
+      }
+    }
+  });
+
+  // Filter input
+  filterJoinedPortalsInput?.addEventListener('input', (e) => {
+    renderJoinedPortals(e.target.value);
+  });
+
+  // Catalog of known demo topics for newly joined portals
+  const demoPortalMeta = {
+    '#PORTAL-FIGMA-101': { name: 'UI/UX Cohort 4 — Webflow Breakpoints Lab', instructor: 'Vativa Hub', topic: 'UI/UX Design', schedule: 'Mon & Wed · 10:00 AM', learners: '18 Online · 24 Total', materialsCount: '12 Modules', progress: 75, accentColor: '#E11D48' },
+    '#WEBFLOW-LAB-44': { name: 'Interactive Webflow CMS & Animations Workshop', instructor: 'Elena Rostova', topic: 'Webflow & CMS', schedule: 'Tue & Thu · 2:00 PM', learners: '22 Enrolled · 3 Active', materialsCount: '8 Modules', progress: 50, accentColor: '#2563EB' },
+    '#STUDY-ROOM-B': { name: 'Peer Design Review & Token Architecture Room', instructor: 'Harsh Vardhan (Host)', topic: 'Design Systems', schedule: 'Fri · 4:00 PM', learners: '8 Enrolled · Open Discussion', materialsCount: '6 Modules', progress: 90, accentColor: '#D97706' }
   };
 
   function setClassroomPortal(tag, name = null) {
     const formattedTag = tag.startsWith('#') ? tag.toUpperCase() : `#${tag.toUpperCase()}`;
     state.activeTag = formattedTag;
-    state.activePortalName = name || (portalDirectory[formattedTag] ? portalDirectory[formattedTag].name : `Classroom Portal (${formattedTag})`);
+
+    // Check if portal exists in joined list
+    let existing = joinedPortals.find(p => p.tag.toUpperCase() === formattedTag);
+    if (!existing) {
+      const meta = demoPortalMeta[formattedTag] || {
+        name: name || `Classroom Workplace (${formattedTag})`,
+        instructor: 'Invited Instructor',
+        topic: 'Collaborative Cohort',
+        schedule: 'Self-Paced / Cohort Live',
+        learners: '12 Students Enrolled',
+        materialsCount: '8 Modules',
+        progress: 10,
+        accentColor: '#8B5CF6'
+      };
+      existing = {
+        tag: formattedTag,
+        name: name || meta.name,
+        instructor: meta.instructor,
+        topic: meta.topic,
+        schedule: meta.schedule,
+        learners: meta.learners,
+        materialsCount: meta.materialsCount,
+        progress: meta.progress,
+        accentColor: meta.accentColor
+      };
+      joinedPortals.unshift(existing);
+      saveJoinedPortals(joinedPortals);
+    } else if (name) {
+      existing.name = name;
+      saveJoinedPortals(joinedPortals);
+    }
+
+    state.activePortalName = existing.name;
 
     // Update UI elements
-    if (currentPortalName) currentPortalName.textContent = state.activePortalName;
-    if (activePortalTagLabel) activePortalTagLabel.textContent = formattedTag;
     if (activeTagBadge) activeTagBadge.textContent = formattedTag;
     if (sidebarActiveTag) sidebarActiveTag.textContent = formattedTag;
     if (currentShareLink) {
       currentShareLink.value = `https://blendify.edu/portal/join?tag=${formattedTag.replace('#', '')}`;
     }
 
-    showToast(`Joined classroom portal: ${formattedTag}!`);
+    renderJoinedPortals(filterJoinedPortalsInput ? filterJoinedPortalsInput.value : '');
+    showToast(`Switched active classroom: ${existing.name}!`);
   }
+
+  // Initial render of joined portals
+  renderJoinedPortals();
 
   // Join by Tag button
   btnJoinPortalByTag?.addEventListener('click', () => {
@@ -363,48 +625,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-
   // Copy shareable link
   btnCopyPortalLink?.addEventListener('click', () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(currentShareLink.value);
     }
     showToast('Classroom portal invite link copied to clipboard!');
-  });
-
-  btnCopyTagOnly?.addEventListener('click', () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(state.activeTag);
-    }
-    showToast(`Portal tag ${state.activeTag} copied!`);
-  });
-
-  // Send message in active classroom portal
-  function sendPortalMessage() {
-    const text = portalMsgInput.value.trim();
-    if (!text) return;
-
-    const msgBox = document.createElement('div');
-    msgBox.className = 'msg-bubble';
-    msgBox.innerHTML = `
-      <div class="msg-author">
-        <strong>Harsh (You)</strong>
-        <span>Just now</span>
-      </div>
-      <p>${text}</p>
-    `;
-    portalMessages.appendChild(msgBox);
-    portalMsgInput.value = '';
-    portalMessages.scrollTop = portalMessages.scrollHeight;
-    showToast('Posted message to active classroom stream');
-  }
-
-  btnSendPortalMsg?.addEventListener('click', sendPortalMessage);
-  portalMsgInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      sendPortalMessage();
-    }
   });
 
   // Modal: Generate New Workplace Tag
