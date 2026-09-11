@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In &amp; Choose Role | Blendify</title>
+  <meta name="description"
+    content="Sign in with your Google account to access Blendify LMS. Choose whether to enter as a Student or Teacher." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Roboto:wght@500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/src/login.css" />
+</head>
+
+<body>
+  <div class="auth-layout" id="authApp">
+
+    <!-- BRAND TOP BAR -->
+    <header class="auth-header">
+      <div class="brand-logo">
+        <div class="brand-symbol">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <span class="brand-name">blendify</span>
+      </div>
+
+      <!-- Logged-in Account Pill (Visible after signing in) -->
+      <div class="signed-in-user-pill" id="signedInUserPill" style="display: none;">
+        <img class="user-google-avatar" id="headerUserAvatar" src="" alt="Google Profile" />
+        <div class="user-meta-text">
+          <strong id="headerUserName">Google User</strong>
+          <span id="headerUserEmail">user@gmail.com</span>
+        </div>
+        <button class="btn-switch-account" id="btnSwitchAccount" title="Switch or sign out of Google account">
+          <span>Switch Account</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="auth-main-container">
+
+      <!-- =====================================================================
+           STEP 1: GOOGLE SIGN-IN PORTAL SCREEN
+           ===================================================================== -->
+      <section class="auth-card-section" id="sectionSignIn">
+        <div class="auth-card">
+          <div class="card-hero-icon">
+            <div class="icon-circle">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C59A53" stroke-width="2">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                <polyline points="10 17 15 12 10 7"></polyline>
+                <line x1="15" y1="12" x2="3" y2="12"></line>
+              </svg>
+            </div>
+          </div>
+
+          <h1 class="auth-title">Welcome to Blendify</h1>
+          <p class="auth-subtitle">Sign in with your Google account to access your personalized educational workspace or
+            teaching studio.</p>
+
+          <!-- OFFICIAL GOOGLE SIGN IN BUTTON -->
+          <div class="google-btn-wrapper">
+            <button class="google-sign-in-btn" id="btnGoogleSignIn" type="button">
+              <div class="google-icon-box">
+                <!-- Official Google Multi-Color SVG -->
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                  <path fill="#4285F4"
+                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.02h3.88c2.28-2.09 3.66-5.17 3.66-9.12z" />
+                  <path fill="#34A853"
+                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.02c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.12C3.26 21.36 7.33 24 12 24z" />
+                  <path fill="#FBBC05"
+                    d="M5.28 14.3c-.25-.72-.38-1.49-.38-2.3s.13-1.58.38-2.3V6.58H1.24C.45 8.15 0 9.97 0 12s.45 3.85 1.24 5.42l4.04-3.12z" />
+                  <path fill="#EA4335"
+                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.12c.95-2.83 3.6-4.95 6.72-4.95z" />
+                </svg>
+              </div>
+              <span class="google-btn-text">Sign in with Google</span>
+            </button>
+          </div>
+
+          <div class="auth-security-notice">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Secured with Google OAuth 2.0 Single Sign-On</span>
+          </div>
+
+          <div class="auth-quick-accounts-hint">
+            <span class="hint-label">Available test accounts:</span>
+            <div class="hint-chips">
+              <button class="hint-chip" data-email="alex.student@gmail.com" data-name="Alex Rivers (Student)"
+                data-role="student">
+                Alex (Student)
+              </button>
+              <button class="hint-chip" data-email="harsh.teacher@blendify.edu" data-name="Harsh Vardhan (Teacher)"
+                data-role="teacher">
+                Harsh (Teacher)
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- =====================================================================
+           STEP 2: GOOGLE CLASSROOM-STYLE ROLE SELECTION ("I'M A STUDENT / TEACHER")
+           ===================================================================== -->
+      <section class="role-selection-section" id="sectionRoleSelection" style="display: none;">
+        <div class="role-intro-header">
+          <h2 class="role-title" id="roleTitle">Choose your role in Blendify</h2>
+          <p class="role-desc" id="roleDesc">Select how you want to use the platform.</p>
+        </div>
+
+        <!-- TWO BIG ROLE OPTION BUTTONS -->
+        <div class="role-cards-grid">
+
+          <!-- OPTION 1: STUDENT -->
+          <div class="role-option-card student-card" id="cardChooseStudent">
+            <div class="card-accent-pill student-pill">Learner Portal</div>
+
+            <div class="role-icon-banner">
+              <div class="role-illustration student-illustration">
+                <!-- Backpack & Graduation Symbol -->
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+              </div>
+            </div>
+
+            <h3 class="role-card-name">I'm a Student</h3>
+            <p class="role-card-desc">Access learning materials, participate in classroom portals via tags and links,
+              and learn with personalized AI agents.</p>
+
+            <ul class="role-features-list">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Access educational curriculum &amp; cheat sheets</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Join cohort portals with tags &amp; invite links</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Personalized 24/7 AI tutor &amp; learning agents</span>
+              </li>
+            </ul>
+
+            <div class="role-btn-wrap">
+              <button class="btn-role-action btn-student" id="btnEnterStudentPortal">
+                <span>Enter as Student</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- OPTION 2: TEACHER -->
+          <div class="role-option-card teacher-card" id="cardChooseTeacher">
+            <div class="card-accent-pill teacher-pill">Faculty &amp; Admin Studio</div>
+
+            <div class="role-icon-banner">
+              <div class="role-illustration teacher-illustration">
+                <!-- Teacher & Workspace Symbol -->
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  <line x1="9" y1="7" x2="15" y2="7"></line>
+                  <line x1="9" y1="11" x2="15" y2="11"></line>
+                </svg>
+              </div>
+            </div>
+
+            <h3 class="role-card-name">I'm a Teacher</h3>
+            <p class="role-card-desc">Create classroom portals, upload materials, audit in-time activity logs, customize
+              quizzes, and print progression sheets.</p>
+
+            <ul class="role-features-list">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Create classroom portals &amp; generated tags</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Upload learning materials through portal</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Track in-time activity (who, when, what time)</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Customize quizzes &amp; print progression data sheets</span>
+              </li>
+            </ul>
+
+            <div class="role-btn-wrap">
+              <button class="btn-role-action btn-teacher" id="btnEnterTeacherStudio">
+                <span>Enter as Teacher</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- GOOGLE ACCOUNT CHOOSER MODAL (Simulated OAuth 2.0 Dialog) -->
+    <div class="google-modal-backdrop" id="googleAccountModal" style="display: none;">
+      <div class="google-modal-box">
+        <div class="google-modal-header">
+          <svg width="32" height="32" viewBox="0 0 24 24">
+            <path fill="#4285F4"
+              d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.02h3.88c2.28-2.09 3.66-5.17 3.66-9.12z" />
+            <path fill="#34A853"
+              d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.02c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.12C3.26 21.36 7.33 24 12 24z" />
+            <path fill="#FBBC05"
+              d="M5.28 14.3c-.25-.72-.38-1.49-.38-2.3s.13-1.58.38-2.3V6.58H1.24C.45 8.15 0 9.97 0 12s.45 3.85 1.24 5.42l4.04-3.12z" />
+            <path fill="#EA4335"
+              d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.12c.95-2.83 3.6-4.95 6.72-4.95z" />
+          </svg>
+          <button class="btn-modal-close" id="btnCloseGoogleModal" aria-label="Close dialog">✕</button>
+        </div>
+
+        <h3 class="google-modal-title">Choose an account</h3>
+        <p class="google-modal-sub">to continue to <strong>Blendify Learning Platform</strong></p>
+
+        <!-- Account List -->
+        <div class="google-accounts-list">
+
+          <button class="google-account-item" data-name="Alex Rivers" data-email="alex.student@gmail.com"
+            data-avatar="A" data-role="student">
+            <div class="acc-avatar avatar-blue">A</div>
+            <div class="acc-details">
+              <strong class="acc-name">Alex Rivers</strong>
+              <span class="acc-email">alex.student@gmail.com</span>
+            </div>
+            <span class="acc-tag student">Student</span>
+          </button>
+
+          <button class="google-account-item" data-name="Harsh Vardhan" data-email="harsh.teacher@blendify.edu"
+            data-avatar="H" data-role="teacher">
+            <div class="acc-avatar avatar-gold">H</div>
+            <div class="acc-details">
+              <strong class="acc-name">Harsh Vardhan</strong>
+              <span class="acc-email">harsh.teacher@blendify.edu</span>
+            </div>
+            <span class="acc-tag teacher">Teacher</span>
+          </button>
+
+          <button class="google-account-item" data-name="Elena Rostova" data-email="elena.design@gmail.com"
+            data-avatar="E" data-role="teacher">
+            <div class="acc-avatar avatar-purple">E</div>
+            <div class="acc-details">
+              <strong class="acc-name">Elena Rostova</strong>
+              <span class="acc-email">elena.design@gmail.com</span>
+            </div>
+            <span class="acc-tag teacher">Teacher</span>
+          </button>
+
+        </div>
+
+        <!-- Custom Account Entry Form -->
+        <div class="google-custom-entry">
+          <div class="custom-entry-toggle" id="btnToggleCustomEntry">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Use another Google account</span>
+          </div>
+
+          <div class="custom-entry-form" id="customEntryForm" style="display: none;">
+            <input type="email" class="form-control-google" id="customGoogleEmail"
+              placeholder="Enter your Google email address" />
+            <input type="text" class="form-control-google" id="customGoogleName" placeholder="Enter your full name" />
+            <button class="btn-google-primary" id="btnSubmitCustomAccount">Continue with this Account</button>
+          </div>
+        </div>
+
+        <div class="google-modal-footer">
+          <span>To continue, Google will share your name, email address, and profile picture with Blendify.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="auth-loading-overlay" id="authLoadingOverlay" style="display: none;">
+      <div class="spinner-box">
+        <div class="google-spinner"></div>
+        <strong id="loadingStatusText">Connecting with Google...</strong>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div class="toast-container" id="toastContainer"></div>
+
+  </div>
+
+  <script type="module" src="/src/login.js"></script>
+</body>
+
+</html>

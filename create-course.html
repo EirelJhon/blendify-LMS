@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher &amp; Administrator Studio | Blendify</title>
+  <meta name="description" content="Blendify Administrator & Teacher Management Studio - Create classroom portals, upload materials, track in-time activity, customize quizzes, and print progression sheets." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/create-course.css" />
+</head>
+<body>
+  <div class="studio-layout" id="studioApp">
+    
+    <!-- ADMINISTRATOR & TEACHER SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="create-course.html" class="brand-logo">
+          <div class="brand-symbol">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <span class="brand-name">blendify</span>
+        </a>
+      </div>
+
+      <div class="admin-badge-row">
+        <span class="admin-role-badge">Teacher &amp; Admin Studio</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <!-- 1. Classroom Workplaces & Portals -->
+          <li class="nav-item">
+            <button class="nav-link active" data-view="workspaces" id="nav-workspaces">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </span>
+              <span class="nav-label">Classroom Portals</span>
+            </button>
+          </li>
+
+          <!-- 2. Upload Materials -->
+          <li class="nav-item">
+            <button class="nav-link" data-view="upload-materials" id="nav-upload-materials">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              </span>
+              <span class="nav-label">Upload Materials</span>
+            </button>
+          </li>
+
+          <!-- 3. In-Time Activity Tracker -->
+          <li class="nav-item">
+            <button class="nav-link" data-view="activity-tracker" id="nav-activity-tracker">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </span>
+              <span class="nav-label">In-Time Activity</span>
+              <span class="badge-live-pulse">Live</span>
+            </button>
+          </li>
+
+          <!-- 4. Quiz & Activity Creator -->
+          <li class="nav-item">
+            <button class="nav-link" data-view="quiz-builder" id="nav-quiz-builder">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15h6"></path><path d="M9 11h6"></path><path d="M9 7h2"></path></svg>
+              </span>
+              <span class="nav-label">Quizzes &amp; Activities</span>
+            </button>
+          </li>
+
+          <!-- 5. Progression & Printable Record Sheet -->
+          <li class="nav-item">
+            <button class="nav-link" data-view="progression-sheet" id="nav-progression-sheet">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              </span>
+              <span class="nav-label">Progression &amp; Print</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Active Portal Indicator in Sidebar -->
+      <div class="sidebar-footer">
+        <div class="active-portal-info-box">
+          <div class="portal-info-top">
+            <span class="live-dot"></span>
+            <span class="portal-info-lbl">Active Portal</span>
+          </div>
+          <strong class="portal-info-tag" id="sidebarActivePortalTag">#PORTAL-FIGMA-101</strong>
+          <span class="portal-info-name" id="sidebarActivePortalName">UI/UX Cohort 4</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN STUDIO WRAPPER -->
+    <div class="main-wrapper">
+      
+      <!-- TOP BAR -->
+      <header class="top-header no-print">
+        <div class="header-left">
+          <button class="mobile-toggle" id="sidebarToggle" aria-label="Toggle navigation menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          
+          <div class="portal-switcher-pill">
+            <span class="pill-label">Selected Portal:</span>
+            <select id="headerPortalSelect" class="portal-select-dropdown">
+              <option value="#PORTAL-FIGMA-101">#PORTAL-FIGMA-101 (Cohort 4 Responsive Lab)</option>
+              <option value="#PORTAL-WEBFLOW-88">#PORTAL-WEBFLOW-88 (Webflow CMS Masterclass)</option>
+              <option value="#PORTAL-TOKENS-22">#PORTAL-TOKENS-22 (Design Tokens &amp; Systems)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="btn-primary-sm" id="btnQuickCreatePortal">
+            <span>New Portal</span>
+          </button>
+
+          <!-- User Profile -->
+          <div class="user-profile-wrapper">
+            <button class="user-profile-btn" id="userProfileBtn" aria-label="User profile menu">
+              <div class="user-avatar-wrap">
+                <div class="user-avatar">
+                  <span>H</span>
+                </div>
+              </div>
+              <span class="user-name">Harsh</span>
+              <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="dropdown-panel user-panel" id="userPanel">
+              <div class="user-panel-info">
+                <div class="user-panel-name">Harsh Vardhan</div>
+                <div class="user-panel-role">Instructor · Teacher &amp; Admin Studio</div>
+              </div>
+              <button class="panel-item text-danger" id="btnSignOutAccount" style="color: #EF4444;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Sign Out of Google
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW PANELS CONTAINER -->
+      <main class="studio-content-container">
+
+        <!-- =================================================================
+             MODULE 1: CREATE CLASSROOM WORKSPACES & PORTALS
+             ================================================================= -->
+        <section class="studio-panel active" id="viewWorkspaces">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Classroom Workplaces &amp; Portals</h2>
+              <p class="panel-sub">Create dedicated classroom workspaces for your cohorts, generate portal tags, and share access links.</p>
+            </div>
+          </div>
+
+          <!-- Create New Portal Form Card -->
+          <div class="card-box">
+            <h3 class="card-heading">Create a New Classroom Workspace</h3>
+            <div class="portal-create-grid">
+              <div class="field-group">
+                <label class="field-label">Classroom / Workspace Name</label>
+                <input type="text" class="form-control" id="newPortalTitleInput" placeholder="e.g. UI/UX Cohort 5 — Advanced Responsive Breakpoints" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Subject &amp; Cohort Code</label>
+                <input type="text" class="form-control" id="newPortalCohortInput" placeholder="e.g. FIGMA-WEBFLOW-2026" />
+              </div>
+            </div>
+
+            <!-- Auto-generated Tag Preview -->
+            <div class="generated-tag-preview-card">
+              <div class="tag-meta-left">
+                <span class="tag-meta-lbl">Generated Portal Tag:</span>
+                <div class="tag-with-copy">
+                  <strong class="highlight-tag" id="liveGeneratedTag">#PORTAL-FIGMA-2026</strong>
+                  <button class="btn-ghost-sm" id="btnRefreshGeneratedTag">Randomize Tag</button>
+                </div>
+              </div>
+              <div class="tag-meta-right">
+                <span class="tag-meta-lbl">Generated Shareable Link:</span>
+                <span class="share-url-snippet" id="liveGeneratedUrl">https://blendify.edu/portal/join?tag=PORTAL-FIGMA-2026</span>
+              </div>
+            </div>
+
+            <div class="card-footer-right">
+              <button class="btn-primary" id="btnSubmitCreatePortal">Create &amp; Launch Portal</button>
+            </div>
+          </div>
+
+          <!-- Active Portals Directory -->
+          <div class="card-box">
+            <div class="card-header-between">
+              <h3 class="card-heading">Active Classroom Portals</h3>
+              <span class="count-badge" id="portalsCount">3 Active Portals</span>
+            </div>
+
+            <div class="portals-grid" id="portalsListGrid">
+              <!-- Portal 1 -->
+              <div class="portal-card active">
+                <div class="portal-card-top">
+                  <span class="portal-tag-pill">#PORTAL-FIGMA-101</span>
+                  <span class="status-live-tag"><span class="green-dot"></span> Active</span>
+                </div>
+                <h4>UI/UX Cohort 4 — Webflow Breakpoints Lab</h4>
+                <p>Focused on converting 1440px desktop wireframes to fluid flexbox and auto-layout containers.</p>
+                <div class="portal-card-stats">
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> 18 Learners</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> 6 Materials</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><line x1="9" y1="15" x2="15" y2="15"></line><line x1="9" y1="11" x2="15" y2="11"></line></svg> 2 Quizzes</span>
+                </div>
+                <div class="portal-card-actions">
+                  <button class="btn-primary-sm btn-select-portal" data-tag="#PORTAL-FIGMA-101" data-name="UI/UX Cohort 4">Manage Portal</button>
+                  <button class="btn-ghost-sm btn-copy-portal-link" data-url="https://blendify.edu/portal/join?tag=PORTAL-FIGMA-101">Copy Link</button>
+                </div>
+              </div>
+
+              <!-- Portal 2 -->
+              <div class="portal-card">
+                <div class="portal-card-top">
+                  <span class="portal-tag-pill">#PORTAL-WEBFLOW-88</span>
+                  <span class="status-live-tag"><span class="green-dot"></span> Active</span>
+                </div>
+                <h4>Webflow CMS &amp; Animations Workshop</h4>
+                <p>Structuring dynamic CMS collections, client-first classes, and scroll-driven micro-interactions.</p>
+                <div class="portal-card-stats">
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> 24 Learners</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> 8 Materials</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><line x1="9" y1="15" x2="15" y2="15"></line><line x1="9" y1="11" x2="15" y2="11"></line></svg> 1 Quiz</span>
+                </div>
+                <div class="portal-card-actions">
+                  <button class="btn-secondary-sm btn-select-portal" data-tag="#PORTAL-WEBFLOW-88" data-name="Webflow CMS Workshop">Manage Portal</button>
+                  <button class="btn-ghost-sm btn-copy-portal-link" data-url="https://blendify.edu/portal/join?tag=PORTAL-WEBFLOW-88">Copy Link</button>
+                </div>
+              </div>
+
+              <!-- Portal 3 -->
+              <div class="portal-card">
+                <div class="portal-card-top">
+                  <span class="portal-tag-pill">#PORTAL-TOKENS-22</span>
+                  <span class="status-live-tag"><span class="green-dot"></span> Active</span>
+                </div>
+                <h4>Enterprise Design Tokens &amp; Multi-Brand UI</h4>
+                <p>Figma variables, 8pt spacing rhythm, and fluid rem conversion formulas for production teams.</p>
+                <div class="portal-card-stats">
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> 14 Learners</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> 4 Materials</span>
+                  <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><line x1="9" y1="15" x2="15" y2="15"></line><line x1="9" y1="11" x2="15" y2="11"></line></svg> 1 Quiz</span>
+                </div>
+                <div class="portal-card-actions">
+                  <button class="btn-secondary-sm btn-select-portal" data-tag="#PORTAL-TOKENS-22" data-name="Design Tokens UI">Manage Portal</button>
+                  <button class="btn-ghost-sm btn-copy-portal-link" data-url="https://blendify.edu/portal/join?tag=PORTAL-TOKENS-22">Copy Link</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             MODULE 2: UPLOAD MATERIALS INTO CLASSROOM PORTAL
+             ================================================================= -->
+        <section class="studio-panel" id="viewUploadMaterials">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Upload Learning Materials</h2>
+              <p class="panel-sub">Upload educational resources directly into <strong class="highlight-gold" id="currentUploadPortalName">#PORTAL-FIGMA-101</strong>.</p>
+            </div>
+          </div>
+
+          <!-- Material Upload Form -->
+          <div class="card-box">
+            <h3 class="card-heading">Add Learning Resource to Classroom Portal</h3>
+            
+            <div class="upload-form-grid">
+              <div class="field-group">
+                <label class="field-label">Material Title</label>
+                <input type="text" class="form-control" id="materialTitleInput" placeholder="e.g. Module 2.3: Fluid Grid Breakpoints Cheatsheet" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Resource Category</label>
+                <select class="form-control" id="materialCategorySelect">
+                  <option value="Figma Kit">Figma UI Kit &amp; Tokens (.fig)</option>
+                  <option value="Study Guide">Educational Reading Guide (PDF)</option>
+                  <option value="Webflow Project">Webflow Cloneable / Staging Template</option>
+                  <option value="Lecture Notes">Practical Code &amp; Layout Notes</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- File Drag & Drop Box -->
+            <div class="file-drop-card" id="fileDropCard">
+              <div class="file-drop-content">
+                <div class="file-icon-cloud">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#C59A53" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                </div>
+                <h4 id="fileDropLabel">Choose a file or drag &amp; drop here</h4>
+                <p>Supported: .fig, .pdf, .zip, .html, .png, .mp4 (Up to 100 MB)</p>
+                <label class="btn-secondary-sm" for="portalMaterialFileInput">Browse Files</label>
+                <input type="file" id="portalMaterialFileInput" class="visually-hidden" />
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Brief Educational Description &amp; Instructions</label>
+              <textarea class="form-control" id="materialDescInput" rows="3" placeholder="Provide instructions for learners studying this material..."></textarea>
+            </div>
+
+            <div class="card-footer-between">
+              <label class="checkbox-toggle-lbl">
+                <input type="checkbox" id="checkAllowDownload" checked />
+                <span>Allow students to download raw asset file</span>
+              </label>
+              <button class="btn-primary" id="btnPublishMaterialToPortal">Upload to Portal</button>
+            </div>
+          </div>
+
+          <!-- Uploaded Materials List for This Portal -->
+          <div class="card-box">
+            <h3 class="card-heading">Materials Currently Active in this Portal</h3>
+            <div class="materials-table-wrapper">
+              <table class="studio-table" id="portalMaterialsTable">
+                <thead>
+                  <tr>
+                    <th>Material Name</th>
+                    <th>Category</th>
+                    <th>File Size</th>
+                    <th>Uploaded Date</th>
+                    <th>Student Access</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="portalMaterialsTableBody">
+                  <tr>
+                    <td>
+                      <div class="table-mat-name">
+                        <span class="file-badge vector-badge">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 2a4 4 0 0 0-4 4v4h4a4 4 0 0 0 0-8z"></path><path d="M12 10H8a4 4 0 0 0 0 8h4v-8z"></path><path d="M12 10h4a4 4 0 0 0 0-8h-4v8z"></path><path d="M12 18H8a4 4 0 0 0 4 4 4 4 0 0 0 4-4v-4h-4v4z"></path></svg>
+                        </span>
+                        <strong>Figma Responsive Wireframe Starter Kit v2.4</strong>
+                      </div>
+                    </td>
+                    <td>Figma Kit</td>
+                    <td>34.2 MB</td>
+                    <td>Sept 7, 2026</td>
+                    <td><span class="status-pill open">Open Access</span></td>
+                    <td><button class="btn-ghost-xs text-danger btn-delete-mat">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="table-mat-name">
+                        <span class="file-badge vector-badge">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        </span>
+                        <strong>Fluid Breakpoints &amp; Rem Units Cheat Sheet</strong>
+                      </div>
+                    </td>
+                    <td>Study Guide</td>
+                    <td>4.8 MB</td>
+                    <td>Sept 8, 2026</td>
+                    <td><span class="status-pill open">Open Access</span></td>
+                    <td><button class="btn-ghost-xs text-danger btn-delete-mat">Delete</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="table-mat-name">
+                        <span class="file-badge vector-badge">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        </span>
+                        <strong>Webflow Client-First Component Library</strong>
+                      </div>
+                    </td>
+                    <td>Webflow Project</td>
+                    <td>Live URL</td>
+                    <td>Sept 8, 2026</td>
+                    <td><span class="status-pill open">Open Access</span></td>
+                    <td><button class="btn-ghost-xs text-danger btn-delete-mat">Delete</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             MODULE 3: IN-TIME ACTIVITY TRACKER (WHO, WHEN, WHAT TIME)
+             ================================================================= -->
+        <section class="studio-panel" id="viewActivityTracker">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">In-Time Activity Tracker</h2>
+              <p class="panel-sub">Real-time audit log tracking <strong>who</strong> opened materials, <strong>when</strong>, and the <strong>exact timestamp</strong>.</p>
+            </div>
+            <div class="tracker-top-actions">
+              <button class="btn-secondary-sm" id="btnSimulateStudentAccess">Simulate Student Opening Material</button>
+            </div>
+          </div>
+
+          <!-- Activity Tracker Stats Banner -->
+          <div class="tracker-metrics-grid">
+            <div class="metric-box">
+              <span class="metric-val" id="metricActiveToday">18</span>
+              <span class="metric-lbl">Active Students Today</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-val" id="metricMaterialOpenings">42</span>
+              <span class="metric-lbl">Total Material Openings</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-val" id="metricDownloads">14</span>
+              <span class="metric-lbl">Asset Downloads Recorded</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-val text-success">Live Sync</span>
+              <span class="metric-lbl">Audit Status</span>
+            </div>
+          </div>
+
+          <!-- Live Activity Log Table -->
+          <div class="card-box">
+            <div class="card-header-between">
+              <h3 class="card-heading">Live In-Time Access Feed</h3>
+              <div class="search-filter-wrap">
+                <input type="text" id="activitySearchInput" placeholder="Filter by student or material..." class="search-sm" />
+              </div>
+            </div>
+
+            <div class="materials-table-wrapper">
+              <table class="studio-table" id="activityLogTable">
+                <thead>
+                  <tr>
+                    <th>Learner (Who)</th>
+                    <th>Material Opened (What)</th>
+                    <th>Action Type</th>
+                    <th>Exact Timestamp (When &amp; What Time)</th>
+                    <th>In-Time Status</th>
+                  </tr>
+                </thead>
+                <tbody id="activityLogTableBody">
+                  <!-- Row 1 -->
+                  <tr class="activity-row">
+                    <td>
+                      <div class="student-user-cell">
+                        <div class="stu-avatar">AM</div>
+                        <div>
+                          <strong>Aria Montgomery</strong>
+                          <span class="stu-id">ID: #STU-9021</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>Module 2.2: Auto-Layout Fluid Constraints</strong>
+                      <span class="mat-subtext">Classroom Portal: #PORTAL-FIGMA-101</span>
+                    </td>
+                    <td><span class="action-tag open">Viewed Material</span></td>
+                    <td>
+                      <div class="timestamp-cell">
+                        <strong class="time-text">10:44:18 PM</strong>
+                        <span class="date-text">Sept 8, 2026</span>
+                      </div>
+                    </td>
+                    <td><span class="live-status-pill online"><span class="green-dot"></span> Active Now</span></td>
+                  </tr>
+
+                  <!-- Row 2 -->
+                  <tr class="activity-row">
+                    <td>
+                      <div class="student-user-cell">
+                        <div class="stu-avatar rc-avatar">RC</div>
+                        <div>
+                          <strong>Rahim Chowdhury</strong>
+                          <span class="stu-id">ID: #STU-4812</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>Figma Responsive Wireframe Starter Kit v2.4</strong>
+                      <span class="mat-subtext">Classroom Portal: #PORTAL-FIGMA-101</span>
+                    </td>
+                    <td><span class="action-tag download">Downloaded (.fig)</span></td>
+                    <td>
+                      <div class="timestamp-cell">
+                        <strong class="time-text">10:38:05 PM</strong>
+                        <span class="date-text">Sept 8, 2026</span>
+                      </div>
+                    </td>
+                    <td><span class="live-status-pill recent">6m ago</span></td>
+                  </tr>
+
+                  <!-- Row 3 -->
+                  <tr class="activity-row">
+                    <td>
+                      <div class="student-user-cell">
+                        <div class="stu-avatar">HV</div>
+                        <div>
+                          <strong>Harsh Vardhan</strong>
+                          <span class="stu-id">ID: #STU-1004</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>Fluid Breakpoints &amp; Rem Units Cheat Sheet</strong>
+                      <span class="mat-subtext">Classroom Portal: #PORTAL-FIGMA-101</span>
+                    </td>
+                    <td><span class="action-tag open">Opened PDF</span></td>
+                    <td>
+                      <div class="timestamp-cell">
+                        <strong class="time-text">10:15:22 PM</strong>
+                        <span class="date-text">Sept 8, 2026</span>
+                      </div>
+                    </td>
+                    <td><span class="live-status-pill recent">29m ago</span></td>
+                  </tr>
+
+                  <!-- Row 4 -->
+                  <tr class="activity-row">
+                    <td>
+                      <div class="student-user-cell">
+                        <div class="stu-avatar sk-avatar">SK</div>
+                        <div>
+                          <strong>Sarah Kim</strong>
+                          <span class="stu-id">ID: #STU-6523</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>Webflow Client-First Component Library</strong>
+                      <span class="mat-subtext">Classroom Portal: #PORTAL-FIGMA-101</span>
+                    </td>
+                    <td><span class="action-tag open">Viewed Cloneable</span></td>
+                    <td>
+                      <div class="timestamp-cell">
+                        <strong class="time-text">09:42:50 PM</strong>
+                        <span class="date-text">Sept 8, 2026</span>
+                      </div>
+                    </td>
+                    <td><span class="live-status-pill offline">1h ago</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             MODULE 4: CUSTOMIZABLE QUIZ & ACTIVITY BUILDER
+             ================================================================= -->
+        <section class="studio-panel" id="viewQuizBuilder">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Customizable Quizzes &amp; Activities</h2>
+              <p class="panel-sub">Create and customize interactive quizzes, practical design assessments, and checkpoints for <strong class="highlight-gold" id="currentQuizPortalName">#PORTAL-FIGMA-101</strong>.</p>
+            </div>
+          </div>
+
+          <!-- Quiz Creator Card -->
+          <div class="card-box">
+            <h3 class="card-heading">Activity &amp; Quiz Configuration</h3>
+            <div class="form-row-2">
+              <div class="field-group">
+                <label class="field-label">Quiz / Activity Title</label>
+                <input type="text" class="form-control" id="customQuizTitleInput" placeholder="e.g. Module 2: Auto Layout Constraints &amp; Breakpoints Assessment" value="Module 2: Auto Layout Constraints &amp; Breakpoints Assessment" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Activity Type</label>
+                <select class="form-control" id="quizTypeSelect">
+                  <option value="quiz">Interactive Multiple-Choice Quiz</option>
+                  <option value="project">Practical Project &amp; File Submission</option>
+                  <option value="checkpoint">Conceptual True/False Checkpoint</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-3">
+              <div class="field-group">
+                <label class="field-label">Passing Score (%)</label>
+                <input type="number" class="form-control" id="quizPassScoreInput" value="80" min="50" max="100" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Time Limit (Minutes)</label>
+                <input type="number" class="form-control" id="quizTimeLimitInput" value="15" min="5" max="120" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Max Attempts Allowed</label>
+                <input type="number" class="form-control" id="quizAttemptsInput" value="3" min="1" max="10" />
+              </div>
+            </div>
+
+            <!-- Custom Questions Builder -->
+            <div class="questions-builder-section">
+              <div class="section-title-row">
+                <label class="field-label">Customize Questions &amp; Answer Keys</label>
+                <button class="btn-add-inline" id="btnAddQuestionItem">Add Another Question</button>
+              </div>
+
+              <div class="questions-list" id="questionsListContainer">
+                <!-- Question 1 -->
+                <div class="question-builder-card" data-q="1">
+                  <div class="q-header-bar">
+                    <strong>Question 01</strong>
+                    <div class="q-points-wrap">
+                      <span>Points:</span>
+                      <input type="number" value="10" class="points-input" />
+                      <button class="btn-ghost-xs text-danger btn-delete-question">Remove</button>
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <input type="text" class="form-control q-prompt-input" placeholder="Enter question prompt..." value="In Figma Auto-Layout, what constraint behavior causes a frame to expand to 100% of its parent container width?" />
+                  </div>
+                  <div class="options-radio-list">
+                    <div class="option-edit-row">
+                      <input type="radio" name="q1_correct" value="0" />
+                      <input type="text" class="form-control" value="Hug contents" />
+                    </div>
+                    <div class="option-edit-row">
+                      <input type="radio" name="q1_correct" value="1" checked />
+                      <input type="text" class="form-control" value="Fill container (width: 100%)" />
+                      <span class="correct-badge">Correct Answer</span>
+                    </div>
+                    <div class="option-edit-row">
+                      <input type="radio" name="q1_correct" value="2" />
+                      <input type="text" class="form-control" value="Fixed width: 375px" />
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label-sm">Custom Hint / Teacher Explanation for Learners</label>
+                    <input type="text" class="form-control input-sm" placeholder="e.g. Fill tells the element to stretch across all available space." value="Fill container is the equivalent of width: 100% in CSS flexbox." />
+                  </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="question-builder-card" data-q="2">
+                  <div class="q-header-bar">
+                    <strong>Question 02</strong>
+                    <div class="q-points-wrap">
+                      <span>Points:</span>
+                      <input type="number" value="10" class="points-input" />
+                      <button class="btn-ghost-xs text-danger btn-delete-question">Remove</button>
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <input type="text" class="form-control q-prompt-input" placeholder="Enter question prompt..." value="Why should Webflow web designers use rem units over hardcoded pixels for typography?" />
+                  </div>
+                  <div class="options-radio-list">
+                    <div class="option-edit-row">
+                      <input type="radio" name="q2_correct" value="0" checked />
+                      <input type="text" class="form-control" value="Rem units scale proportionately with the user's browser accessibility settings" />
+                      <span class="correct-badge">Correct Answer</span>
+                    </div>
+                    <div class="option-edit-row">
+                      <input type="radio" name="q2_correct" value="1" />
+                      <input type="text" class="form-control" value="Pixels load faster in CSS rendering engines" />
+                    </div>
+                    <div class="option-edit-row">
+                      <input type="radio" name="q2_correct" value="2" />
+                      <input type="text" class="form-control" value="Rem units prevent font loading on mobile" />
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label-sm">Custom Hint / Teacher Explanation for Learners</label>
+                    <input type="text" class="form-control input-sm" value="Rem units honor user-defined browser font sizes, ensuring accessible digital experiences." />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer-right">
+              <button class="btn-primary" id="btnPublishQuizToPortal">Publish Activity to Classroom Portal</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             MODULE 5: PROGRESSION ASSESSMENT & PRINTABLE RECORD SHEET
+             ================================================================= -->
+        <section class="studio-panel" id="viewProgressionSheet">
+          <div class="panel-header-row no-print">
+            <div>
+              <h2 class="panel-title">Student Progression &amp; Record Data Sheet</h2>
+              <p class="panel-sub">Track ratings, opening frequency, and file downloads. Export or print an official grade sheet for your cohort.</p>
+            </div>
+            <div class="print-actions-group">
+              <button class="btn-primary" id="btnPrintRecordSheet">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>Print Record Sheet (PDF)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Printable Classroom Record Sheet Container -->
+          <div class="record-sheet-card" id="printableRecordSheet">
+            
+            <!-- Official Header for Print -->
+            <div class="sheet-official-header">
+              <div class="sheet-brand">
+                <div class="brand-symbol">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                </div>
+                <div>
+                  <h2 class="sheet-title-text">BLENDIFY LEARNING ACADEMY</h2>
+                  <span class="sheet-sub-text">Official Student Academic Progression &amp; Engagement Record</span>
+                </div>
+              </div>
+
+              <div class="sheet-meta-block">
+                <div><strong>Portal:</strong> <span id="printPortalTag">#PORTAL-FIGMA-101</span></div>
+                <div><strong>Classroom:</strong> UI/UX Cohort 4 — Responsive Breakpoints</div>
+                <div><strong>Instructor:</strong> Harsh Vardhan (Vativa Hub)</div>
+                <div><strong>Report Date:</strong> <span id="printReportDate">September 8, 2026</span></div>
+              </div>
+            </div>
+
+            <!-- Progression Summary Matrix Table -->
+            <div class="sheet-table-wrapper">
+              <table class="progression-table">
+                <thead>
+                  <tr>
+                    <th>Learner Info</th>
+                    <th>Material Rating Given</th>
+                    <th>Material Openings &amp; Views</th>
+                    <th>Assets Downloaded</th>
+                    <th>Quiz Performance</th>
+                    <th>Progression Status</th>
+                  </tr>
+                </thead>
+                <tbody id="progressionTableBody">
+                  <tr>
+                    <td>
+                      <div class="stu-info-bold">Aria Montgomery</div>
+                      <div class="stu-id-sub">STU-9021 · aria@blendify.edu</div>
+                    </td>
+                    <td>
+                      <div class="rating-cell">
+                        <span class="stars-gold">★★★★★</span>
+                        <strong>5.0 / 5.0</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="views-metric">
+                        <strong>18 Openings</strong>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 100%;"></div></div>
+                        <span class="percent-label">100% Curriculum Completed</span>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>4 Downloads</strong>
+                      <span class="download-sub">Figma kit, PDF sheets</span>
+                    </td>
+                    <td>
+                      <span class="score-badge high">98% (A+)</span>
+                    </td>
+                    <td>
+                      <span class="status-badge-cert awarded">Distinction (Cert Issued)</span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="stu-info-bold">Rahim Chowdhury</div>
+                      <div class="stu-id-sub">STU-4812 · rahim@blendify.edu</div>
+                    </td>
+                    <td>
+                      <div class="rating-cell">
+                        <span class="stars-gold">★★★★★</span>
+                        <strong>4.9 / 5.0</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="views-metric">
+                        <strong>14 Openings</strong>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 85%;"></div></div>
+                        <span class="percent-label">85% Completed</span>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>3 Downloads</strong>
+                      <span class="download-sub">Figma assets</span>
+                    </td>
+                    <td>
+                      <span class="score-badge high">94% (A)</span>
+                    </td>
+                    <td>
+                      <span class="status-badge-cert in-progress">In Progress (Review Ready)</span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="stu-info-bold">Harsh Vardhan</div>
+                      <div class="stu-id-sub">STU-1004 · harsh@blendify.edu</div>
+                    </td>
+                    <td>
+                      <div class="rating-cell">
+                        <span class="stars-gold">★★★★★</span>
+                        <strong>5.0 / 5.0</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="views-metric">
+                        <strong>20 Openings</strong>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 100%;"></div></div>
+                        <span class="percent-label">100% Completed</span>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>5 Downloads</strong>
+                      <span class="download-sub">All assets &amp; templates</span>
+                    </td>
+                    <td>
+                      <span class="score-badge high">100% (A+)</span>
+                    </td>
+                    <td>
+                      <span class="status-badge-cert awarded">Distinction (Cert Issued)</span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="stu-info-bold">Sarah Kim</div>
+                      <div class="stu-id-sub">STU-6523 · sarah@blendify.edu</div>
+                    </td>
+                    <td>
+                      <div class="rating-cell">
+                        <span class="stars-gold">★★★★☆</span>
+                        <strong>4.5 / 5.0</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="views-metric">
+                        <strong>11 Openings</strong>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 70%;"></div></div>
+                        <span class="percent-label">70% Completed</span>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>2 Downloads</strong>
+                      <span class="download-sub">PDF cheat sheet</span>
+                    </td>
+                    <td>
+                      <span class="score-badge mid">88% (B+)</span>
+                    </td>
+                    <td>
+                      <span class="status-badge-cert in-progress">Module 3 In Progress</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Official Signature Block for Print -->
+            <div class="sheet-signature-block">
+              <div class="sig-col">
+                <div class="sig-line"></div>
+                <span>Classroom Instructor Signature</span>
+              </div>
+              <div class="sig-col">
+                <div class="sig-line"></div>
+                <span>Academic Department Seal &amp; Verification</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module" src="/src/create-course.js"></script>
+</body>
+</html>

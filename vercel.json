@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/create-course", "destination": "/create-course.html" },
+    { "source": "/studio", "destination": "/create-course.html" }
+  ]
+}

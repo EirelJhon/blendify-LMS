@@ -1,0 +1,25 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# Multi-Page App Clean URLs
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/create-course"
+  to = "/create-course.html"
+  status = 200
+
+[[redirects]]
+  from = "/studio"
+  to = "/create-course.html"
+  status = 200
+
+# Root fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

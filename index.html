@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blendify | Educational LMS & AI Learning Platform</title>
+  <meta name="description"
+    content="Blendify LMS - Access educational learning materials, collaborate in classroom workplaces via links and tags, and learn with personalized AI agents." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+
+<body>
+
+  <div class="app-layout" id="app">
+    <!-- STREAMLINED SIDEBAR (FOCUSED STRICTLY ON LEARNER REQUIREMENTS) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#" class="brand-logo" id="brandLogo">
+          <div class="brand-symbol">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <span class="brand-name">blendify</span>
+        </a>
+      </div>
+
+      <!-- Navigation focused strictly on the 3 core student pillars -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">LEARNER PORTAL</div>
+        <ul class="nav-list">
+          <!-- 1. Learning Materials -->
+          <li class="nav-item">
+            <button class="nav-link active" data-view="materials" id="nav-materials">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+              </span>
+              <span class="nav-label">Learning Materials</span>
+            </button>
+          </li>
+
+          <!-- 2. Classroom Workplaces (Tags & Links) -->
+          <li class="nav-item">
+            <button class="nav-link" data-view="workplaces" id="nav-workplaces">
+              <span class="nav-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </span>
+              <span class="nav-label">Workplaces</span>
+            </button>
+          </li>
+
+          <!-- 3. Personalized AI Agents -->
+          <li class="nav-item">
+            <button class="nav-link" data-view="ai-agent" id="nav-ai-agent">
+              <span class="nav-icon ai-sparkle-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
+                  </path>
+                </svg>
+              </span>
+              <span class="nav-label">AI Learning Agent</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Active Classroom Quick Status Footer -->
+      <div class="sidebar-footer">
+        <div class="active-portal-badge-card">
+          <div class="portal-status-header">
+            <span class="live-dot"></span>
+            <span class="portal-lbl">Current Workplace</span>
+          </div>
+          <p class="current-tag-text" id="sidebarActiveTag">#PORTAL-FIGMA-101</p>
+          <button class="btn-switch-portal" id="btnSidebarSwitchPortal">Switch Portal</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="main-wrapper">
+      <!-- TOP BAR -->
+      <header class="top-header" id="topHeader">
+        <div class="header-left">
+          <button class="mobile-toggle" id="sidebarToggle" aria-label="Toggle navigation menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="header-right">
+          <!-- User Profile -->
+          <div class="user-profile-wrapper">
+            <button class="user-profile-btn" id="userProfileBtn">
+              <div class="user-avatar-wrap">
+                <div class="user-avatar">
+                  <span>H</span>
+                </div>
+              </div>
+              <span class="user-name">Harsh</span>
+              <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="dropdown-panel user-panel" id="userPanel">
+              <div class="user-panel-info">
+                <div class="user-panel-name">Harsh Vardhan</div>
+                <div class="user-panel-role">Student · Blendify Pro</div>
+              </div>
+              <hr class="panel-divider" />
+              <button class="panel-item" id="btnOpenAIFromProfile">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
+                  </path>
+                </svg>
+                My AI Tutor History
+              </button>
+              <button class="panel-item" id="btnViewMyPortals">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                </svg>
+                Joined Workplaces
+              </button>
+              <button class="panel-item text-danger" id="btnSignOutAccount" style="color: #EF4444;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Sign Out of Google
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ===================================================================
+           VIEW 1: LEARNING MATERIALS (EDUCATIONAL CONTENT)
+           Preserves Reference Design with Video & Price removed
+           =================================================================== -->
+      <main class="page-content" id="viewMaterials">
+        <!-- DARK HERO / SHORT INTRODUCTION ON HOW IT WORKS -->
+        <section class="hero-banner" id="heroIntroBanner">
+          <div class="hero-container">
+            <div class="hero-top-meta">
+              <span class="instructor-credit">
+                Blendify LMS
+              </span>
+            </div>
+
+            <h1 class="course-main-title">
+              Welcome to Blendify
+            </h1>
+
+            <p class="hero-intro-description">
+              Blendify connects your learning in 3 simple steps: study hands-on curriculum materials, join collaborative
+              classroom workplaces using shared portal tags, and get instant answers from your 24/7 personalized AI
+              mentor.
+            </p>
+          </div>
+        </section>
+
+        <!-- MAIN LAYOUT: MATERIALS COLUMN + SIDEBAR CARD (PRICE REMOVED) -->
+        <div class="course-body-container">
+          <div class="main-column">
+
+            <!-- CURRENT LEARNING MATERIAL WORKSPACE (IN PLACE OF VIDEO) -->
+            <section class="learning-workspace-card" id="learningWorkspace">
+              <div class="workspace-top-bar">
+                <div class="module-status-badge">
+                  <span class="pulse-amber"></span>
+                  <span>ACTIVE EDUCATIONAL MATERIAL</span>
+                </div>
+                <div class="workspace-actions">
+                  <button class="btn-ghost-sm" id="btnAskAIAboutLesson">
+                    Ask AI Agent
+                  </button>
+                  <button class="btn-ghost-sm" id="btnShareToClassroom">
+                    Share to Workplace
+                  </button>
+                </div>
+              </div>
+
+              <!-- Lesson Material Header -->
+              <div class="active-lesson-hero">
+                <div class="lesson-info">
+                  <span class="lesson-breadcrumbs">Module 2 · Material 5 of 20</span>
+                  <h2 class="active-lesson-title">Fluid Breakpoints, Auto Layout &amp; Responsive Webflow Grid</h2>
+                  <p class="active-lesson-desc">
+                    Comprehensive study material exploring how strict 1440px desktop layouts translate into fluid
+                    Webflow CSS Flexbox and Grid models. Includes design token rules, 8pt spacing rhythm, and
+                    tablet/mobile viewport behaviors.
+                  </p>
+
+                  <div class="progress-container">
+                    <div class="progress-info">
+                      <span class="progress-label">Material Progress</span>
+                      <span class="progress-value" id="progressPercentage">45% Completed (9 of 20 Studied)</span>
+                    </div>
+                    <div class="progress-bar-track">
+                      <div class="progress-bar-fill" id="progressBarFill" style="width: 45%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="lesson-action-group">
+                    <button class="btn-primary" id="btnReadMaterial">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                      </svg>
+                      <span>Open Interactive Guide</span>
+                    </button>
+                    <button class="btn-secondary" id="btnMarkComplete">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      <span id="markCompleteText">Mark Completed</span>
+                    </button>
+                    <button class="btn-outline" id="btnDownloadAssets">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                      <span>Download Starter Assets (.fig)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Interactive Responsive Device Simulator -->
+                <div class="interactive-preview-box">
+                  <div class="simulator-header">
+                    <div class="simulator-dots"><span></span><span></span><span></span></div>
+                    <div class="simulator-viewports">
+                      <button class="viewport-btn active" data-device="desktop"><span>Desktop</span></button>
+                      <button class="viewport-btn" data-device="tablet"><span>Tablet</span></button>
+                      <button class="viewport-btn" data-device="mobile"><span>Mobile</span></button>
+                    </div>
+                    <span class="viewport-size-label" id="viewportSizeLabel">1440 × 900</span>
+                  </div>
+
+                  <div class="simulator-stage">
+                    <div class="simulated-device-frame desktop" id="deviceFrame">
+                      <div class="wireframe-mockup">
+                        <div class="wireframe-nav">
+                          <div class="mock-logo"></div>
+                          <div class="mock-links"><span></span><span></span><span></span></div>
+                          <div class="mock-cta"></div>
+                        </div>
+                        <div class="wireframe-hero">
+                          <div class="mock-badge"></div>
+                          <div class="mock-h1"></div>
+                          <div class="mock-p"></div>
+                          <div class="mock-btns">
+                            <div class="mock-btn-primary"></div>
+                            <div class="mock-btn-sec"></div>
+                          </div>
+                        </div>
+                        <div class="wireframe-grid">
+                          <div class="mock-card">
+                            <div class="mock-icon"></div>
+                            <div class="mock-card-title"></div>
+                          </div>
+                          <div class="mock-card">
+                            <div class="mock-icon"></div>
+                            <div class="mock-card-title"></div>
+                          </div>
+                          <div class="mock-card">
+                            <div class="mock-icon"></div>
+                            <div class="mock-card-title"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="simulator-footer">
+                    <span class="sim-caption">Interactive learning model: Auto Layout fluid constraints</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- TABS CONTAINER (MATERIALS FOCUSED) -->
+            <div class="tabs-container">
+              <div class="tabs-header-nav" role="tablist">
+                <button class="tab-btn active" data-tab="materials-curriculum" role="tab">
+                  Curriculum &amp; Materials
+                </button>
+                <button class="tab-btn" data-tab="materials-downloads" role="tab">
+                  Asset Library (.fig &amp; .zip)
+                </button>
+                <button class="tab-btn" data-tab="materials-study-guide" role="tab">
+                  Study Guides &amp; Notes
+                </button>
+              </div>
+
+              <div class="tab-content-wrapper">
+                <!-- TAB 1: CURRICULUM ACCORDION -->
+                <div class="tab-panel active" id="panel-materials-curriculum" role="tabpanel">
+                  <div class="syllabus-header-row">
+                    <div>
+                      <h3 class="section-title">Educational Learning Modules</h3>
+                      <p class="sub-text">20 Core Lessons · Step-by-Step Educational Guides</p>
+                    </div>
+                    <button class="btn-ghost-sm" id="btnExpandAllModules">Expand All</button>
+                  </div>
+
+                  <div class="accordion" id="syllabusAccordion">
+                    <!-- Module 1 -->
+                    <div class="accordion-item open">
+                      <button class="accordion-trigger">
+                        <div class="acc-title-group">
+                          <span class="module-number">01</span>
+                          <div class="acc-text">
+                            <h4>Foundations of UI/UX &amp; Responsive Layout Principles</h4>
+                            <span class="acc-meta">4 Materials · 45 mins total reading</span>
+                          </div>
+                        </div>
+                        <div class="acc-right">
+                          <span class="badge-status completed">Completed</span>
+                          <svg class="acc-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </button>
+                      <div class="accordion-content">
+                        <ul class="lesson-list">
+                          <li class="lesson-item completed">
+                            <div class="lesson-status-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg></div>
+                            <div class="lesson-details">
+                              <span class="lesson-name">1.1 Modern Web Architecture &amp; Fluid Grid
+                                Specifications</span>
+                              <span class="lesson-length">Study Guide · PDF &amp; Interactive Notes</span>
+                            </div>
+                            <button class="lesson-action-btn">Read</button>
+                          </li>
+                          <li class="lesson-item completed">
+                            <div class="lesson-status-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg></div>
+                            <div class="lesson-details">
+                              <span class="lesson-name">1.2 Visual Hierarchy, Typography Scales &amp; Golden
+                                Ratio</span>
+                              <span class="lesson-length">Reference Sheets &amp; Tokens</span>
+                            </div>
+                            <button class="lesson-action-btn">Read</button>
+                          </li>
+                          <li class="lesson-item completed">
+                            <div class="lesson-status-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg></div>
+                            <div class="lesson-details">
+                              <span class="lesson-name">1.3 Wireframing Desktop &amp; Mobile Breakpoints (1440px / 768px
+                                / 375px)</span>
+                              <span class="lesson-length">Practical Exercise Brief</span>
+                            </div>
+                            <button class="lesson-action-btn">Read</button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <!-- Module 2 -->
+                    <div class="accordion-item open">
+                      <button class="accordion-trigger">
+                        <div class="acc-title-group">
+                          <span class="module-number">02</span>
+                          <div class="acc-text">
+                            <h4>Figma Design Systems, Auto Layout &amp; Design Tokens</h4>
+                            <span class="acc-meta">6 Materials · 1 hr 20 mins</span>
+                          </div>
+                        </div>
+                        <div class="acc-right">
+                          <span class="badge-status in-progress">In Progress</span>
+                          <svg class="acc-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </button>
+                      <div class="accordion-content">
+                        <ul class="lesson-list">
+                          <li class="lesson-item completed">
+                            <div class="lesson-status-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg></div>
+                            <div class="lesson-details">
+                              <span class="lesson-name">2.1 Setting Up Reusable Color &amp; Typography Tokens in
+                                Figma</span>
+                              <span class="lesson-length">Figma UI Kit Included</span>
+                            </div>
+                            <button class="lesson-action-btn">Read</button>
+                          </li>
+                          <li class="lesson-item current">
+                            <div class="lesson-status-icon current-icon">
+                              <div class="small-play-dot"></div>
+                            </div>
+                            <div class="lesson-details">
+                              <span class="lesson-name">2.2 Fluid Breakpoints, Auto Layout &amp; Responsive Webflow
+                                Grid</span>
+                              <span class="lesson-length">Active Material · Hands-on Exercise</span>
+                            </div>
+                            <button class="lesson-action-btn active" id="btnStudyCurrent">Study Now</button>
+                          </li>
+                          <li class="lesson-item">
+                            <div class="lesson-status-icon">
+                              <div class="circle-empty"></div>
+                            </div>
+                            <div class="lesson-details">
+                              <span class="lesson-name">2.3 Building High-Fidelity Navigation &amp; Responsive
+                                Menus</span>
+                              <span class="lesson-length">Design Walkthrough</span>
+                            </div>
+                            <button class="lesson-action-btn">Start</button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <!-- Module 3 -->
+                    <div class="accordion-item">
+                      <button class="accordion-trigger">
+                        <div class="acc-title-group">
+                          <span class="module-number">03</span>
+                          <div class="acc-text">
+                            <h4>Webflow Visual Development, CMS &amp; CSS Fluid Layouts</h4>
+                            <span class="acc-meta">6 Materials · 1 hr 45 mins</span>
+                          </div>
+                        </div>
+                        <div class="acc-right">
+                          <span class="badge-status locked">Upcoming</span>
+                          <svg class="acc-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </button>
+                      <div class="accordion-content">
+                        <ul class="lesson-list">
+                          <li class="lesson-item">
+                            <div class="lesson-status-icon">
+                              <div class="circle-empty"></div>
+                            </div>
+                            <div class="lesson-details">
+                              <span class="lesson-name">3.1 Client-First Naming Architecture &amp; Rem Units</span>
+                              <span class="lesson-length">CSS &amp; Webflow Guide</span>
+                            </div>
+                            <button class="lesson-action-btn">Start</button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB 2: DOWNLOADABLE ASSET LIBRARY -->
+                <div class="tab-panel" id="panel-materials-downloads" role="tabpanel">
+                  <div class="materials-library-grid">
+                    <div class="material-card">
+                      <div class="mat-icon vector-icon-box">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="3"></circle>
+                          <path d="M12 2a4 4 0 0 0-4 4v4h4a4 4 0 0 0 0-8z"></path>
+                          <path d="M12 10H8a4 4 0 0 0 0 8h4v-8z"></path>
+                          <path d="M12 10h4a4 4 0 0 0 0-8h-4v8z"></path>
+                          <path d="M12 18H8a4 4 0 0 0 4 4 4 4 0 0 0 4-4v-4h-4v4z"></path>
+                        </svg>
+                      </div>
+                      <div class="mat-body">
+                        <h4>Figma Responsive Wireframe Starter Kit v2.4</h4>
+                        <p>Complete design system with responsive auto-layout components, 8pt spatial grid, and color
+                          token variables.</p>
+                        <div class="mat-meta">
+                          <span>34.2 MB · .fig file</span>
+                          <button class="btn-primary-sm download-trigger"
+                            data-name="Figma Wireframe Starter Kit">Download</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="material-card">
+                      <div class="mat-icon vector-icon-box">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="16 18 22 12 16 6"></polyline>
+                          <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                      </div>
+                      <div class="mat-body">
+                        <h4>Webflow Client-First Style Guide Cloneable</h4>
+                        <p>Pre-configured typography, fluid rem unit calculations, and responsive navigation classes.
+                        </p>
+                        <div class="mat-meta">
+                          <span>Online Cloneable · Webflow Project</span>
+                          <button class="btn-primary-sm download-trigger"
+                            data-name="Webflow Style Guide Cloneable">Clone Project</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="material-card">
+                      <div class="mat-icon vector-icon-box">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                      </div>
+                      <div class="mat-body">
+                        <h4>Responsive Layout Cheat Sheet &amp; Formulas</h4>
+                        <p>Quick conversion charts from Figma auto-layout padding to Webflow CSS flexbox and grid rules.
+                        </p>
+                        <div class="mat-meta">
+                          <span>4.8 MB · High-res PDF</span>
+                          <button class="btn-primary-sm download-trigger"
+                            data-name="Responsive Cheat Sheet PDF">Download</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB 3: STUDY GUIDES -->
+                <div class="tab-panel" id="panel-materials-study-guide" role="tabpanel">
+                  <div class="content-section">
+                    <h3 class="section-title">Core Educational Takeaways</h3>
+                    <div class="learn-grid">
+                      <div class="learn-item">
+                        <div class="learn-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg></div>
+                        <span>Understanding 1440px desktop to 375px mobile fluid constraints</span>
+                      </div>
+                      <div class="learn-item">
+                        <div class="learn-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg></div>
+                        <span>Using <code>rem</code> units instead of fixed pixels for accessible scaling</span>
+                      </div>
+                      <div class="learn-item">
+                        <div class="learn-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg></div>
+                        <span>Auto-Layout Hug vs Fill container rules</span>
+                      </div>
+                      <div class="learn-item">
+                        <div class="learn-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg></div>
+                        <span>SEO metadata and OpenGraph tag setups</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: RECENTLY VISITED MATERIALS & NEW CLASS WORKSPACE -->
+          <aside class="sidebar-column" id="sidebarRightColumn">
+            <!-- SECTION 1: TOP CORNER - RECENTLY VISITED MATERIALS OF FILES -->
+            <div class="sidebar-widget-card recent-materials-card" id="recentMaterialsCard">
+              <div class="widget-header">
+                <div class="widget-title-wrap">
+                  <div class="widget-icon recent-clock-icon">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 class="widget-heading">Recently Visited</h3>
+                    <span class="widget-sub">Materials &amp; Study Files</span>
+                  </div>
+                </div>
+                <span class="badge-count" id="recentCountBadge">4 Files</span>
+              </div>
+
+              <!-- List of recently visited materials & files -->
+              <div class="recent-materials-list" id="recentMaterialsList">
+                <!-- Item 1: Guide PDF -->
+                <button class="recent-file-item" data-action="open-guide" data-file="Module 2 Interactive Guide"
+                  data-tab="materials-curriculum" data-target="syllabusAccordion" title="Open Module 2 Guide">
+                  <div class="file-icon-box file-pdf">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                  </div>
+                  <div class="file-info">
+                    <span class="file-name">Fluid Breakpoints &amp; Grid Guide</span>
+                    <div class="file-meta">
+                      <span class="file-type-pill pill-pdf">PDF</span>
+                      <span class="file-dot">•</span>
+                      <span class="file-time">12 mins ago</span>
+                    </div>
+                  </div>
+                  <div class="file-action-arrow">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
+                </button>
+
+                <!-- Item 2: Figma Asset -->
+                <button class="recent-file-item" data-action="download-figma" data-file="Responsive Starter Pack (.fig)"
+                  data-tab="materials-downloads" title="Download Figma Assets">
+                  <div class="file-icon-box file-figma">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M12 2a4 4 0 0 0-4 4v4h4a4 4 0 0 0 0-8z"></path>
+                      <path d="M12 10H8a4 4 0 0 0 0 8h4v-8z"></path>
+                      <path d="M12 10h4a4 4 0 0 0 0-8h-4v8z"></path>
+                      <path d="M12 18H8a4 4 0 0 0 4 4 4 4 0 0 0 4-4v-4h-4v4z"></path>
+                    </svg>
+                  </div>
+                  <div class="file-info">
+                    <span class="file-name">Responsive Design Starter Pack</span>
+                    <div class="file-meta">
+                      <span class="file-type-pill pill-figma">.FIG</span>
+                      <span class="file-dot">•</span>
+                      <span class="file-time">34.2 MB · 1 hr ago</span>
+                    </div>
+                  </div>
+                  <div class="file-action-arrow">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
+                </button>
+
+                <!-- Item 3: Webflow CSS Tokens -->
+                <button class="recent-file-item" data-action="inspect-tokens" data-file="Webflow CSS Tokens"
+                  data-tab="materials-downloads" title="Inspect Webflow Tokens">
+                  <div class="file-icon-box file-code">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="16 18 22 12 16 6"></polyline>
+                      <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                  </div>
+                  <div class="file-info">
+                    <span class="file-name">Fluid Breakpoints Stylesheet</span>
+                    <div class="file-meta">
+                      <span class="file-type-pill pill-code">.CSS</span>
+                      <span class="file-dot">•</span>
+                      <span class="file-time">3 hrs ago</span>
+                    </div>
+                  </div>
+                  <div class="file-action-arrow">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
+                </button>
+
+                <!-- Item 4: Study Notes -->
+                <button class="recent-file-item" data-action="open-notes" data-file="Module 1 Notes"
+                  data-tab="materials-study-guide" title="View Study Notes">
+                  <div class="file-icon-box file-notes">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                  </div>
+                  <div class="file-info">
+                    <span class="file-name">Visual Hierarchy &amp; Scales</span>
+                    <div class="file-meta">
+                      <span class="file-type-pill pill-notes">NOTES</span>
+                      <span class="file-dot">•</span>
+                      <span class="file-time">Yesterday</span>
+                    </div>
+                  </div>
+                  <div class="file-action-arrow">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
+                </button>
+              </div>
+
+              <div class="recent-card-footer">
+                <button class="btn-ghost-xs" id="btnBrowseAllFiles">
+                  <span>Browse All 20 Curriculum Files</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- SECTION 2: BOTTOM CORNER - NEW CLASS? JOIN STUDENT WORKPLACE -->
+            <div class="sidebar-widget-card new-class-card" id="newClassCard">
+              <div class="new-class-decor-glow"></div>
+              <div class="new-class-content">
+                <div class="new-class-header">
+                  <span class="new-class-tag">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                      <polyline points="2 17 12 22 22 17"></polyline>
+                      <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                    JOIN CLASSROOM
+                  </span>
+                  <h3 class="new-class-title">New Class?</h3>
+                </div>
+
+                <p class="new-class-description">
+                  Have a portal tag from your instructor or peers? Join an active collaborative classroom workplace.
+                </p>
+
+                <!-- BUTTON UNDER THE DESCRIPTION DIRECTING TO STUDENT WORKSPACE (JOIN ONLY) -->
+                <div class="new-class-action-area">
+                  <button type="button" class="btn-create-class-plus" id="btnNewClassWorkspace"
+                    title="Join Classroom Workplace" aria-label="Join Classroom Workplace">
+                    <div class="btn-plus-labels">
+                      <span class="btn-plus-title">Join Class</span>
+                      <span class="btn-plus-sub">Enter Portal by Tag</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </main>
+
+      <!-- ===================================================================
+           VIEW 2: CLASSROOM WORKPLACES (TAGS & SHAREABLE LINKS)
+           =================================================================== -->
+      <section class="page-content view-hidden" id="viewWorkplaces">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">Classroom Workplaces</h2>
+            <p class="view-sub">Participate in live collaborative portals by sharing links or entering generated tags.
+            </p>
+          </div>
+          <button class="btn-primary" id="btnOpenCreatePortalModal">
+            Generate New Workplace Tag
+          </button>
+        </div>
+
+        <div class="workplaces-container">
+          <!-- Tag Join & Share Box -->
+          <div class="portal-access-card">
+            <div class="portal-access-col">
+              <h3>Join a Classroom by Tag</h3>
+              <p>Enter the generated portal tag provided by your instructor or peer:</p>
+              <div class="tag-input-group">
+                <input type="text" class="tag-input-field" id="portalTagInput" placeholder="e.g. #PORTAL-FIGMA-101" />
+                <button class="btn-primary" id="btnJoinPortalByTag">Enter Portal</button>
+              </div>
+              <div class="preset-tags">
+                <span>Quick demo tags:</span>
+                <button class="tag-pill-btn" data-tag="#PORTAL-FIGMA-101">#PORTAL-FIGMA-101</button>
+                <button class="tag-pill-btn" data-tag="#WEBFLOW-LAB-44">#WEBFLOW-LAB-44</button>
+                <button class="tag-pill-btn" data-tag="#STUDY-ROOM-B">#STUDY-ROOM-B</button>
+              </div>
+            </div>
+
+            <div class="portal-divider-v"></div>
+
+            <div class="portal-access-col">
+              <h3>Share Current Workplace Link</h3>
+              <p>Invite fellow students to collaborate in your active learning portal:</p>
+              <div class="share-link-group">
+                <input type="text" class="share-link-field" id="currentShareLink" readonly
+                  value="https://blendify.edu/portal/join?tag=PORTAL-FIGMA-101" />
+                <button class="btn-secondary" id="btnCopyPortalLink">
+                  Copy Link
+                </button>
+              </div>
+              <span class="tag-info-note">Active Tag: <strong id="activeTagBadge">#PORTAL-FIGMA-101</strong> · Shareable
+                with unlimited classmates</span>
+            </div>
+          </div>
+
+          <!-- Active Workplace Live Board -->
+          <div class="active-workplace-board">
+            <div class="workplace-board-header">
+              <div>
+                <div class="workplace-title-row">
+                  <h3 id="currentPortalName">UI/UX Cohort 4 — Webflow Breakpoints Lab</h3>
+                  <span class="live-portal-pill"><span class="green-dot"></span> Live Portal</span>
+                </div>
+                <p class="workplace-meta-sub">Portal Tag: <strong id="activePortalTagLabel">#PORTAL-FIGMA-101</strong> ·
+                  Instructor: Vativa Hub · 18 Learners Online</p>
+              </div>
+              <div class="board-actions">
+                <button class="btn-outline-sm" id="btnCopyTagOnly">Copy Tag Only</button>
+              </div>
+            </div>
+
+            <div class="workplace-grid">
+              <!-- Left: Pinned Classroom Resources & Live Links -->
+              <div class="workplace-left-col">
+                <div class="board-section-card">
+                  <h4 class="card-title-sm">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
+                      <line x1="12" y1="17" x2="12" y2="22"></line>
+                      <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
+                    </svg>
+                    Pinned Classroom Links
+                  </h4>
+                  <div class="pinned-links-list">
+                    <a href="#" class="pinned-link-item" onclick="return false;">
+                      <div class="pinned-link-icon vector-icon-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="3"></circle>
+                          <path d="M12 2a4 4 0 0 0-4 4v4h4a4 4 0 0 0 0-8z"></path>
+                          <path d="M12 10H8a4 4 0 0 0 0 8h4v-8z"></path>
+                          <path d="M12 10h4a4 4 0 0 0 0-8h-4v8z"></path>
+                          <path d="M12 18H8a4 4 0 0 0 4 4 4 4 0 0 0 4-4v-4h-4v4z"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <strong>Collaborative Figma Canvas (Sprint 2)</strong>
+                        <span>figma.com/@blendify/cohort4-live-sandbox</span>
+                      </div>
+                    </a>
+                    <a href="#" class="pinned-link-item" onclick="return false;">
+                      <div class="pinned-link-icon vector-icon-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="16 18 22 12 16 6"></polyline>
+                          <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                      </div>
+                      <div>
+                        <strong>Webflow Shared Staging Dashboard</strong>
+                        <span>preview.webflow.com/preview/blendify-lab4</span>
+                      </div>
+                    </a>
+                    <a href="#" class="pinned-link-item" onclick="return false;">
+                      <div class="pinned-link-icon vector-icon-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                      </div>
+                      <div>
+                        <strong>Classroom Audio/Video Huddle</strong>
+                        <span>huddle.blendify.edu/portal-figma-101 (Open)</span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="board-section-card">
+                  <h4 class="card-title-sm">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Active Learners in this Portal
+                  </h4>
+                  <div class="peers-list">
+                    <div class="peer-item">
+                      <div class="peer-avatar">AM</div>
+                      <div class="peer-info">
+                        <strong>Aria Montgomery</strong>
+                        <span>Working on Module 2.2 auto-layout</span>
+                      </div>
+                      <span class="online-indicator">Active</span>
+                    </div>
+                    <div class="peer-item">
+                      <div class="peer-avatar">RC</div>
+                      <div class="peer-info">
+                        <strong>Rahim Chowdhury</strong>
+                        <span>Reviewing mobile breakpoint CSS</span>
+                      </div>
+                      <span class="online-indicator">Active</span>
+                    </div>
+                    <div class="peer-item">
+                      <div class="peer-avatar user-me">H</div>
+                      <div class="peer-info">
+                        <strong>Harsh (You)</strong>
+                        <span>Connected to portal</span>
+                      </div>
+                      <span class="online-indicator">You</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Classroom Portal Activity & Link Sharing -->
+              <div class="workplace-right-col">
+                <div class="board-section-card stream-card">
+                  <h4 class="card-title-sm">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-vector-icon">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Classroom Portal Feed
+                  </h4>
+                  <div class="portal-messages" id="portalMessages">
+                    <div class="msg-bubble instructor-msg">
+                      <div class="msg-author">
+                        <strong>Vativa Hub (Instructor)</strong>
+                        <span>10 mins ago</span>
+                      </div>
+                      <p>Welcome everyone to <code>#PORTAL-FIGMA-101</code>! Remember to check out the fluid constraints
+                        formula in Learning Materials before editing the Webflow grid.</p>
+                    </div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-author">
+                        <strong>Aria Montgomery</strong>
+                        <span>4 mins ago</span>
+                      </div>
+                      <p>Just shared my responsive card variant into the Figma canvas! Anyone want to review the tablet
+                        breakpoint?</p>
+                    </div>
+                  </div>
+
+                  <!-- Send classroom message/link -->
+                  <div class="portal-send-box">
+                    <input type="text" id="portalMsgInput"
+                      placeholder="Share a link, question, or note in this portal..." />
+                    <button class="btn-primary-sm" id="btnSendPortalMsg">Send</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 3: PERSONALIZED AI LEARNING AGENT
+           =================================================================== -->
+      <section class="page-content view-hidden" id="viewAIAgent">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">Personalized AI Learning Agents</h2>
+            <p class="view-sub">Tailored AI companions to support, guide, critique, and accelerate your educational
+              journey.</p>
+          </div>
+          <div class="ai-mode-selector">
+            <span class="selector-lbl">Active Persona:</span>
+            <div class="persona-chips">
+              <button class="persona-chip active" data-persona="alex">
+                <span>Alex</span>
+                <small>Design Mentor</small>
+              </button>
+              <button class="persona-chip" data-persona="kavita">
+                <span>Kavita</span>
+                <small>Webflow &amp; Code</small>
+              </button>
+              <button class="persona-chip" data-persona="socrates">
+                <span>Socrates</span>
+                <small>Concept Coach</small>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-agent-workspace">
+          <!-- Left: Persona Details & Quick Prompts -->
+          <div class="ai-sidebar-info">
+            <div class="persona-profile-card">
+              <div class="persona-avatar-wrap" id="personaAvatar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                  <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                  <path d="M2 2l7.586 7.586"></path>
+                  <circle cx="11" cy="11" r="2"></circle>
+                </svg>
+              </div>
+              <h3 id="personaName">Alex</h3>
+              <span class="persona-role" id="personaRole">Principal Design System Architect</span>
+              <p class="persona-bio" id="personaBio">
+                Specialized in visual hierarchy, Figma auto-layout constraints, typography scales, and translating UI
+                tokens into practical web structures.
+              </p>
+            </div>
+
+            <div class="suggested-prompts-card">
+              <h4>Suggested Educational Prompts</h4>
+              <div class="prompt-chips-list" id="promptChipsList">
+                <button class="prompt-chip" data-prompt="Explain how Auto-Layout Hug vs Fill works in Figma">
+                  How does Auto-Layout Hug vs Fill work?
+                </button>
+                <button class="prompt-chip"
+                  data-prompt="How do I translate 1440px desktop breakpoints into 768px tablet layout?">
+                  Desktop to Tablet layout transition rules
+                </button>
+                <button class="prompt-chip" data-prompt="Give me a quick 3-question quiz on responsive CSS grids">
+                  Quiz me on responsive CSS grids
+                </button>
+                <button class="prompt-chip" data-prompt="What are design tokens and why should I use rem over px?">
+                  Why use rem units over px in Webflow?
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Interactive AI Conversation Hub -->
+          <div class="ai-chat-card">
+            <div class="ai-chat-header">
+              <div class="ai-status">
+                <span class="pulse-green"></span>
+                <span id="aiStatusText">Alex is ready to guide your learning</span>
+              </div>
+              <button class="btn-ghost-sm" id="btnClearAIChat">Clear Chat</button>
+            </div>
+
+            <div class="ai-chat-history" id="aiChatHistory">
+              <!-- Initial Welcome Message -->
+              <div class="ai-msg-row ai-agent">
+                <div class="agent-avatar-sm">AI</div>
+                <div class="ai-bubble">
+                  <p>Hello Harsh! I'm your personalized AI design mentor for <strong>Blendify</strong>. I can break down
+                    any learning material, critique your Figma auto-layouts, or test your comprehension with custom
+                    exercises. What would you like to explore today?</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="ai-chat-input-wrap">
+              <textarea id="aiMessageInput"
+                placeholder="Ask your AI agent anything about the curriculum, layout rules, or design tokens... (Press Enter to send)"
+                rows="2"></textarea>
+              <button class="btn-primary" id="btnSendAIMessage">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                <span>Ask Agent</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- MODAL: GENERATE NEW WORKPLACE TAG -->
+  <div class="modal-overlay" id="createPortalModal">
+    <div class="modal-box portal-create-modal">
+      <div class="modal-header">
+        <div>
+          <span class="quiz-badge">Collaborative Workplace</span>
+          <h3 class="modal-title">Generate New Classroom Portal Tag</h3>
+        </div>
+        <button class="modal-close-btn" id="modalCloseCreatePortal">✕</button>
+      </div>
+      <div class="modal-body-content">
+        <p class="modal-desc">Create a dedicated workplace for your study group, classroom cohort, or live pair-design
+          session:</p>
+        <div class="form-group">
+          <label>Workplace Name</label>
+          <input type="text" id="newWorkplaceNameInput" placeholder="e.g. Cohort 4 — Webflow Interactions Study Room" />
+        </div>
+        <div class="generated-tag-box">
+          <span class="tag-gen-lbl">Generated Portal Tag:</span>
+          <div class="tag-display-row">
+            <span class="highlight-tag" id="newGeneratedTag">#PORTAL-BLEND-8492</span>
+            <button class="btn-ghost-sm" id="btnRegenerateTag">New Tag</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btnCancelCreatePortal">Cancel</button>
+        <button class="btn-primary" id="btnConfirmCreatePortal">Create &amp; Enter Workplace</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH MODAL OVERLAY (CMD + F) -->
+  <div class="modal-overlay" id="searchModal">
+    <div class="modal-box search-modal-box">
+      <div class="modal-search-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="modalSearchInput" placeholder="Search learning materials, portal tags, AI topics..." />
+        <button class="modal-close-btn" id="modalSearchClose">✕</button>
+      </div>
+      <div class="modal-search-results" id="searchResults">
+        <div class="search-category-title">Core Features</div>
+        <div class="search-result-item" data-action="view-materials">
+          <span class="sr-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </span>
+          <div>
+            <strong>Access Learning Materials</strong>
+            <p>20 educational modules, design kits, and guides</p>
+          </div>
+        </div>
+        <div class="search-result-item" data-action="view-workplaces">
+          <span class="sr-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </span>
+          <div>
+            <strong>Classroom Workplaces &amp; Tags</strong>
+            <p>Join portal #PORTAL-FIGMA-101 or share invite link</p>
+          </div>
+        </div>
+        <div class="search-result-item" data-action="view-ai-agent">
+          <span class="sr-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+            </svg>
+          </span>
+          <div>
+            <strong>Personalized AI Learning Agent</strong>
+            <p>Chat with Alex, Kavita, or Socrates for tailored learning</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

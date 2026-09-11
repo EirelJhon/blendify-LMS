@@ -1,0 +1,16 @@
+{
+  "name": "blendify-lms",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "studio": "vite --open /create-course.html",
+    "build": "vite build",
+    "preview": "vite preview",
+    "preview:studio": "vite preview --open /create-course.html"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}
