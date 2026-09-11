@@ -513,12 +513,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   const searchCommunityMaterialsInput = document.getElementById('searchCommunityMaterialsInput');
   const btnClearMaterialSearch = document.getElementById('btnClearMaterialSearch');
+  const btnConfirmMaterialSearch = document.getElementById('btnConfirmMaterialSearch');
   const materialsCategoryPills = document.getElementById('materialsCategoryPills');
   const communityUploadsGrid = document.getElementById('communityUploadsGrid');
   const searchResultsCounter = document.getElementById('searchResultsCounter');
   const totalUploadsCount = document.getElementById('totalUploadsCount');
   const emptyMaterialsState = document.getElementById('emptyMaterialsState');
   const btnResetMaterialSearch = document.getElementById('btnResetMaterialSearch');
+
+  // Search error popup modal elements
+  const searchErrorModal = document.getElementById('searchErrorModal');
+  const modalCloseSearchError = document.getElementById('modalCloseSearchError');
+  const btnDismissSearchError = document.getElementById('btnDismissSearchError');
+  const btnResetFromSearchError = document.getElementById('btnResetFromSearchError');
+  const searchErrorQueryText = document.getElementById('searchErrorQueryText');
 
   // Upload modal elements
   const uploadMaterialModal = document.getElementById('uploadMaterialModal');
@@ -777,19 +785,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Search input events
-  searchCommunityMaterialsInput?.addEventListener('input', (e) => {
-    activeMaterialSearchQuery = e.target.value;
-    if (btnClearMaterialSearch) {
-      btnClearMaterialSearch.style.display = activeMaterialSearchQuery ? 'flex' : 'none';
+  // =========================================================================
+  // SEARCH CONFIRMATION & ERROR POPUP SCREEN LOGIC
+  // =========================================================================
+  function showSearchErrorModal(queryTerm) {
+    if (searchErrorQueryText) {
+      searchErrorQueryText.textContent = `"${queryTerm}"`;
     }
-    renderCommunityMaterials(activeMaterialSearchQuery, activeMaterialCategory);
+    searchErrorModal?.classList.add('open');
+  }
+
+  function closeSearchErrorModal() {
+    searchErrorModal?.classList.remove('open');
+  }
+
+  function performCommunitySearch() {
+    const rawQuery = searchCommunityMaterialsInput?.value || '';
+    const query = rawQuery.trim();
+    activeMaterialSearchQuery = query;
+
+    if (btnClearMaterialSearch) {
+      btnClearMaterialSearch.style.display = query ? 'flex' : 'none';
+    }
+
+    const q = query.toLowerCase();
+    const matchingResults = communityMaterials.filter(mat => {
+      const matchCat = activeMaterialCategory === 'all' || mat.category === activeMaterialCategory;
+      const matchQuery = !q ||
+        mat.title.toLowerCase().includes(q) ||
+        mat.desc.toLowerCase().includes(q) ||
+        mat.author.toLowerCase().includes(q) ||
+        mat.categoryLabel.toLowerCase().includes(q) ||
+        mat.ext.toLowerCase().includes(q);
+      return matchCat && matchQuery;
+    });
+
+    // Explicit User Flow:
+    // if the search is match then show the matching results
+    // else show a little pop up screen error
+    if (matchingResults.length > 0) {
+      renderCommunityMaterials(query, activeMaterialCategory);
+      document.getElementById('userMaterialsSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (query) {
+        showToast(`Found ${matchingResults.length} matching learning material${matchingResults.length === 1 ? '' : 's'}`);
+      }
+    } else {
+      showSearchErrorModal(query || 'No keywords entered');
+    }
+  }
+
+  // Confirm search on button click
+  btnConfirmMaterialSearch?.addEventListener('click', (e) => {
+    e.preventDefault();
+    performCommunitySearch();
+  });
+
+  // Confirm search on Enter in input field
+  searchCommunityMaterialsInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performCommunitySearch();
+    }
+  });
+
+  // Manage clear button state; reset to full list if input emptied
+  searchCommunityMaterialsInput?.addEventListener('input', (e) => {
+    const val = e.target.value;
+    if (btnClearMaterialSearch) {
+      btnClearMaterialSearch.style.display = val ? 'flex' : 'none';
+    }
+    if (!val.trim() && activeMaterialSearchQuery) {
+      activeMaterialSearchQuery = '';
+      renderCommunityMaterials('', activeMaterialCategory);
+    }
   });
 
   btnClearMaterialSearch?.addEventListener('click', () => {
     if (searchCommunityMaterialsInput) searchCommunityMaterialsInput.value = '';
     activeMaterialSearchQuery = '';
-    btnClearMaterialSearch.style.display = 'none';
+    if (btnClearMaterialSearch) btnClearMaterialSearch.style.display = 'none';
     renderCommunityMaterials('', activeMaterialCategory);
     searchCommunityMaterialsInput?.focus();
   });
@@ -803,6 +877,52 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.toggle('active', btn.dataset.category === 'all');
     });
     renderCommunityMaterials('', 'all');
+  });
+
+  // Search error modal close & action listeners
+  modalCloseSearchError?.addEventListener('click', closeSearchErrorModal);
+
+  btnDismissSearchError?.addEventListener('click', () => {
+    closeSearchErrorModal();
+    searchCommunityMaterialsInput?.focus();
+    searchCommunityMaterialsInput?.select();
+  });
+
+  btnResetFromSearchError?.addEventListener('click', () => {
+    if (searchCommunityMaterialsInput) searchCommunityMaterialsInput.value = '';
+    activeMaterialSearchQuery = '';
+    if (btnClearMaterialSearch) btnClearMaterialSearch.style.display = 'none';
+    activeMaterialCategory = 'all';
+    materialsCategoryPills?.querySelectorAll('.cat-pill').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.category === 'all');
+    });
+    renderCommunityMaterials('', 'all');
+    closeSearchErrorModal();
+    document.getElementById('userMaterialsSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  searchErrorModal?.addEventListener('click', (e) => {
+    if (e.target === searchErrorModal) {
+      closeSearchErrorModal();
+    }
+  });
+
+  // Suggestion tags within error modal
+  searchErrorModal?.querySelectorAll('.search-quick-tag').forEach(tagBtn => {
+    tagBtn.addEventListener('click', () => {
+      const tag = tagBtn.dataset.tag || tagBtn.textContent.trim();
+      if (searchCommunityMaterialsInput) {
+        searchCommunityMaterialsInput.value = tag;
+      }
+      closeSearchErrorModal();
+      performCommunitySearch();
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && searchErrorModal?.classList.contains('open')) {
+      closeSearchErrorModal();
+    }
   });
 
   // Category filter pills

@@ -278,13 +278,12 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
                 </div>
-                <button type="button" class="btn-primary btn-upload-hero-action" id="btnOpenUploadModal">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                <button type="button" class="btn-primary btn-search-hero-action" id="btnConfirmMaterialSearch" aria-label="Confirm Search">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
-                  <span>Upload Material</span>
+                  <span>Search</span>
                 </button>
               </div>
 
@@ -317,6 +316,16 @@
                 <p class="user-materials-sub">
                   Free educational guides, templates, and project resources uploaded and maintained by learners and instructors.
                 </p>
+              </div>
+              <div class="user-materials-header-actions">
+                <button type="button" class="btn-secondary-sm btn-upload-community-action" id="btnOpenUploadModal" aria-label="Upload New Material">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span>Upload Material</span>
+                </button>
               </div>
             </div>
 
@@ -1231,6 +1240,8 @@
           <div>
             <strong>Access Learning Materials</strong>
             <p>20 educational modules, design kits, and guides</p>
+          </div>
+        </div>
         <div class="search-result-item" data-action="view-ai-agent">
           <span class="sr-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1242,6 +1253,61 @@
             <p>Chat with Alex, Kavita, or Socrates for tailored learning</p>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY SEARCH ERROR MODAL POPUP (LITTLE POP UP SCREEN ERROR) -->
+  <div class="modal-overlay search-error-modal-overlay" id="searchErrorModal">
+    <div class="modal-box search-error-modal-box" role="dialog" aria-modal="true" aria-labelledby="searchErrorTitle">
+      <div class="modal-header search-error-header">
+        <div class="search-error-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="search-error-title-wrap">
+          <h3 class="modal-title" id="searchErrorTitle">No Matching Results</h3>
+          <p class="search-error-subtitle">We couldn't find any learning materials</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="modalCloseSearchError" aria-label="Close search error modal">✕</button>
+      </div>
+
+      <div class="search-error-body">
+        <div class="search-error-query-card">
+          <span class="query-card-label">Search Query:</span>
+          <span class="query-card-term" id="searchErrorQueryText">"keyword"</span>
+        </div>
+
+        <div class="search-error-tips">
+          <h5 class="tips-heading">Suggestions to find what you need:</h5>
+          <ul class="tips-list">
+            <li>Double-check your spelling or try fewer words.</li>
+            <li>Try searching popular topics:
+              <div class="quick-tags-wrap">
+                <button type="button" class="search-quick-tag" data-tag="Figma">Figma</button>
+                <button type="button" class="search-quick-tag" data-tag="CSS">CSS</button>
+                <button type="button" class="search-quick-tag" data-tag="Wireframe">Wireframe</button>
+                <button type="button" class="search-quick-tag" data-tag="Cheatsheet">Cheatsheet</button>
+                <button type="button" class="search-quick-tag" data-tag="Typography">Typography</button>
+              </div>
+            </li>
+            <li>Make sure the category filter matches what you are seeking.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions search-error-actions">
+        <button type="button" class="btn-secondary" id="btnDismissSearchError">Try Again</button>
+        <button type="button" class="btn-primary" id="btnResetFromSearchError">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          <span>Show All Materials</span>
+        </button>
       </div>
     </div>
   </div>
