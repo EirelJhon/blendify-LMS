@@ -498,42 +498,7 @@ button {
   margin-bottom: 24px;
 }
 
-.auth-quick-accounts-hint {
-  border-top: 1px dashed var(--border-light);
-  padding-top: 20px;
-}
 
-.hint-label {
-  display: block;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 10px;
-}
-
-.hint-chips {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.hint-chip {
-  font-size: 0.82rem;
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  background-color: var(--bg-subtle);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-light);
-  font-weight: 500;
-}
-
-.hint-chip:hover {
-  background-color: var(--primary-light);
-  color: var(--primary);
-  border-color: var(--primary);
-}
 
 .auth-guest-link-wrap {
   margin-top: 18px;

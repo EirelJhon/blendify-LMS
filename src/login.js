@@ -254,18 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Quick account hint chips on main sign-in card
-  document.querySelectorAll('.hint-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const name = chip.getAttribute('data-name');
-      const email = chip.getAttribute('data-email');
-      const defaultRole = chip.getAttribute('data-role');
-      if (defaultRole && !getSavedRoleForEmail(email)) {
-        saveRoleForEmail(email, defaultRole);
-      }
-      completeGoogleSignIn({ name, email });
-    });
-  });
+
 
   // Custom Google account entry toggle
   btnToggleCustomEntry?.addEventListener('click', () => {
