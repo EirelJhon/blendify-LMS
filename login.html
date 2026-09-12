@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign In &amp; Choose Role | Blendify</title>
   <meta name="description"
-    content="Sign in with your Google account to access Blendify LMS. Choose whether to enter as a Student or Teacher." />
+    content="Sign in with your email and password or Google account to access Blendify LMS. Choose whether to enter as a Student or Teacher." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -14,6 +14,22 @@
     rel="stylesheet">
   <link rel="icon" type="image/png" href="/blendify-logo.png" />
   <link rel="stylesheet" href="/src/login.css" />
+  <!-- CHOICE SAVED: SKIPS LOGIN ON RETURN -->
+  <script>
+    (function () {
+      try {
+        var savedRole = localStorage.getItem('blendify_role');
+        var rawUser = localStorage.getItem('blendify_auth_user');
+        if (savedRole && rawUser) {
+          if (savedRole === 'student') {
+            window.location.replace('index.html');
+          } else if (savedRole === 'teacher') {
+            window.location.replace('create-course.html');
+          }
+        }
+      } catch (e) { }
+    })();
+  </script>
 </head>
 
 <body>
@@ -28,12 +44,12 @@
 
       <!-- Logged-in Account Pill (Visible after signing in) -->
       <div class="signed-in-user-pill" id="signedInUserPill" style="display: none;">
-        <img class="user-google-avatar" id="headerUserAvatar" src="" alt="Google Profile" />
+        <div class="user-google-avatar" id="headerUserAvatar">U</div>
         <div class="user-meta-text">
-          <strong id="headerUserName">Google User</strong>
-          <span id="headerUserEmail">user@gmail.com</span>
+          <strong id="headerUserName">User</strong>
+          <span id="headerUserEmail">user@example.com</span>
         </div>
-        <button class="btn-switch-account" id="btnSwitchAccount" title="Switch or sign out of Google account">
+        <button class="btn-switch-account" id="btnSwitchAccount" title="Switch or sign out of account">
           <span>Switch Account</span>
         </button>
       </div>
@@ -43,7 +59,7 @@
     <main class="auth-main-container">
 
       <!-- =====================================================================
-           STEP 1: PLATFORM INTRODUCTION & GOOGLE SIGN-IN ONBOARDING
+           STEP 1: PLATFORM INTRODUCTION & LOGIN SCREEN (EMAIL & PASSWORD)
            ===================================================================== -->
       <section class="auth-card-section" id="sectionSignIn">
         <div class="auth-intro-grid">
@@ -131,12 +147,12 @@
             </div>
           </div>
 
-          <!-- RIGHT COLUMN: AUTH & ACCESS CARD -->
+          <!-- RIGHT COLUMN: AUTH & ACCESS CARD (LOGIN SCREEN: ENTER EMAIL & PASSWORD) -->
           <div class="auth-card-panel">
             <div class="auth-card">
               <div class="card-hero-icon">
                 <div class="icon-circle">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C59A53" stroke-width="2">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C59A53" stroke-width="2">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                     <polyline points="10 17 15 12 10 7"></polyline>
                     <line x1="15" y1="12" x2="3" y2="12"></line>
@@ -144,15 +160,84 @@
                 </div>
               </div>
 
-              <h2 class="auth-title">Welcome to Blendify</h2>
-              <p class="auth-subtitle">Sign in with your Google account to access your personalized educational
-                workspace or teaching studio.</p>
+              <h2 class="auth-title">Login Screen</h2>
+              <p class="auth-subtitle">Enter email &amp; password to access your Blendify dashboard.</p>
+
+              <!-- EMAIL & PASSWORD LOGIN FORM -->
+              <form class="auth-credentials-form" id="formEmailPassword" novalidate>
+                <div class="auth-form-group">
+                  <label for="inputEmail" class="auth-input-label">Email Address</label>
+                  <div class="auth-input-wrapper">
+                    <span class="auth-input-icon">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                      </svg>
+                    </span>
+                    <input type="email" id="inputEmail" class="auth-input" placeholder="name@example.com" required
+                      autocomplete="email" />
+                  </div>
+                </div>
+
+                <div class="auth-form-group">
+                  <div class="auth-label-row">
+                    <label for="inputPassword" class="auth-input-label">Password</label>
+                    <button type="button" class="auth-forgot-link" id="btnForgotPassword">Forgot password?</button>
+                  </div>
+                  <div class="auth-input-wrapper">
+                    <span class="auth-input-icon">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                      </svg>
+                    </span>
+                    <input type="password" id="inputPassword" class="auth-input" placeholder="Enter your password"
+                      required autocomplete="current-password" />
+                    <button type="button" class="auth-password-toggle" id="btnTogglePassword"
+                      aria-label="Toggle password visibility">
+                      <svg class="eye-show" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <svg class="eye-hide" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                        </path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="auth-form-meta">
+                  <label class="auth-remember-label">
+                    <input type="checkbox" id="checkRememberMe" checked class="auth-checkbox" />
+                    <span>Remember choice &amp; skip login on return</span>
+                  </label>
+                </div>
+
+                <button type="submit" class="btn-auth-submit" id="btnEmailSignIn">
+                  <span>Sign In &amp; Continue</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </form>
+
+              <div class="auth-divider">
+                <span>or continue with</span>
+              </div>
 
               <!-- OFFICIAL GOOGLE SIGN IN BUTTON -->
               <div class="google-btn-wrapper">
                 <button class="google-sign-in-btn" id="btnGoogleSignIn" type="button">
                   <div class="google-icon-box">
-                    <!-- Official Google Multi-Color SVG -->
                     <svg width="20" height="20" viewBox="0 0 24 24">
                       <path fill="#4285F4"
                         d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.02h3.88c2.28-2.09 3.66-5.17 3.66-9.12z" />
@@ -168,23 +253,33 @@
                 </button>
               </div>
 
+              <!-- DEMO ACCOUNTS QUICK-FILL -->
+              <div class="auth-demo-accounts">
+                <span class="demo-accounts-label">Quick Test Credentials:</span>
+                <div class="demo-chips-group">
+                  <button type="button" class="demo-chip student-chip" id="demoChipStudent"
+                    title="Auto-fill student demo credentials">
+                    <span class="chip-dot student"></span>
+                    <span>Student Demo</span>
+                  </button>
+                  <button type="button" class="demo-chip teacher-chip" id="demoChipTeacher"
+                    title="Auto-fill teacher demo credentials">
+                    <span class="chip-dot teacher"></span>
+                    <span>Teacher Demo</span>
+                  </button>
+                  <button type="button" class="demo-chip new-chip" id="demoChipNew" title="Auto-fill first-time user">
+                    <span class="chip-dot new"></span>
+                    <span>First-Time User</span>
+                  </button>
+                </div>
+              </div>
+
               <div class="auth-security-notice">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                   <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
-                <span>Secured with Google OAuth 2.0 Single Sign-On</span>
-              </div>
-
-
-
-              <div class="auth-guest-link-wrap">
-                <a href="index.html" class="auth-guest-link">
-                  <span>Explore as a Guest</span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </a>
+                <span>End-to-End Encrypted Session</span>
               </div>
             </div>
           </div>
@@ -194,20 +289,22 @@
 
 
       <!-- =====================================================================
-           STEP 2: GOOGLE CLASSROOM-STYLE ROLE SELECTION ("I'M A STUDENT / TEACHER")
+           STEP 2: ROLE SELECTION ("CHOOSE ROLE: STUDENT OR TEACHER")
            ===================================================================== -->
       <section class="role-selection-section" id="sectionRoleSelection" style="display: none;">
         <div class="role-intro-header">
-          <h2 class="role-title" id="roleTitle">Choose your role in Blendify</h2>
-          <p class="role-desc" id="roleDesc">Select how you want to use the platform.</p>
+          <div class="role-badge">Step 2: Choose Role</div>
+          <h2 class="role-title" id="roleTitle">Choose role</h2>
+          <p class="role-desc" id="roleDesc">Select <strong>Student</strong> or <strong>Teacher</strong>. Your choice
+            will be permanently saved and skips login on return visits.</p>
         </div>
 
         <!-- TWO BIG ROLE OPTION BUTTONS -->
         <div class="role-cards-grid">
 
-          <!-- OPTION 1: STUDENT -->
+          <!-- OPTION 1: STUDENT (STUDENT PORTAL - LOADS STUDENT DASHBOARD) -->
           <div class="role-option-card student-card" id="cardChooseStudent">
-            <div class="card-accent-pill student-pill">Learner Portal</div>
+            <div class="card-accent-pill student-pill">Student Portal · Loads Student Dashboard</div>
 
             <div class="role-icon-banner">
               <div class="role-illustration student-illustration">
@@ -252,9 +349,9 @@
             </div>
           </div>
 
-          <!-- OPTION 2: TEACHER -->
+          <!-- OPTION 2: TEACHER (TEACHER PORTAL - LOADS TEACHER DASHBOARD) -->
           <div class="role-option-card teacher-card" id="cardChooseTeacher">
-            <div class="card-accent-pill teacher-pill">Faculty &amp; Admin Studio</div>
+            <div class="card-accent-pill teacher-pill">Teacher Portal · Loads Teacher Dashboard</div>
 
             <div class="role-icon-banner">
               <div class="role-illustration teacher-illustration">

@@ -755,12 +755,17 @@ document.addEventListener('DOMContentLoaded', () => {
     userPanel?.classList.remove('show');
   });
 
-  // Synchronize Google Account User & Permanent Role
+  // Synchronize User & Role
   try {
     const rawUser = localStorage.getItem('blendify_auth_user');
     const savedRole = localStorage.getItem('blendify_role');
 
-    // If account role is locked to student, redirect to student portal
+    if (!rawUser || !savedRole) {
+      window.location.replace('login.html');
+      return;
+    }
+
+    // If account role is student, redirect to student portal
     if (savedRole === 'student') {
       window.location.replace('index.html');
       return;
@@ -775,18 +780,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const panelRoleEl = document.querySelector('.user-panel-role');
 
         if (userNameEl) userNameEl.textContent = user.name.split(' ')[0];
-        if (userAvatarEl) userAvatarEl.textContent = user.name.charAt(0).toUpperCase();
+        if (userAvatarEl) userAvatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
         if (panelNameEl) panelNameEl.textContent = user.name;
         if (panelRoleEl) panelRoleEl.textContent = 'Instructor · Teacher & Admin Studio';
       }
     }
   } catch (e) {}
 
-  document.getElementById('btnSignOutAccount')?.addEventListener('click', () => {
+  function handleSignOutOrSwitch() {
     localStorage.removeItem('blendify_auth_user');
     localStorage.removeItem('blendify_role');
     window.location.href = 'login.html';
-  });
+  }
+
+  document.getElementById('btnSignOutAccount')?.addEventListener('click', handleSignOutOrSwitch);
+  document.getElementById('btnSwitchAccountDropdown')?.addEventListener('click', handleSignOutOrSwitch);
 
   console.log('Blendify Teacher & Administrator Studio initialized.');
 });
