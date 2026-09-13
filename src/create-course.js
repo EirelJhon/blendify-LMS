@@ -8,7 +8,30 @@
  * 5. Student Progression Assessment & Printable Record Sheet
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+import {
+  getDatabase,
+  getMaterials as getSqlMaterials,
+  addMaterial as addSqlMaterial,
+  getQuizzes as getSqlQuizzes,
+  addQuiz as addSqlQuiz,
+  getActivities as getSqlActivities,
+  addActivity as addSqlActivity,
+  downloadDatabaseFile
+} from './db.js';
+import { initDatabaseExplorer } from './explorer.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize Database & API Explorer Modal
+  initDatabaseExplorer();
+
+  // Initialize SQLite WebAssembly Database in background
+  try {
+    await getDatabase();
+    console.log('[Blendify SQLite] Relational database ready in Teacher Studio.');
+  } catch (err) {
+    console.warn('[Blendify SQLite] SQLite initialization fallback to local storage:', err);
+  }
+
   // =========================================================================
   // APPLICATION STATE
   // =========================================================================
@@ -542,6 +565,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rows.length > 30) {
       rows[rows.length - 1].remove();
     }
+
+    // Persist to SQLite student_activities table
+    addSqlActivity({
+      studentName,
+      action: `${action}: ${materialName}`,
+      portalTag: state.activePortal.tag
+    }).catch(e => console.warn('[SQLite] addActivity error:', e));
   }
 
   // Simulation button for testing real-time logging
@@ -718,6 +748,14 @@ document.addEventListener('DOMContentLoaded', () => {
       actionClass: 'open',
       statusPill: 'Active Now'
     });
+
+    // Persist to SQLite quizzes table
+    addSqlQuiz({
+      portalTag: state.activePortal.tag,
+      title,
+      type,
+      deadline: 'Upcoming'
+    }).catch(e => console.warn('[SQLite] addQuiz error:', e));
   });
 
   // =========================================================================
@@ -782,11 +820,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch (e) {}
 
-  document.getElementById('btnSignOutAccount')?.addEventListener('click', () => {
+  document.getElementById('btnExportSqliteDb')?.addEventListener('click', () => {
+    downloadDatabaseFile('blendify.sqlite');
+    showToast('Exporting SQLite Database (blendify.sqlite)...');
+  });
+
+  const handleTeacherSignOutOrSwitch = () => {
     localStorage.removeItem('blendify_auth_user');
     localStorage.removeItem('blendify_role');
     window.location.href = 'login.html';
-  });
+  };
+
+  document.getElementById('btnSignOutAccount')?.addEventListener('click', handleTeacherSignOutOrSwitch);
+  document.getElementById('btnSwitchAccountDropdown')?.addEventListener('click', handleTeacherSignOutOrSwitch);
 
   console.log('Blendify Teacher & Administrator Studio initialized.');
 });

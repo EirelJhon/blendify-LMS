@@ -12,5 +12,8 @@
   },
   "devDependencies": {
     "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "sql.js": "^1.14.2"
   }
 }

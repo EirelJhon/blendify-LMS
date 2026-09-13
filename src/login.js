@@ -6,9 +6,19 @@
  * - If first time: User chooses role once on a clean selection screen; that choice is permanently saved to the Google account.
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+import { getDatabase, getAccountRolesMap as getSqlAccountRolesMap, saveUserRole as saveSqlUserRole } from './db.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize SQLite WebAssembly Database in background
+  try {
+    await getDatabase();
+    console.log('[Blendify SQLite] Database ready for authentication.');
+  } catch (err) {
+    console.warn('[Blendify SQLite] SQLite initialization fallback to local storage:', err);
+  }
+
   // =========================================================================
-  // STORAGE KEYS & PERSISTENT ROLE SYSTEM
+  // STORAGE KEYS & PERSISTENT ROLE SYSTEM (SYNCHRONIZED WITH SQLITE)
   // =========================================================================
   const STORAGE_KEY_USER = 'blendify_auth_user';
   const STORAGE_KEY_ROLE = 'blendify_role';
@@ -37,11 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return map[email.trim().toLowerCase()] || null;
   }
 
-  function saveRoleForEmail(email, role) {
+  function saveRoleForEmail(email, role, name = null) {
     if (!email || !role) return;
     const map = getAccountRolesMap();
     map[email.trim().toLowerCase()] = role;
     localStorage.setItem(STORAGE_KEY_ACCOUNTS_MAP, JSON.stringify(map));
+    // Persist to SQLite users table
+    saveSqlUserRole(email, role, name).catch(e => console.warn('[SQLite] saveUserRole error:', e));
   }
 
   // State
