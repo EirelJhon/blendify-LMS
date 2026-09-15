@@ -793,12 +793,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     userPanel?.classList.remove('show');
   });
 
-  // Synchronize Google Account User & Permanent Role
+  // Synchronize User & Role
   try {
     const rawUser = localStorage.getItem('blendify_auth_user');
     const savedRole = localStorage.getItem('blendify_role');
 
-    // If account role is locked to student, redirect to student portal
+    if (!rawUser || !savedRole) {
+      window.location.replace('login.html');
+      return;
+    }
+
+    // If account role is student, redirect to student portal
     if (savedRole === 'student') {
       window.location.replace('index.html');
       return;
@@ -813,13 +818,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const panelRoleEl = document.querySelector('.user-panel-role');
 
         if (userNameEl) userNameEl.textContent = user.name.split(' ')[0];
-        if (userAvatarEl) userAvatarEl.textContent = user.name.charAt(0).toUpperCase();
+        if (userAvatarEl) userAvatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
         if (panelNameEl) panelNameEl.textContent = user.name;
         if (panelRoleEl) panelRoleEl.textContent = 'Instructor · Teacher & Admin Studio';
       }
     }
   } catch (e) {}
 
+<<<<<<< HEAD
   document.getElementById('btnExportSqliteDb')?.addEventListener('click', () => {
     downloadDatabaseFile('blendify.sqlite');
     showToast('Exporting SQLite Database (blendify.sqlite)...');
@@ -833,6 +839,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('btnSignOutAccount')?.addEventListener('click', handleTeacherSignOutOrSwitch);
   document.getElementById('btnSwitchAccountDropdown')?.addEventListener('click', handleTeacherSignOutOrSwitch);
+=======
+  function handleSignOutOrSwitch() {
+    localStorage.removeItem('blendify_auth_user');
+    localStorage.removeItem('blendify_role');
+    window.location.href = 'login.html';
+  }
+
+  document.getElementById('btnSignOutAccount')?.addEventListener('click', handleSignOutOrSwitch);
+  document.getElementById('btnSwitchAccountDropdown')?.addEventListener('click', handleSignOutOrSwitch);
+>>>>>>> b422d956db84f50802a354ab6e7aa51d4708e232
 
   console.log('Blendify Teacher & Administrator Studio initialized.');
 });

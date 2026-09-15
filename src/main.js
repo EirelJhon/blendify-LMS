@@ -1533,12 +1533,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     userPanel?.classList.remove('show');
   });
 
-  // Synchronize Google Account User & Permanent Role
+  // Synchronize User & Role
   try {
     const rawUser = localStorage.getItem('blendify_auth_user');
     const savedRole = localStorage.getItem('blendify_role');
 
-    // If account role is locked to teacher, redirect to teacher studio
+    if (!rawUser || !savedRole) {
+      window.location.replace('login.html');
+      return;
+    }
+
+    // If account role is teacher, redirect to teacher studio
     if (savedRole === 'teacher') {
       window.location.replace('create-course.html');
       return;

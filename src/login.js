@@ -1,9 +1,11 @@
 /**
- * BLENDIFY AUTHENTICATION & ONE-TIME ROLE SELECTION
- * Enforces one-time role assignment per Google account silently:
- * - When signing in, checks if this Google account already selected a role.
- * - If already selected: Immediately navigates to their workspace (Student -> index.html, Teacher -> create-course.html).
- * - If first time: User chooses role once on a clean selection screen; that choice is permanently saved to the Google account.
+ * BLENDIFY AUTHENTICATION & ROLE ROUTING SYSTEM
+ * Implements the Flowchart Lifecycle:
+ * 1. First-time visit: Loads Login Screen.
+ * 2. Login screen: Enters email & password (or Google SSO / demo accounts).
+ * 3. Choose role: Selects Student or Teacher (one-time selection for new users).
+ * 4. Branches to Student portal (loads student dashboard) or Teacher portal (loads teacher dashboard).
+ * 5. Choice saved: Permanently saves role so return visits skip login entirely.
  */
 
 import { getDatabase, getAccountRolesMap as getSqlAccountRolesMap, saveUserRole as saveSqlUserRole } from './db.js';
@@ -18,13 +20,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
+<<<<<<< HEAD
   // STORAGE KEYS & PERSISTENT ROLE SYSTEM (SYNCHRONIZED WITH SQLITE)
+=======
+  // STORAGE KEYS & ROLES PERSISTENCE
+>>>>>>> b422d956db84f50802a354ab6e7aa51d4708e232
   // =========================================================================
   const STORAGE_KEY_USER = 'blendify_auth_user';
   const STORAGE_KEY_ROLE = 'blendify_role';
   const STORAGE_KEY_ACCOUNTS_MAP = 'blendify_account_roles';
 
-  // Seed default test accounts if not already stored
+  // Preset demo accounts with pre-mapped roles
   function getAccountRolesMap() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY_ACCOUNTS_MAP);
@@ -56,12 +62,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     saveSqlUserRole(email, role, name).catch(e => console.warn('[SQLite] saveUserRole error:', e));
   }
 
-  // State
+  // Application State
   const state = {
     currentUser: null
   };
 
-  // Toast System
+  // Toast Notification System
   const CHECK_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
   const toastContainer = document.getElementById('toastContainer');
   function showToast(message, icon = CHECK_SVG) {
@@ -91,7 +97,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const headerUserEmail = document.getElementById('headerUserEmail');
   const btnSwitchAccount = document.getElementById('btnSwitchAccount');
 
-  // Buttons & Inputs
+  // Login Form Elements
+  const formEmailPassword = document.getElementById('formEmailPassword');
+  const inputEmail = document.getElementById('inputEmail');
+  const inputPassword = document.getElementById('inputPassword');
+  const btnTogglePassword = document.getElementById('btnTogglePassword');
+  const checkRememberMe = document.getElementById('checkRememberMe');
+  const btnForgotPassword = document.getElementById('btnForgotPassword');
+
+  // Quick Demo Account Buttons
+  const demoChipStudent = document.getElementById('demoChipStudent');
+  const demoChipTeacher = document.getElementById('demoChipTeacher');
+  const demoChipNew = document.getElementById('demoChipNew');
+
+  // Google SSO Elements
   const btnGoogleSignIn = document.getElementById('btnGoogleSignIn');
   const btnCloseGoogleModal = document.getElementById('btnCloseGoogleModal');
   const btnToggleCustomEntry = document.getElementById('btnToggleCustomEntry');
@@ -100,13 +119,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const customGoogleEmail = document.getElementById('customGoogleEmail');
   const customGoogleName = document.getElementById('customGoogleName');
 
-  // Role Cards & Buttons
+  // Role Selection Cards & Buttons
   const cardChooseStudent = document.getElementById('cardChooseStudent');
   const cardChooseTeacher = document.getElementById('cardChooseTeacher');
   const btnEnterStudentPortal = document.getElementById('btnEnterStudentPortal');
   const btnEnterTeacherStudio = document.getElementById('btnEnterTeacherStudio');
-  const studentPill = cardChooseStudent?.querySelector('.card-accent-pill');
-  const teacherPill = cardChooseTeacher?.querySelector('.card-accent-pill');
 
   // Clean Account tags in Google Chooser modal
   function updateModalAccountTags() {
@@ -130,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
-  // VIEW RENDERING: SIGN IN vs ROLE SELECTION
+  // VIEW SWITCHING
   // =========================================================================
   function renderSignInView() {
     sectionSignIn.style.display = 'block';
@@ -145,37 +162,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (state.currentUser) {
       signedInUserPill.style.display = 'flex';
-      headerUserName.textContent = state.currentUser.name;
-      headerUserEmail.textContent = state.currentUser.email;
+      headerUserName.textContent = state.currentUser.name || 'User';
+      headerUserEmail.textContent = state.currentUser.email || 'user@example.com';
 
-      const firstLetter = state.currentUser.name.charAt(0).toUpperCase() || 'U';
-      const existingAvatar = document.getElementById('headerUserAvatar');
-      if (existingAvatar) {
-        existingAvatar.outerHTML = `<div class="user-google-avatar" id="headerUserAvatar">${firstLetter}</div>`;
+      const firstLetter = (state.currentUser.name || state.currentUser.email || 'U').charAt(0).toUpperCase();
+      if (headerUserAvatar) {
+        headerUserAvatar.textContent = firstLetter;
       }
     }
 
-    // Clean, natural role cards without lock warnings
-    cardChooseStudent.className = 'role-option-card student-card';
-    if (studentPill) studentPill.textContent = 'Learner Portal';
-    if (btnEnterStudentPortal) {
-      btnEnterStudentPortal.innerHTML = `<span>Enter as Student</span>`;
-    }
-
-    cardChooseTeacher.className = 'role-option-card teacher-card';
-    if (teacherPill) teacherPill.textContent = 'Faculty & Admin Studio';
-    if (btnEnterTeacherStudio) {
-      btnEnterTeacherStudio.innerHTML = `<span>Enter as Teacher</span>`;
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Initial check on page load: if user already has a role saved, redirect immediately
+  // Check saved choice on initial page load: if already saved, skip login immediately
   try {
     const savedUserRaw = localStorage.getItem(STORAGE_KEY_USER);
-    if (savedUserRaw) {
+    const savedRole = localStorage.getItem(STORAGE_KEY_ROLE);
+    if (savedUserRaw && savedRole) {
       const savedUser = JSON.parse(savedUserRaw);
       state.currentUser = savedUser;
-      const savedRole = getSavedRoleForEmail(savedUser.email) || savedUser.role || localStorage.getItem(STORAGE_KEY_ROLE);
 
       if (savedRole === 'student') {
         window.location.replace('index.html');
@@ -183,26 +188,151 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else if (savedRole === 'teacher') {
         window.location.replace('create-course.html');
         return;
-      } else {
-        renderRoleView();
       }
-    } else {
-      renderSignInView();
     }
-  } catch {
-    renderSignInView();
+  } catch (e) {}
+
+  // Otherwise, default to Login Screen for first-time or returning unauthenticated visit
+  renderSignInView();
+
+  // =========================================================================
+  // PASSWORD VISIBILITY TOGGLE
+  // =========================================================================
+  btnTogglePassword?.addEventListener('click', () => {
+    if (!inputPassword) return;
+    const isPassword = inputPassword.type === 'password';
+    inputPassword.type = isPassword ? 'text' : 'password';
+    const eyeShow = btnTogglePassword.querySelector('.eye-show');
+    const eyeHide = btnTogglePassword.querySelector('.eye-hide');
+    if (eyeShow && eyeHide) {
+      eyeShow.style.display = isPassword ? 'none' : 'block';
+      eyeHide.style.display = isPassword ? 'block' : 'none';
+    }
+  });
+
+  // Forgot password mock prompt
+  btnForgotPassword?.addEventListener('click', () => {
+    showToast('A password reset link has been dispatched to your email.');
+  });
+
+  // =========================================================================
+  // AUTHENTICATION PROCESSOR (CORE FLOW)
+  // =========================================================================
+  function processAuthentication(user) {
+    if (googleAccountModal) googleAccountModal.style.display = 'none';
+    if (authLoadingOverlay) {
+      authLoadingOverlay.style.display = 'flex';
+      if (loadingStatusText) {
+        loadingStatusText.textContent = `Signing in as ${user.name}...`;
+      }
+    }
+
+    setTimeout(() => {
+      if (authLoadingOverlay) authLoadingOverlay.style.display = 'none';
+      state.currentUser = user;
+
+      const email = user.email ? user.email.toLowerCase().trim() : '';
+      const existingRole = getSavedRoleForEmail(email) || user.role;
+
+      if (existingRole) {
+        // CHOICE ALREADY SAVED FOR THIS ACCOUNT:
+        // Skips login on return and loads portal directly!
+        user.role = existingRole;
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
+        localStorage.setItem(STORAGE_KEY_ROLE, existingRole);
+
+        showToast(`Welcome back, ${user.name}!`);
+
+        setTimeout(() => {
+          if (existingRole === 'student') {
+            window.location.href = 'index.html';
+          } else {
+            window.location.href = 'create-course.html';
+          }
+        }, 350);
+      } else {
+        // FIRST-TIME VISIT FOR THIS ACCOUNT:
+        // Proceeds to Choose role screen (Student or teacher)
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
+        renderRoleView();
+        showToast(`Signed in as ${user.name}. Please choose your role.`);
+      }
+    }, 450);
   }
 
   // =========================================================================
-  // GOOGLE SIGN-IN FLOW
+  // EMAIL & PASSWORD FORM SUBMISSION
+  // =========================================================================
+  formEmailPassword?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = inputEmail?.value.trim();
+    const password = inputPassword?.value;
+
+    if (!email || !email.includes('@')) {
+      showToast('Please enter a valid email address.');
+      inputEmail?.focus();
+      return;
+    }
+
+    if (!password || password.length < 3) {
+      showToast('Please enter a password with at least 3 characters.');
+      inputPassword?.focus();
+      return;
+    }
+
+    // Derive display name from email or preset accounts
+    let name = '';
+    const lowerEmail = email.toLowerCase();
+    if (lowerEmail === 'alex.student@gmail.com') {
+      name = 'Alex Rivers';
+    } else if (lowerEmail === 'harsh.teacher@blendify.edu') {
+      name = 'Harsh Vardhan';
+    } else if (lowerEmail === 'elena.design@gmail.com') {
+      name = 'Elena Rostova';
+    } else {
+      const prefix = email.split('@')[0];
+      name = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+    }
+
+    processAuthentication({
+      name,
+      email,
+      remember: checkRememberMe ? checkRememberMe.checked : true
+    });
+  });
+
+  // =========================================================================
+  // QUICK DEMO ACCOUNTS HELPER
+  // =========================================================================
+  demoChipStudent?.addEventListener('click', () => {
+    if (inputEmail) inputEmail.value = 'alex.student@gmail.com';
+    if (inputPassword) inputPassword.value = 'student123';
+    showToast('Loaded Student demo account credentials.');
+  });
+
+  demoChipTeacher?.addEventListener('click', () => {
+    if (inputEmail) inputEmail.value = 'harsh.teacher@blendify.edu';
+    if (inputPassword) inputPassword.value = 'teacher123';
+    showToast('Loaded Teacher demo account credentials.');
+  });
+
+  demoChipNew?.addEventListener('click', () => {
+    const randomId = Math.floor(100 + Math.random() * 900);
+    if (inputEmail) inputEmail.value = `student${randomId}@blendify.io`;
+    if (inputPassword) inputPassword.value = 'welcome123';
+    showToast('Generated fresh first-time user credentials.');
+  });
+
+  // =========================================================================
+  // GOOGLE SIGN-IN MODAL (SSO ALTERNATIVE)
   // =========================================================================
   function openGoogleModal() {
     updateModalAccountTags();
-    googleAccountModal.style.display = 'flex';
+    if (googleAccountModal) googleAccountModal.style.display = 'flex';
   }
 
   function closeGoogleModal() {
-    googleAccountModal.style.display = 'none';
+    if (googleAccountModal) googleAccountModal.style.display = 'none';
   }
 
   btnGoogleSignIn?.addEventListener('click', openGoogleModal);
@@ -214,46 +344,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Complete Google Sign-In: if role already chosen, forward directly to portal
-  function completeGoogleSignIn(user) {
-    closeGoogleModal();
-    authLoadingOverlay.style.display = 'flex';
-    if (loadingStatusText) {
-      loadingStatusText.textContent = `Signing in as ${user.name}...`;
-    }
-
-    setTimeout(() => {
-      authLoadingOverlay.style.display = 'none';
-      state.currentUser = user;
-
-      const email = user.email ? user.email.toLowerCase() : '';
-      const existingRole = getSavedRoleForEmail(email);
-
-      if (existingRole) {
-        // Account ALREADY selected a role! Save session & route directly
-        user.role = existingRole;
-        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
-        localStorage.setItem(STORAGE_KEY_ROLE, existingRole);
-
-        showToast(`Signed in as ${user.name}...`, '✓');
-
-        setTimeout(() => {
-          if (existingRole === 'student') {
-            window.location.href = 'index.html';
-          } else {
-            window.location.href = 'create-course.html';
-          }
-        }, 400);
-      } else {
-        // First-time sign-in for this Google account: display clean role selection
-        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
-        renderRoleView();
-        showToast(`Signed in as ${user.name}.`, '✓');
-      }
-    }, 500);
-  }
-
-  // Account item clicks inside Google modal
   document.querySelectorAll('.google-account-item').forEach(item => {
     item.addEventListener('click', () => {
       const name = item.getAttribute('data-name');
@@ -262,14 +352,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (defaultRole && !getSavedRoleForEmail(email)) {
         saveRoleForEmail(email, defaultRole);
       }
-      completeGoogleSignIn({ name, email });
+      processAuthentication({ name, email });
     });
   });
 
-
-
-  // Custom Google account entry toggle
   btnToggleCustomEntry?.addEventListener('click', () => {
+    if (!customEntryForm) return;
     const isHidden = customEntryForm.style.display === 'none';
     customEntryForm.style.display = isHidden ? 'flex' : 'none';
     if (isHidden) {
@@ -277,7 +365,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Custom account submit
   btnSubmitCustomAccount?.addEventListener('click', () => {
     const email = customGoogleEmail?.value.trim();
     const name = customGoogleName?.value.trim() || (email ? email.split('@')[0] : '') || 'Google User';
@@ -288,32 +375,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    completeGoogleSignIn({ name, email });
+    processAuthentication({ name, email });
   });
 
-  // Switch Google Account / Sign Out
+  // =========================================================================
+  // SWITCH ACCOUNT / SIGN OUT
+  // =========================================================================
   btnSwitchAccount?.addEventListener('click', () => {
     localStorage.removeItem(STORAGE_KEY_USER);
     localStorage.removeItem(STORAGE_KEY_ROLE);
     state.currentUser = null;
     renderSignInView();
-    showToast('Signed out of Google account.');
+    showToast('Signed out. Ready for new sign-in.');
   });
 
   // =========================================================================
-  // ONE-TIME ROLE SELECTION (Saves permanently to account without warnings)
+  // ROLE SELECTION HANDLERS: STUDENT vs TEACHER
   // =========================================================================
   function handleStudentSelection() {
-    const email = state.currentUser?.email;
-    if (email) {
-      saveRoleForEmail(email, 'student');
+    const email = state.currentUser?.email || 'student@blendify.io';
+    saveRoleForEmail(email, 'student');
+
+    if (!state.currentUser) {
+      state.currentUser = { name: 'Student', email: email };
     }
-    if (state.currentUser) {
-      state.currentUser.role = 'student';
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(state.currentUser));
-    }
+    state.currentUser.role = 'student';
+
+    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(state.currentUser));
     localStorage.setItem(STORAGE_KEY_ROLE, 'student');
-    showToast('Taking you to Student Portal...');
+
+    showToast('Choice saved! Loading Student Dashboard...');
 
     setTimeout(() => {
       window.location.href = 'index.html';
@@ -321,16 +412,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function handleTeacherSelection() {
-    const email = state.currentUser?.email;
-    if (email) {
-      saveRoleForEmail(email, 'teacher');
+    const email = state.currentUser?.email || 'teacher@blendify.edu';
+    saveRoleForEmail(email, 'teacher');
+
+    if (!state.currentUser) {
+      state.currentUser = { name: 'Instructor', email: email };
     }
-    if (state.currentUser) {
-      state.currentUser.role = 'teacher';
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(state.currentUser));
-    }
+    state.currentUser.role = 'teacher';
+
+    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(state.currentUser));
     localStorage.setItem(STORAGE_KEY_ROLE, 'teacher');
-    showToast('Taking you to Teacher Studio...');
+
+    showToast('Choice saved! Loading Teacher Studio...');
 
     setTimeout(() => {
       window.location.href = 'create-course.html';
@@ -355,6 +448,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     handleTeacherSelection();
   });
 
-  console.log('Blendify Account Role System initialized.');
+  console.log('Blendify Authentication & Role Flow initialized.');
 });
-
