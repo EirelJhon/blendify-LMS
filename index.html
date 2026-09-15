@@ -367,24 +367,7 @@
            VIEW 2: CLASSROOM PORTALS (JOIN BY TAG & JOINED CLASSES LIST)
            =================================================================== -->
       <section class="page-content view-hidden" id="viewWorkplaces">
-        <!-- CLASSROOM WORKPLACES HERO BANNER -->
-        <section class="hero-banner" id="portalHeroBanner">
-          <div class="hero-container">
-            <div class="hero-top-meta">
-              <span class="instructor-credit" id="portalInstructorCredit">
-                Vativa Hub · UI/UX Design
-              </span>
-            </div>
 
-            <h1 class="course-main-title" id="portalHeroTitle">
-              UI/UX Cohort 4 — Webflow Breakpoints Lab
-            </h1>
-
-            <p class="hero-intro-description" id="portalHeroDesc">
-              Active Portal: <strong id="portalHeroTag">#PORTAL-FIGMA-101</strong> · Study hands-on curriculum materials, explore responsive device models, and download starter assets directly to your computer.
-            </p>
-          </div>
-        </section>
 
         <div class="workplaces-container">
           <!-- Tag Join & Share Box -->
@@ -884,20 +867,10 @@
           <aside class="sidebar-column" id="sidebarRightColumn">
             <!-- SECTION 1: TOP CORNER - FILE DOWNLOADS (SAVED TO COMPUTER) -->
             <div class="sidebar-widget-card download-materials-card" id="downloadMaterialsCard">
-              <div class="widget-header">
+              <div class="widget-header download-widget-header">
                 <div class="widget-title-wrap">
-                  <div class="widget-icon download-widget-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="7 10 12 15 17 10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="widget-heading">File Downloads</h3>
-                    <span class="widget-sub">Save to your computer</span>
-                  </div>
+                  <h3 class="widget-heading">File Downloads</h3>
+                  <span class="widget-sub">Save to your computer</span>
                 </div>
                 <span class="badge-count download-status-badge" id="downloadCountBadge">4 Files</span>
               </div>
@@ -1058,10 +1031,10 @@
                 <span id="aiStatusText">Alex is ready to guide your learning</span>
               </div>
               <div class="ai-header-badges">
-                <span class="ai-openai-badge" title="Connected to OpenAI API (gpt-4o-mini)">
+                <button type="button" class="ai-openai-badge clickable" id="btnAiApiSettings" title="View OpenAI Connection &amp; Quota Status">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4947zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1683a.0757.0757 0 0 1-.071 0l-4.8303-2.7866A4.504 4.504 0 0 1 2.3408 7.8956zm16.0993 3.8558L12.5973 8.3829l2.0201-1.1635a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.4021-.6863zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L8.907 9.2297V6.8974a.0662.0662 0 0 1 .0331-.0615l4.981-2.8764a4.4992 4.4992 0 0 1 6.5303 4.6732zM8.4806 13.799l-2.02-1.1636a.071.071 0 0 1-.038-.052V6.9958a4.504 4.504 0 0 1 7.3709-3.4539l-.142.0805L8.8732 6.3806a.7948.7948 0 0 0-.3926.6813v6.7369zm1.3705-2.4503L12 10.1384l2.1489 1.2351v2.4703L12 15.0789l-2.1489-1.2351v-2.4703z"/></svg>
-                  <span>OpenAI Live</span>
-                </span>
+                  <span id="aiBadgeText">OpenAI Live</span>
+                </button>
                 <button class="btn-ghost-sm" id="btnClearAIChat">Clear Chat</button>
               </div>
             </div>
@@ -1298,6 +1271,45 @@
 
       <div class="modal-footer-actions search-error-actions">
         <button type="button" class="btn-primary" id="btnDismissSearchError">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPENAI API KEY SETTINGS MODAL -->
+  <div class="modal-overlay" id="aiApiKeyModal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="aiKeyModalTitle" style="max-width: 520px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="ai-openai-badge" style="padding: 6px 10px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4947zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1683a.0757.0757 0 0 1-.071 0l-4.8303-2.7866A4.504 4.504 0 0 1 2.3408 7.8956zm16.0993 3.8558L12.5973 8.3829l2.0201-1.1635a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.4021-.6863zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L8.907 9.2297V6.8974a.0662.0662 0 0 1 .0331-.0615l4.981-2.8764a4.4992 4.4992 0 0 1 6.5303 4.6732zM8.4806 13.799l-2.02-1.1636a.071.071 0 0 1-.038-.052V6.9958a4.504 4.504 0 0 1 7.3709-3.4539l-.142.0805L8.8732 6.3806a.7948.7948 0 0 0-.3926.6813v6.7369zm1.3705-2.4503L12 10.1384l2.1489 1.2351v2.4703L12 15.0789l-2.1489-1.2351v-2.4703z"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title" id="aiKeyModalTitle" style="font-size: 1.1rem; margin: 0;">OpenAI API Key &amp; Connection</h3>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 2px 0 0;">Manage your AI model connection and live quota</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" id="modalCloseAiKey" aria-label="Close API Key modal">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div id="aiKeyStatusNotice" style="background: var(--bg-subtle); border: 1px solid var(--border-light); padding: 12px; border-radius: var(--radius-sm); font-size: 0.82rem; line-height: 1.45;">
+          Checking connection status...
+        </div>
+
+        <div>
+          <label for="inputOpenAiKey" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">
+            OpenAI API Key:
+          </label>
+          <input type="text" id="inputOpenAiKey" class="form-input" placeholder="sk-proj-..." style="width: 100%; font-family: monospace; font-size: 0.82rem; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-main);" />
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+            When this key has available credits, the AI agents use <strong>gpt-4o-mini</strong> with strict architectural persona rules. If credits are exhausted (HTTP 429), our intelligent non-repeating local engine automatically handles queries.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions" style="padding: 16px 24px; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-secondary" id="btnTestOpenAiKey">Test Key</button>
+        <button type="button" class="btn-primary" id="btnSaveOpenAiKey">Save &amp; Apply</button>
       </div>
     </div>
   </div>
