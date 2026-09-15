@@ -8,9 +8,9 @@
       "type": "node",
       "request": "launch",
       "name": "Run vite",
-      "runtimeExecutable": "vite",
-      "cwd": "${workspaceFolder}",
-      "args": []
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}"
     },
     {
       "type": "msedge",

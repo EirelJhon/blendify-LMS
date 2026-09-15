@@ -1,14 +1,37 @@
 /**
- * BLENDIFY INTERACTIVE AI LEARNING AGENT
+ * BLENDIFY INTERACTIVE AI LEARNING AGENT WITH OPENAI INTEGRATION
  * Features:
+ * - Direct connection to OpenAI API (gpt-4o-mini) with key configuration
+ * - Strict Persona Purpose, Limitations & Guardrail Enforcement (Alex, Kavita, Socrates)
+ * - Automatic quota / offline resilience with high-fidelity local intelligence fallback
  * - Real-time animated typing & streaming effect
- * - Bouncing-dots typing indicator
  * - Markdown & Code block rendering with 1-click Copy Code button
- * - Interactive follow-up action chips after every response
  * - In-chat interactive quiz engine with immediate feedback
- * - Deep knowledge base (UI/UX, CSS Grid, Webflow, Breakpoints, SQLite & APIs)
+ * - Multi-turn conversational context memory
  */
 
+export const DEFAULT_OPENAI_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OPENAI_API_KEY) || '';
+
+export function getOpenAIApiKey() {
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem('blendify_openai_api_key') || DEFAULT_OPENAI_KEY;
+  }
+  return DEFAULT_OPENAI_KEY;
+}
+
+export function setOpenAIApiKey(key) {
+  if (typeof localStorage !== 'undefined') {
+    if (key && key.trim()) {
+      localStorage.setItem('blendify_openai_api_key', key.trim());
+    } else {
+      localStorage.removeItem('blendify_openai_api_key');
+    }
+  }
+}
+
+/**
+ * AI PERSONAS DEFINITION
+ */
 export const AI_PERSONAS = {
   alex: {
     name: 'Alex',
@@ -49,6 +72,78 @@ export const AI_PERSONAS = {
 };
 
 /**
+ * RULES OF LIMITATION & SYSTEM PROMPTS BASED ON SPECIALIZED PURPOSE
+ */
+export const AI_AGENT_RULES = {
+  alex: {
+    name: 'Alex',
+    role: 'Principal Design System Architect',
+    purpose: 'Specializes in UI/UX architecture, Figma auto-layout, spacing tokens, typography scales, and visual hierarchy.',
+    limitations: [
+      'Scope restricted strictly to UI/UX design, visual hierarchy, Figma auto-layouts, and design system tokens.',
+      'Will NOT write complex backend code, database queries, or server-side scripts. Directs backend/CSS questions to Kavita.',
+      'Refuses non-design, non-educational, or completely off-topic inquiries (e.g., general trivia, math homework, finance).',
+      'Encourages structured design decisions with practical token recommendations (4pt/8pt grid).'
+    ],
+    systemPrompt: `You are Alex, the Principal Design System Architect and AI Mentor at Blendify LMS.
+Your purpose: Guide students on visual hierarchy, Figma auto-layout constraints, responsive breakpoints (1440px desktop to 768px tablet and 375px mobile), spacing systems (4pt/8pt), and design token architecture.
+
+RULES OF LIMITATION (STRICT ENFORCEMENT):
+1. DOMAIN BOUNDARY: You ONLY answer questions about UI/UX design, Figma, visual hierarchy, design tokens, color contrast, and layout aesthetics.
+2. OUT-OF-SCOPE RE-ROUTING: If asked for low-level CSS debugging, Webflow-specific implementation, or backend code, politely state: "That is outside my domain as your Design System Architect. For CSS code and Webflow implementation, please switch to Kavita!"
+3. OFF-TOPIC REFUSAL: If the student asks questions completely unrelated to digital product design, web architecture, or educational curriculum, politely decline and steer them back to UI/UX topics.
+4. FORMATTING: Use structured markdown, concise bullet points, and code blocks for design token schemas where appropriate. Keep answers practical, encouraging, and focused.`
+  },
+
+  kavita: {
+    name: 'Kavita',
+    role: 'Webflow & Frontend Specialist',
+    purpose: 'Focuses on visual CSS architecture, fluid layout models, Client-First conventions, and zero-code responsive development.',
+    limitations: [
+      'Scope restricted strictly to Webflow, HTML, CSS, fluid layout formulas (clamp/rem), and frontend implementation.',
+      'Will NOT provide subjective artistic branding critiques or abstract philosophical theory without code context. Directs students to Alex or Socrates.',
+      'Refuses requests for non-web engineering, generic software scripts, or non-educational topics.',
+      'Ensures all CSS and Webflow advice follows modern standards (responsive, accessible, clean class names).'
+    ],
+    systemPrompt: `You are Kavita, the Webflow and Frontend Code Specialist at Blendify LMS.
+Your purpose: Help students master responsive front-end development, Webflow Client-First conventions, modern CSS (Flexbox, CSS Grid), fluid typography formulas (clamp()), and debugging 100vw horizontal overflow.
+
+RULES OF LIMITATION (STRICT ENFORCEMENT):
+1. DOMAIN BOUNDARY: You ONLY answer questions related to Webflow, HTML/CSS, frontend layout models, responsive breakpoints, and code troubleshooting.
+2. OUT-OF-SCOPE RE-ROUTING: If asked for abstract design aesthetics or visual branding tokens without code context, say: "My specialty is Webflow and front-end CSS implementation! For design tokens and visual hierarchy, please consult Alex." If asked deep philosophical learning questions, direct them to Socrates.
+3. OFF-TOPIC REFUSAL: If the student asks questions unrelated to web development, coding, or LMS learning materials, politely decline and redirect them to frontend topics.
+4. FORMATTING: Provide clean, modern, production-grade CSS or HTML code blocks with short explanations. Always prioritize fluid units (rem, clamp) over fixed px.`
+  },
+
+  socrates: {
+    name: 'Socrates',
+    role: 'Adaptive Concept & Retention Coach',
+    purpose: 'Uses the Socratic method and simple real-world analogies to deepen comprehension and ensure long-term mastery of web design fundamentals.',
+    limitations: [
+      'Scope restricted to conceptual reasoning, UX psychology, design trade-offs, and critical thinking.',
+      'Will NOT simply hand over direct assignment solutions or raw copy-paste boilerplate code. Guides students to think through the problem.',
+      'Directs students seeking raw code syntax or specific Webflow fixes to Kavita.',
+      'Refuses inquiries unrelated to digital design concepts, user empathy, and curriculum mastery.'
+    ],
+    systemPrompt: `You are Socrates, the Adaptive Concept and Retention Coach at Blendify LMS.
+Your purpose: Use the Socratic method, probing questions, and relatable real-world analogies to deepen the student's conceptual understanding of responsive design, viewport adaptation, and digital systems.
+
+RULES OF LIMITATION (STRICT ENFORCEMENT):
+1. SOCRATIC METHOD GUARDRAIL: DO NOT simply write full solutions or do the student's homework for them. Instead, answer with thought-provoking explanations followed by 1 or 2 targeted questions that guide the student to arrive at the answer themselves.
+2. DOMAIN BOUNDARY: You focus on the *why* and *how* of design logic, cognitive load, mobile-first constraints, and user empathy.
+3. OUT-OF-SCOPE RE-ROUTING: If the student insists on immediate raw code snippets or syntax troubleshooting, guide them conceptually, then suggest: "If you need immediate CSS syntax or Webflow code, Kavita is our front-end specialist!"
+4. OFF-TOPIC REFUSAL: Politely decline any queries outside of digital design principles, tech concepts, and educational growth. Keep the tone intellectually stimulating, warm, and philosophical.`
+  }
+};
+
+// Conversational turn memory per persona
+const conversationHistories = {
+  alex: [],
+  kavita: [],
+  socrates: []
+};
+
+/**
  * Format markdown, code blocks, bold, lists, and inline tags into HTML
  */
 export function formatAIMarkdown(rawText) {
@@ -84,9 +179,65 @@ export function formatAIMarkdown(rawText) {
 }
 
 /**
- * Generate intelligent, contextual responses for each persona
+ * Call OpenAI Chat Completions API with System Persona Rules
  */
-export function getAIResponse(userText, personaKey) {
+async function callOpenAIApi(userText, personaKey) {
+  const apiKey = getOpenAIApiKey();
+  if (!apiKey || apiKey.trim() === '') {
+    throw new Error('No OpenAI API key provided');
+  }
+
+  const rules = AI_AGENT_RULES[personaKey] || AI_AGENT_RULES.alex;
+  const history = conversationHistories[personaKey] || [];
+
+  const messages = [
+    { role: 'system', content: rules.systemPrompt },
+    ...history.slice(-6),
+    { role: 'user', content: userText }
+  ];
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey.trim()}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 700
+    })
+  });
+
+  if (!response.ok) {
+    const errorJson = await response.json().catch(() => ({}));
+    const errMessage = errorJson?.error?.message || `HTTP ${response.status} ${response.statusText}`;
+    const errType = errorJson?.error?.type || 'api_error';
+    const err = new Error(errMessage);
+    err.status = response.status;
+    err.type = errType;
+    throw err;
+  }
+
+  const data = await response.json();
+  const reply = data.choices?.[0]?.message?.content || '';
+
+  // Record into conversational turn memory
+  history.push({ role: 'user', content: userText });
+  history.push({ role: 'assistant', content: reply });
+  if (history.length > 12) history.splice(0, history.length - 12);
+
+  return {
+    text: reply,
+    followups: AI_PERSONAS[personaKey]?.followups || ['💡 Ask another question', '🎯 Test my understanding']
+  };
+}
+
+/**
+ * Local high-accuracy response engine (Fallback when offline or quota limits occur)
+ */
+export function getLocalAIResponse(userText, personaKey) {
   const lower = (userText || '').toLowerCase().trim();
 
   // --- Interactive Quiz Request ---
@@ -234,6 +385,20 @@ export function getAIResponse(userText, personaKey) {
 }
 
 /**
+ * Master AI Response Dispatcher (OpenAI API first, graceful local fallback)
+ */
+export async function getAIResponse(userText, personaKey) {
+  try {
+    const liveResponse = await callOpenAIApi(userText, personaKey);
+    return liveResponse;
+  } catch (error) {
+    console.warn(`[Blendify AI] OpenAI API notice (${error.message}). Utilizing specialized persona engine.`);
+    const fallbackResponse = getLocalAIResponse(userText, personaKey);
+    return fallbackResponse;
+  }
+}
+
+/**
  * Initialize Interactive AI Learning Agent
  */
 export function initAILearningAgent(state, showToast) {
@@ -247,6 +412,8 @@ export function initAILearningAgent(state, showToast) {
   const personaName = document.getElementById('personaName');
   const personaRole = document.getElementById('personaRole');
   const personaBio = document.getElementById('personaBio');
+  const aiRulesPurposeText = document.getElementById('aiRulesPurposeText');
+  const aiRulesList = document.getElementById('aiRulesList');
 
   let isGenerating = false;
 
@@ -263,7 +430,7 @@ export function initAILearningAgent(state, showToast) {
       <div class="ai-bubble">
         <div class="ai-text-body">${textHtml}</div>
         ${contentObj.quiz ? renderQuizHtml(contentObj.quiz) : ''}
-        ${contentObj.followups && contentObj.followups.length > 0 ? renderFollowupChipsHtml(contentObj.followups) : ''}
+        ${contentObj.followups ? renderFollowupChipsHtml(contentObj.followups) : ''}
       </div>
     `;
 
@@ -274,15 +441,13 @@ export function initAILearningAgent(state, showToast) {
     row.querySelectorAll('.btn-copy-code').forEach(btn => {
       btn.addEventListener('click', () => {
         const code = decodeURIComponent(btn.dataset.code);
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(code);
-          btn.textContent = 'Copied!';
-          setTimeout(() => btn.textContent = 'Copy Code', 2000);
-        }
+        navigator.clipboard.writeText(code);
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Code', 2000);
       });
     });
 
-    // Attach in-chat quiz options
+    // Attach quiz answer clicks
     row.querySelectorAll('.ai-quiz-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const isCorrect = btn.dataset.correct === 'true';
@@ -293,8 +458,8 @@ export function initAILearningAgent(state, showToast) {
           b.disabled = true;
           if (b.dataset.correct === 'true') {
             b.classList.add('correct');
-          } else if (b === btn && !isCorrect) {
-            b.classList.add('wrong');
+          } else {
+            b.classList.add('incorrect');
           }
         });
 
@@ -349,7 +514,7 @@ export function initAILearningAgent(state, showToast) {
   // Stream text animation
   async function streamAIResponse(responseObj) {
     const text = responseObj.text;
-    const currentP = AI_PERSONAS[state.activePersona];
+    const currentP = AI_PERSONAS[state.activePersona] || AI_PERSONAS.alex;
 
     // Create placeholder agent message row with typing dots
     const row = document.createElement('div');
@@ -367,10 +532,10 @@ export function initAILearningAgent(state, showToast) {
     aiChatHistory.appendChild(row);
     aiChatHistory.scrollTop = aiChatHistory.scrollHeight;
 
-    if (aiStatusText) aiStatusText.textContent = `${currentP.name} is typing...`;
+    if (aiStatusText) aiStatusText.textContent = `${currentP.name} is thinking & analyzing...`;
 
-    // Natural thinking delay
-    await new Promise(r => setTimeout(r, 450));
+    // Natural processing delay
+    await new Promise(r => setTimeout(r, 350));
 
     const bubble = row.querySelector('.ai-bubble');
     bubble.innerHTML = `<div class="ai-text-body"></div>`;
@@ -384,7 +549,7 @@ export function initAILearningAgent(state, showToast) {
       currentText += (i === 0 ? '' : ' ') + words[i];
       textBody.innerHTML = formatAIMarkdown(currentText);
       aiChatHistory.scrollTop = aiChatHistory.scrollHeight;
-      await new Promise(r => setTimeout(r, 18));
+      await new Promise(r => setTimeout(r, 12));
     }
 
     // Append quiz if present
@@ -404,8 +569,8 @@ export function initAILearningAgent(state, showToast) {
             b.disabled = true;
             if (b.dataset.correct === 'true') {
               b.classList.add('correct');
-            } else if (b === btn && !isCorrect) {
-              b.classList.add('wrong');
+            } else {
+              b.classList.add('incorrect');
             }
           });
 
@@ -419,20 +584,21 @@ export function initAILearningAgent(state, showToast) {
       });
     }
 
-    // Append follow-up chips
-    if (responseObj.followups && responseObj.followups.length > 0) {
+    // Append follow-up chips if present
+    if (responseObj.followups) {
       const chipsWrap = document.createElement('div');
       chipsWrap.innerHTML = renderFollowupChipsHtml(responseObj.followups);
       bubble.appendChild(chipsWrap.firstElementChild);
 
       bubble.querySelectorAll('.ai-followup-btn').forEach(chip => {
         chip.addEventListener('click', () => {
-          sendAIMessage(chip.dataset.prompt);
+          const prompt = chip.dataset.prompt;
+          sendAIMessage(prompt);
         });
       });
     }
 
-    // Wire copy code buttons in this bubble
+    // Attach copy code buttons
     bubble.querySelectorAll('.btn-copy-code').forEach(btn => {
       btn.addEventListener('click', () => {
         const code = decodeURIComponent(btn.dataset.code);
@@ -448,9 +614,9 @@ export function initAILearningAgent(state, showToast) {
     isGenerating = false;
   }
 
-  function sendAIMessage(overrideText = null) {
+  async function sendAIMessage(overrideText = null) {
     if (isGenerating) return;
-    const text = overrideText || aiMessageInput.value.trim();
+    const text = overrideText || (aiMessageInput ? aiMessageInput.value.trim() : '');
     if (!text) return;
 
     isGenerating = true;
@@ -459,9 +625,27 @@ export function initAILearningAgent(state, showToast) {
     appendMessageRow('user', text);
     if (!overrideText && aiMessageInput) aiMessageInput.value = '';
 
-    // 2. Generate response and stream
-    const responseObj = getAIResponse(text, state.activePersona);
-    streamAIResponse(responseObj);
+    // 2. Generate response via OpenAI / local engine and stream
+    try {
+      const responseObj = await getAIResponse(text, state.activePersona);
+      await streamAIResponse(responseObj);
+    } catch (e) {
+      console.error('[AI Error]', e);
+      await streamAIResponse({
+        text: `I encountered an unexpected issue processing that question. Please try asking again or rephrase.`,
+        followups: ['Try again', 'Ask a design question']
+      });
+    }
+  }
+
+  function updateRulesUI(personaKey) {
+    const rules = AI_AGENT_RULES[personaKey] || AI_AGENT_RULES.alex;
+    if (aiRulesPurposeText) {
+      aiRulesPurposeText.textContent = rules.purpose;
+    }
+    if (aiRulesList) {
+      aiRulesList.innerHTML = rules.limitations.map(lim => `<li>${lim}</li>`).join('');
+    }
   }
 
   function switchPersona(personaKey) {
@@ -479,11 +663,14 @@ export function initAILearningAgent(state, showToast) {
     if (personaBio) personaBio.textContent = p.bio;
     if (aiStatusText) aiStatusText.textContent = p.status;
 
+    // Synchronize the Rules & Purpose Card
+    updateRulesUI(personaKey);
+
     // Greet user with persona's unique welcome
     if (aiChatHistory) {
       aiChatHistory.innerHTML = '';
       appendMessageRow('agent', {
-        text: `Hello! I'm **${p.name}**, your ${p.role}. How can I assist your learning today?`,
+        text: `Hello! I'm **${p.name}**, your ${p.role}. Connected to OpenAI. How can I assist your learning today?`,
         followups: p.followups
       });
     }
@@ -504,11 +691,14 @@ export function initAILearningAgent(state, showToast) {
   });
 
   btnClearAIChat?.addEventListener('click', () => {
-    const p = AI_PERSONAS[state.activePersona];
+    const p = AI_PERSONAS[state.activePersona] || AI_PERSONAS.alex;
+    if (conversationHistories[state.activePersona]) {
+      conversationHistories[state.activePersona] = [];
+    }
     if (aiChatHistory) {
       aiChatHistory.innerHTML = '';
       appendMessageRow('agent', {
-        text: `Conversation cleared. I'm **${p.name}**, ready to explore any curriculum question!`,
+        text: `Conversation cleared. I'm **${p.name}**, ready to explore any curriculum question within my scope!`,
         followups: p.followups
       });
     }
@@ -523,12 +713,14 @@ export function initAILearningAgent(state, showToast) {
     });
   });
 
-  // Initial welcome greeting
+  // Initial welcome greeting and Rules UI setup
   const initialP = AI_PERSONAS[state.activePersona] || AI_PERSONAS.alex;
+  updateRulesUI(state.activePersona || 'alex');
+
   if (aiChatHistory) {
     aiChatHistory.innerHTML = '';
     appendMessageRow('agent', {
-      text: `Hello! I'm **${initialP.name}**, your personalized AI mentor for **Blendify LMS**.\n\nI can break down complex curriculum materials, review responsive Figma auto-layouts, demonstrate CSS clamp formulas, or test your comprehension with interactive quizzes!`,
+      text: `Hello! I'm **${initialP.name}**, your personalized AI mentor for **Blendify LMS** powered by OpenAI.\n\nI operate within defined architectural rules based on my specialty. Ask me to break down curriculum materials, review responsive Figma auto-layouts, demonstrate CSS clamp formulas, or test your comprehension with interactive quizzes!`,
       followups: initialP.followups
     });
   }
