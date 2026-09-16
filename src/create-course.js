@@ -16,10 +16,23 @@ import {
   addQuiz as addSqlQuiz,
   getActivities as getSqlActivities,
   addActivity as addSqlActivity,
+  saveUploadedFile,
+  getAllUploadedFiles,
   downloadDatabaseFile
 } from './db.js';
+import { firebaseUploadFile, isFirebaseConfigured } from './firebase.js';
 import { initDatabaseExplorer } from './explorer.js';
 import { getOpenAIApiKey } from './ai-agent.js';
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Database & API Explorer Modal
@@ -433,20 +446,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     showToast(`Attached ${file.name} for upload.`);
   }
 
-  // Delete row listener helper
+  // Helper to bind material row actions (Delete & Download)
   function bindMaterialRowDelete(row) {
     row.querySelector('.btn-delete-mat')?.addEventListener('click', () => {
       const matName = row.querySelector('strong')?.textContent || 'Material';
       row.remove();
       showToast(`Removed "${matName}" from portal.`);
     });
+
+    row.querySelector('.btn-download-mat')?.addEventListener('click', () => {
+
+      const fileData = row.dataset.fileData;
+      const fileName = row.dataset.fileName || 'course_material.pdf';
+      const firebaseUrl = row.dataset.firebaseUrl;
+
+      if (fileData && fileData.startsWith('data:')) {
+        const a = document.createElement('a');
+        a.href = fileData;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => document.body.removeChild(a), 400);
+        showToast(`Downloaded "${fileName}" from SQLite!`);
+      } else if (firebaseUrl) {
+        window.open(firebaseUrl, '_blank');
+        showToast(`Opening "${fileName}" from Firebase Storage!`);
+      } else {
+        showToast(`Downloaded "${fileName}"!`);
+      }
+    });
   }
 
   // Bind initial rows in materials table
   document.querySelectorAll('#portalMaterialsTableBody tr').forEach(bindMaterialRowDelete);
 
-  // Upload button handler
-  btnPublishMaterialToPortal?.addEventListener('click', () => {
+  // Upload button handler: Persists file to SQLite & Firebase
+  btnPublishMaterialToPortal?.addEventListener('click', async () => {
     const title = materialTitleInput?.value.trim();
     if (!title) {
       showToast('Please enter a Material Title.');
@@ -457,25 +492,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     const category = materialCategorySelect?.value || 'Study Guide';
     let iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
     let sizeText = '5.2 MB';
+    let ext = 'PDF';
 
     if (category.includes('Figma')) {
       iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 2a4 4 0 0 0-4 4v4h4a4 4 0 0 0 0-8z"></path><path d="M12 10H8a4 4 0 0 0 0 8h4v-8z"></path><path d="M12 10h4a4 4 0 0 0 0-8h-4v8z"></path><path d="M12 18H8a4 4 0 0 0 4 4 4 4 0 0 0 4-4v-4h-4v4z"></path></svg>`;
       sizeText = '28.4 MB';
+      ext = 'FIG';
     } else if (category.includes('Webflow')) {
       iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`;
       sizeText = 'Live Template';
+      ext = 'HTML';
     } else if (category.includes('Lecture')) {
       iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><line x1="9" y1="15" x2="15" y2="15"></line><line x1="9" y1="11" x2="15" y2="11"></line></svg>`;
       sizeText = '1.8 MB';
+      ext = 'PDF';
     }
+
+    let fileData = null;
+    let fileName = `${title.replace(/[^a-zA-Z0-9-_]/g, '_')}.${ext.toLowerCase()}`;
+    let mimeType = 'application/pdf';
 
     if (state.selectedUploadFile) {
       sizeText = `${(state.selectedUploadFile.size / (1024 * 1024)).toFixed(1)} MB`;
+      fileName = state.selectedUploadFile.name;
+      mimeType = state.selectedUploadFile.type || 'application/octet-stream';
+      const parts = fileName.split('.');
+      if (parts.length > 1) ext = parts.pop().toUpperCase();
+
+      try {
+        fileData = await readFileAsDataURL(state.selectedUploadFile);
+      } catch (err) {
+        console.warn('Teacher Studio FileReader error:', err);
+      }
+    }
+
+    // Upload to Firebase Storage if configured
+    let firebaseUrl = null;
+    if (state.selectedUploadFile && isFirebaseConfigured()) {
+      try {
+        const dest = `teacher_portals/${state.activePortal.cohort}/${Date.now()}_${fileName}`;
+        const fbRes = await firebaseUploadFile(state.selectedUploadFile, dest);
+        if (fbRes.success) {
+          firebaseUrl = fbRes.downloadUrl;
+        }
+      } catch (fbErr) {
+        console.warn('Firebase upload warning:', fbErr);
+      }
     }
 
     const todayDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
     const newRow = document.createElement('tr');
+    if (fileData) newRow.dataset.fileData = fileData;
+    newRow.dataset.fileName = fileName;
+    if (firebaseUrl) newRow.dataset.firebaseUrl = firebaseUrl;
+
     newRow.innerHTML = `
       <td>
         <div class="table-mat-name">
@@ -486,12 +557,43 @@ document.addEventListener('DOMContentLoaded', async () => {
       <td>${category}</td>
       <td>${sizeText}</td>
       <td>${todayDate}</td>
-      <td><span class="status-pill open">Open Access</span></td>
-      <td><button class="btn-ghost-xs text-danger btn-delete-mat">Delete</button></td>
+      <td><span class="status-pill open">Saved in SQLite</span></td>
+      <td>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button class="btn-ghost-xs text-primary btn-download-mat" title="Download saved file">Download</button>
+          <button class="btn-ghost-xs text-danger btn-delete-mat" title="Delete">Delete</button>
+        </div>
+      </td>
     `;
 
     portalMaterialsTableBody?.prepend(newRow);
     bindMaterialRowDelete(newRow);
+
+    // Save to SQLite relational tables
+    addSqlMaterial({
+      title,
+      category,
+      author: 'Harsh Vardhan (Instructor)',
+      fileSize: sizeText,
+      fileType: ext,
+      badgeClass: `badge-${ext.toLowerCase()}`,
+      fileData,
+      fileName,
+      mimeType,
+      firebaseUrl
+    }).catch(e => console.warn('[SQLite] addSqlMaterial error:', e));
+
+    if (fileData) {
+      saveUploadedFile({
+        name: fileName,
+        fileData,
+        mimeType,
+        fileSize: sizeText,
+        uploadedBy: 'Harsh Vardhan (Instructor)',
+        portalTag: state.activePortal.tag,
+        firebaseUrl
+      }).catch(e => console.warn('[SQLite] saveUploadedFile error:', e));
+    }
 
     // Reset upload form
     if (materialTitleInput) materialTitleInput.value = '';
@@ -500,7 +602,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (fileDropLabel) fileDropLabel.innerHTML = 'Choose a file or drag &amp; drop here';
     state.selectedUploadFile = null;
 
-    showToast(`Uploaded "${title}" to portal ${state.activePortal.tag}!`);
+    showToast(`Uploaded "${title}" (Saved in SQLite${firebaseUrl ? ' & Firebase' : ''})!`);
 
     // Audit log entry
     recordActivityEvent({
@@ -512,6 +614,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       statusPill: 'Active Now'
     });
   });
+
 
   // =========================================================================
   // MODULE 3: IN-TIME ACTIVITY TRACKER (WHO, WHEN, EXACT TIME)

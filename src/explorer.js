@@ -49,6 +49,10 @@ export function initDatabaseExplorer() {
                 <span>learning_materials</span>
                 <span class="chip-count" id="stat-learning_materials">0</span>
               </button>
+              <button type="button" class="db-table-chip" data-table="uploaded_files">
+                <span>uploaded_files</span>
+                <span class="chip-count" id="stat-uploaded_files">0</span>
+              </button>
               <button type="button" class="db-table-chip" data-table="quizzes">
                 <span>quizzes</span>
                 <span class="chip-count" id="stat-quizzes">0</span>
@@ -69,6 +73,7 @@ export function initDatabaseExplorer() {
                 <button type="button" class="db-preset-btn" data-sql="SELECT * FROM users;">Users</button>
                 <button type="button" class="db-preset-btn" data-sql="SELECT * FROM classroom_portals;">Portals</button>
                 <button type="button" class="db-preset-btn" data-sql="SELECT title, category, author, downloads_count FROM learning_materials ORDER BY downloads_count DESC;">Top Downloads</button>
+                <button type="button" class="db-preset-btn" data-sql="SELECT id, name, mime_type, file_size, uploaded_by, portal_tag, created_at FROM uploaded_files ORDER BY id DESC;">Saved Files</button>
                 <button type="button" class="db-preset-btn" data-sql="SELECT * FROM student_activities ORDER BY id DESC LIMIT 10;">Recent Activity</button>
                 <button type="button" class="db-preset-btn" data-sql="SELECT category, count(*) as count, sum(downloads_count) as total_downloads FROM learning_materials GROUP BY category;">Categories Aggregation</button>
               </div>
@@ -76,6 +81,7 @@ export function initDatabaseExplorer() {
 
             <div class="db-editor-wrap">
               <textarea id="dbSqlInput" class="db-sql-textarea" rows="3" spellcheck="false" placeholder="Enter standard SQLite query (e.g. SELECT * FROM users)..." aria-label="SQLite Query Editor">SELECT * FROM users;</textarea>
+
               <div class="db-editor-actions">
                 <span class="db-shortcut-hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to run</span>
                 <button type="button" class="btn-primary-sm btn-run-sql" id="btnExecuteSql">

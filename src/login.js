@@ -8,7 +8,20 @@
  * 5. Choice saved: Permanently saves role so return visits skip login entirely.
  */
 
-import { getDatabase, getAccountRolesMap as getSqlAccountRolesMap, saveUserRole as saveSqlUserRole } from './db.js';
+import {
+  getDatabase,
+  getAccountRolesMap as getSqlAccountRolesMap,
+  saveUserRole as saveSqlUserRole,
+  registerSqlUser,
+  authenticateSqlUser,
+  getUserByEmail
+} from './db.js';
+import {
+  firebaseSignUp,
+  firebaseSignIn,
+  isFirebaseConfigured,
+  getFirebaseStatus
+} from './firebase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize SQLite WebAssembly Database in background
@@ -17,6 +30,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('[Blendify SQLite] Database ready for authentication.');
   } catch (err) {
     console.warn('[Blendify SQLite] SQLite initialization fallback to local storage:', err);
+  }
+
+  // Update backend dual-storage indicator
+  const authSyncStatusLabel = document.getElementById('authSyncStatusLabel');
+  if (authSyncStatusLabel) {
+    const fbStatus = getFirebaseStatus();
+    if (fbStatus.configured) {
+      authSyncStatusLabel.textContent = `SQLite & Firebase (${fbStatus.projectId}) Synced`;
+    } else {
+      authSyncStatusLabel.textContent = 'SQLite WebAssembly Active · Dual-Backend Ready';
+    }
   }
 
   // =========================================================================
@@ -60,7 +84,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Application State
   const state = {
-    currentUser: null
+    currentUser: null,
+    activeAuthTab: 'signin'
   };
 
   // Toast Notification System
@@ -94,7 +119,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const headerUserEmail = document.getElementById('headerUserEmail');
   const btnSwitchAccount = document.getElementById('btnSwitchAccount');
 
-  // Login Form & Validation Elements
+  // Auth Tabs & Title
+  const tabBtnSignIn = document.getElementById('tabBtnSignIn');
+  const tabBtnSignUp = document.getElementById('tabBtnSignUp');
+  const authCardTitle = document.getElementById('authCardTitle');
+  const authCardSubtitle = document.getElementById('authCardSubtitle');
+
+  // Sign In Form & Validation Elements
   const formEmailPassword = document.getElementById('formEmailPassword');
   const inputEmail = document.getElementById('inputEmail');
   const inputPassword = document.getElementById('inputPassword');
@@ -109,6 +140,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnTogglePassword = document.getElementById('btnTogglePassword');
   const checkRememberMe = document.getElementById('checkRememberMe');
   const btnForgotPassword = document.getElementById('btnForgotPassword');
+
+  // Sign Up Form Elements
+  const formSignUp = document.getElementById('formSignUp');
+  const inputSignUpName = document.getElementById('inputSignUpName');
+  const inputSignUpEmail = document.getElementById('inputSignUpEmail');
+  const inputSignUpPassword = document.getElementById('inputSignUpPassword');
+  const inputSignUpConfirmPassword = document.getElementById('inputSignUpConfirmPassword');
+  const wrapperSignUpName = document.getElementById('wrapperSignUpName');
+  const wrapperSignUpEmail = document.getElementById('wrapperSignUpEmail');
+  const wrapperSignUpPassword = document.getElementById('wrapperSignUpPassword');
+  const wrapperSignUpConfirmPassword = document.getElementById('wrapperSignUpConfirmPassword');
+  const signUpNameError = document.getElementById('signUpNameError');
+  const signUpEmailError = document.getElementById('signUpEmailError');
+  const signUpPasswordError = document.getElementById('signUpPasswordError');
+  const signUpConfirmError = document.getElementById('signUpConfirmError');
+  const btnToggleSignUpPassword = document.getElementById('btnToggleSignUpPassword');
+  const labelRoleStudent = document.getElementById('labelRoleStudent');
+  const labelRoleTeacher = document.getElementById('labelRoleTeacher');
 
   // Registered Credentials Store
   const DEFAULT_CREDENTIALS = {
@@ -138,6 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_REGISTERED);
       if (stored) {
+
         return { ...DEFAULT_CREDENTIALS, ...JSON.parse(stored) };
       }
     } catch (e) {}
@@ -205,6 +255,43 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
+    // Sign up field feedback
+    if (targetField === 'signup-name' || targetField === 'all') {
+      wrapperSignUpName?.classList.add('has-error');
+      if (signUpNameError) {
+        signUpNameError.textContent = description;
+        signUpNameError.style.display = 'block';
+      }
+      if (targetField === 'signup-name') inputSignUpName?.focus();
+    }
+
+    if (targetField === 'signup-email' || targetField === 'all') {
+      wrapperSignUpEmail?.classList.add('has-error');
+      if (signUpEmailError) {
+        signUpEmailError.textContent = description;
+        signUpEmailError.style.display = 'block';
+      }
+      if (targetField === 'signup-email') inputSignUpEmail?.focus();
+    }
+
+    if (targetField === 'signup-password' || targetField === 'all') {
+      wrapperSignUpPassword?.classList.add('has-error');
+      if (signUpPasswordError) {
+        signUpPasswordError.textContent = description;
+        signUpPasswordError.style.display = 'block';
+      }
+      if (targetField === 'signup-password') inputSignUpPassword?.focus();
+    }
+
+    if (targetField === 'signup-confirm' || targetField === 'all') {
+      wrapperSignUpConfirmPassword?.classList.add('has-error');
+      if (signUpConfirmError) {
+        signUpConfirmError.textContent = description;
+        signUpConfirmError.style.display = 'block';
+      }
+      if (targetField === 'signup-confirm') inputSignUpConfirmPassword?.focus();
+    }
+
     showToast(description, ERROR_SVG, true);
   }
 
@@ -213,50 +300,109 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (authErrorBanner) authErrorBanner.style.display = 'none';
       wrapperEmail?.classList.remove('has-error');
       wrapperPassword?.classList.remove('has-error');
-      if (emailFieldError) {
-        emailFieldError.textContent = '';
-        emailFieldError.style.display = 'none';
-      }
-      if (passwordFieldError) {
-        passwordFieldError.textContent = '';
-        passwordFieldError.style.display = 'none';
-      }
+      wrapperSignUpName?.classList.remove('has-error');
+      wrapperSignUpEmail?.classList.remove('has-error');
+      wrapperSignUpPassword?.classList.remove('has-error');
+      wrapperSignUpConfirmPassword?.classList.remove('has-error');
+      if (emailFieldError) { emailFieldError.textContent = ''; emailFieldError.style.display = 'none'; }
+      if (passwordFieldError) { passwordFieldError.textContent = ''; passwordFieldError.style.display = 'none'; }
+      if (signUpNameError) { signUpNameError.textContent = ''; signUpNameError.style.display = 'none'; }
+      if (signUpEmailError) { signUpEmailError.textContent = ''; signUpEmailError.style.display = 'none'; }
+      if (signUpPasswordError) { signUpPasswordError.textContent = ''; signUpPasswordError.style.display = 'none'; }
+      if (signUpConfirmError) { signUpConfirmError.textContent = ''; signUpConfirmError.style.display = 'none'; }
       return;
     }
 
     if (field === 'email') {
       wrapperEmail?.classList.remove('has-error');
-      if (emailFieldError) {
-        emailFieldError.textContent = '';
-        emailFieldError.style.display = 'none';
-      }
+      if (emailFieldError) { emailFieldError.textContent = ''; emailFieldError.style.display = 'none'; }
     }
-
     if (field === 'password') {
       wrapperPassword?.classList.remove('has-error');
-      if (passwordFieldError) {
-        passwordFieldError.textContent = '';
-        passwordFieldError.style.display = 'none';
-      }
+      if (passwordFieldError) { passwordFieldError.textContent = ''; passwordFieldError.style.display = 'none'; }
     }
-
-    if (!wrapperEmail?.classList.contains('has-error') && !wrapperPassword?.classList.contains('has-error')) {
-      if (authErrorBanner) authErrorBanner.style.display = 'none';
+    if (field === 'signup-name') {
+      wrapperSignUpName?.classList.remove('has-error');
+      if (signUpNameError) { signUpNameError.textContent = ''; signUpNameError.style.display = 'none'; }
+    }
+    if (field === 'signup-email') {
+      wrapperSignUpEmail?.classList.remove('has-error');
+      if (signUpEmailError) { signUpEmailError.textContent = ''; signUpEmailError.style.display = 'none'; }
+    }
+    if (field === 'signup-password') {
+      wrapperSignUpPassword?.classList.remove('has-error');
+      if (signUpPasswordError) { signUpPasswordError.textContent = ''; signUpPasswordError.style.display = 'none'; }
+    }
+    if (field === 'signup-confirm') {
+      wrapperSignUpConfirmPassword?.classList.remove('has-error');
+      if (signUpConfirmError) { signUpConfirmError.textContent = ''; signUpConfirmError.style.display = 'none'; }
     }
   }
 
-  btnDismissAuthError?.addEventListener('click', () => {
+  btnDismissAuthError?.addEventListener('click', () => clearAuthErrors('all'));
+  inputEmail?.addEventListener('input', () => clearAuthErrors('email'));
+  inputPassword?.addEventListener('input', () => clearAuthErrors('password'));
+  inputSignUpName?.addEventListener('input', () => clearAuthErrors('signup-name'));
+  inputSignUpEmail?.addEventListener('input', () => clearAuthErrors('signup-email'));
+  inputSignUpPassword?.addEventListener('input', () => clearAuthErrors('signup-password'));
+  inputSignUpConfirmPassword?.addEventListener('input', () => clearAuthErrors('signup-confirm'));
+
+  // =========================================================================
+  // AUTH SEGMENTED TABS: SIGN IN vs SIGN UP
+  // =========================================================================
+  function switchAuthTab(tab) {
     clearAuthErrors('all');
+    state.activeAuthTab = tab;
+
+    if (tab === 'signup') {
+      tabBtnSignIn?.classList.remove('active');
+      tabBtnSignUp?.classList.add('active');
+      tabBtnSignIn?.setAttribute('aria-selected', 'false');
+      tabBtnSignUp?.setAttribute('aria-selected', 'true');
+      if (authCardTitle) authCardTitle.textContent = 'Create Your Account';
+      if (authCardSubtitle) authCardSubtitle.textContent = 'Sign up for Blendify LMS — instant setup synced with SQLite & Firebase.';
+      if (formEmailPassword) formEmailPassword.style.display = 'none';
+      if (formSignUp) formSignUp.style.display = 'block';
+      inputSignUpName?.focus();
+    } else {
+      tabBtnSignUp?.classList.remove('active');
+      tabBtnSignIn?.classList.add('active');
+      tabBtnSignUp?.setAttribute('aria-selected', 'false');
+      tabBtnSignIn?.setAttribute('aria-selected', 'true');
+      if (authCardTitle) authCardTitle.textContent = 'Login Screen';
+      if (authCardSubtitle) authCardSubtitle.textContent = 'Enter email & password to access your Blendify dashboard.';
+      if (formSignUp) formSignUp.style.display = 'none';
+      if (formEmailPassword) formEmailPassword.style.display = 'block';
+      inputEmail?.focus();
+    }
+  }
+
+  tabBtnSignIn?.addEventListener('click', () => switchAuthTab('signin'));
+  tabBtnSignUp?.addEventListener('click', () => switchAuthTab('signup'));
+
+  // Role Card Selection in Sign Up
+  labelRoleStudent?.addEventListener('click', () => {
+    labelRoleStudent.classList.add('selected');
+    labelRoleTeacher?.classList.remove('selected');
   });
 
-  inputEmail?.addEventListener('input', () => {
-    clearAuthErrors('email');
+  labelRoleTeacher?.addEventListener('click', () => {
+    labelRoleTeacher.classList.add('selected');
+    labelRoleStudent?.classList.remove('selected');
   });
 
-  inputPassword?.addEventListener('input', () => {
-    clearAuthErrors('password');
+  // Password visibility toggle for Sign Up
+  btnToggleSignUpPassword?.addEventListener('click', () => {
+    if (!inputSignUpPassword) return;
+    const isPwd = inputSignUpPassword.type === 'password';
+    inputSignUpPassword.type = isPwd ? 'text' : 'password';
+    const show = btnToggleSignUpPassword.querySelector('.eye-show');
+    const hide = btnToggleSignUpPassword.querySelector('.eye-hide');
+    if (show && hide) {
+      show.style.display = isPwd ? 'none' : 'block';
+      hide.style.display = isPwd ? 'block' : 'none';
+    }
   });
-
 
   // Google SSO Elements
   const btnGoogleSignIn = document.getElementById('btnGoogleSignIn');
@@ -344,7 +490,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderSignInView();
 
   // =========================================================================
-  // PASSWORD VISIBILITY TOGGLE
+  // PASSWORD VISIBILITY TOGGLE (SIGN IN)
   // =========================================================================
   btnTogglePassword?.addEventListener('click', () => {
     if (!inputPassword) return;
@@ -409,9 +555,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
-  // EMAIL / USERNAME & PASSWORD FORM SUBMISSION
+  // EMAIL / USERNAME & PASSWORD SIGN IN SUBMISSION (SQLITE & FIREBASE)
   // =========================================================================
-  formEmailPassword?.addEventListener('submit', (e) => {
+  formEmailPassword?.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearAuthErrors('all');
 
@@ -448,38 +594,177 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 3. Lookup Account in registered users
+    // 3. Authenticate with SQLite users table first
+    try {
+      const sqlAuth = await authenticateSqlUser(identifier, password);
+      if (sqlAuth) {
+        if (!sqlAuth.success && sqlAuth.reason === 'invalid_password') {
+          showAuthError('Incorrect Password', 'The password you entered is incorrect. Please verify your credentials.', 'password');
+          return;
+        }
+        if (sqlAuth.success && sqlAuth.user) {
+          clearAuthErrors('all');
+          processAuthentication({
+            name: sqlAuth.user.name,
+            email: sqlAuth.user.email,
+            role: sqlAuth.user.role,
+            remember: checkRememberMe ? checkRememberMe.checked : true
+          });
+          return;
+        }
+      }
+    } catch (sqlErr) {
+      console.warn('[SQLite Auth Error]', sqlErr);
+    }
+
+    // 4. Try Firebase Auth if live credentials are configured
+    if (isFirebaseConfigured() && isEmailFormat) {
+      try {
+        const fbAuth = await firebaseSignIn(identifier, password);
+        if (fbAuth.success && fbAuth.user) {
+          // Persist to SQLite users table for offline sync
+          saveRoleForEmail(fbAuth.user.email, fbAuth.user.role, fbAuth.user.name);
+          clearAuthErrors('all');
+          processAuthentication({
+            name: fbAuth.user.name,
+            email: fbAuth.user.email,
+            role: fbAuth.user.role,
+            remember: checkRememberMe ? checkRememberMe.checked : true
+          });
+          return;
+        } else if (fbAuth.code === 'auth/wrong-password' || fbAuth.code === 'auth/invalid-credential') {
+          showAuthError('Incorrect Password', 'The password you entered does not match our records.', 'password');
+          return;
+        }
+      } catch (fbErr) {
+        console.warn('[Firebase Auth Error]', fbErr);
+      }
+    }
+
+    // 5. Fallback check for demo/in-memory accounts
     const account = findAccountByIdentifier(identifier);
-    if (!account) {
-      showAuthError(
-        'Account Not Found',
-        `No Blendify account matches "${identifier}". Please check your credentials or sign in with Google.`,
-        'email'
-      );
+    if (account) {
+      if (account.password && account.password !== password) {
+        showAuthError('Incorrect Password', 'The password you entered is incorrect. Please try again.', 'password');
+        return;
+      }
+      clearAuthErrors('all');
+      processAuthentication({
+        name: account.name || identifier.split('@')[0],
+        email: account.email || identifier,
+        role: account.role || getSavedRoleForEmail(account.email),
+        remember: checkRememberMe ? checkRememberMe.checked : true
+      });
       return;
     }
 
-    // 4. Verify Password
-    if (account.password && account.password !== password) {
-      showAuthError(
-        'Incorrect Password',
-        'The password you entered is incorrect. Please verify your credentials and try again.',
-        'password'
-      );
-      return;
-    }
-
-    // 5. Successful Authentication
-    clearAuthErrors('all');
-
-    processAuthentication({
-      name: account.name || identifier.split('@')[0],
-      email: account.email || identifier,
-      role: account.role || getSavedRoleForEmail(account.email),
-      remember: checkRememberMe ? checkRememberMe.checked : true
-    });
+    // 6. If not found anywhere:
+    showAuthError(
+      'Account Not Found',
+      `No Blendify account matches "${identifier}". Switch to "Create Account" tab above to sign up!`,
+      'email'
+    );
   });
 
+  // =========================================================================
+  // USER SIGN UP SUBMISSION (SAVES TO SQLITE & FIREBASE)
+  // =========================================================================
+  formSignUp?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearAuthErrors('all');
+
+    const name = inputSignUpName?.value.trim();
+    const email = inputSignUpEmail?.value.trim();
+    const password = inputSignUpPassword?.value;
+    const confirmPassword = inputSignUpConfirmPassword?.value;
+    const roleRadio = document.querySelector('input[name="signupRole"]:checked');
+    const role = roleRadio?.value || 'student';
+
+    // 1. Validate Name
+    if (!name || name.length < 2) {
+      showAuthError('Invalid Full Name', 'Please enter your full name (at least 2 characters).', 'signup-name');
+      return;
+    }
+
+    // 2. Validate Email
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailPattern.test(email)) {
+      showAuthError('Invalid Email Address', 'Please provide a valid email (e.g. yourname@domain.com).', 'signup-email');
+      return;
+    }
+
+    // 3. Validate Password
+    if (!password || password.length < 6) {
+      showAuthError('Password Too Short', 'Password must be at least 6 characters long.', 'signup-password');
+      return;
+    }
+
+    // 4. Validate Confirm Password
+    if (password !== confirmPassword) {
+      showAuthError('Passwords Do Not Match', 'The confirmation password does not match. Please retype.', 'signup-confirm');
+      return;
+    }
+
+    // Show loading indicator
+    if (authLoadingOverlay) {
+      authLoadingOverlay.style.display = 'flex';
+      if (loadingStatusText) {
+        loadingStatusText.textContent = 'Creating account in SQLite & Firebase...';
+      }
+    }
+
+    try {
+      // 1. Save user to SQLite WebAssembly database
+      await registerSqlUser({ email, name, role, password });
+      saveRoleForEmail(email, role, name);
+
+      // Keep in registered users cache
+      const known = getKnownAccounts();
+      known[email.toLowerCase()] = { password, name, role };
+      try {
+        localStorage.setItem(STORAGE_KEY_REGISTERED, JSON.stringify(known));
+      } catch (e) {}
+
+      // 2. Save user to Firebase Authentication & Firestore if configured
+      let firebaseNotice = '';
+      if (isFirebaseConfigured()) {
+        try {
+          const fbResult = await firebaseSignUp(email, password, name, role);
+          if (fbResult.success) {
+            firebaseNotice = ' & Firebase';
+            console.log('[Firebase] User registered successfully:', fbResult.user);
+          }
+        } catch (fbErr) {
+          console.warn('[Firebase] Firebase registration notice:', fbErr);
+        }
+      }
+
+      if (authLoadingOverlay) authLoadingOverlay.style.display = 'none';
+
+      showToast(`Account successfully created in SQLite${firebaseNotice}! Welcome, ${name}!`);
+
+      // Set user session
+      const newUser = { name, email, role };
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(newUser));
+      localStorage.setItem(STORAGE_KEY_ROLE, role);
+
+      setTimeout(() => {
+        if (role === 'student') {
+          window.location.href = 'index.html';
+        } else {
+          window.location.href = 'create-course.html';
+        }
+      }, 500);
+
+    } catch (err) {
+      if (authLoadingOverlay) authLoadingOverlay.style.display = 'none';
+      showAuthError(
+        'Registration Failed',
+        err.message || 'An error occurred while saving user. Please try a different email.',
+        'signup-email'
+      );
+    }
+  });
 
   // =========================================================================
   // GOOGLE SIGN-IN MODAL (SSO ALTERNATIVE)

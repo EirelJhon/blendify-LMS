@@ -13,10 +13,22 @@ import {
   incrementMaterialDownload as incrementSqlDownload,
   getJoinedPortals as getSqlJoinedPortals,
   addJoinedPortal as addSqlJoinedPortal,
+  saveUploadedFile,
   downloadDatabaseFile
 } from './db.js';
+import { firebaseUploadFile, isFirebaseConfigured } from './firebase.js';
 import { initAILearningAgent } from './ai-agent.js';
 import { initDatabaseExplorer } from './explorer.js';
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Database & API Explorer Modal
@@ -753,31 +765,48 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function downloadCommunityMaterial(mat) {
-    showToast(`Downloading "${mat.title}" (${mat.size})...`);
+    showToast(`Downloading "${mat.title}" (${mat.size || 'file'})...`);
     try {
-      const mimeTypes = {
-        pdf: 'application/pdf',
-        fig: 'application/octet-stream',
-        zip: 'application/zip',
-        css: 'text/css',
-        js: 'text/javascript'
-      };
-      const ext = mat.ext.toLowerCase().replace('.', '');
-      const mime = mimeTypes[ext] || 'application/octet-stream';
-      const content = mat.content || `${mat.title}\nUploaded by: ${mat.author}\nCategory: ${mat.categoryLabel || mat.category}\n\nBlendify Educational Community Material\nDescription: ${mat.desc}`;
-      const filename = mat.filename || `${mat.title.replace(/[^a-zA-Z0-9-_]/g, '_')}.${ext}`;
+      const filename = mat.filename || mat.fileName || `${mat.title.replace(/[^a-zA-Z0-9-_]/g, '_')}.${(mat.ext || mat.fileType || 'pdf').toLowerCase()}`;
+      const filePayload = mat.fileData || mat.file_data || mat.content;
 
-      const blob = new Blob([content], { type: mime });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 800);
+      if (filePayload && typeof filePayload === 'string' && filePayload.startsWith('data:')) {
+        // Direct Base64 / Data URL download for real binary files saved in SQLite
+        const a = document.createElement('a');
+        a.href = filePayload;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+        }, 500);
+      } else if (mat.firebaseUrl || mat.firebase_url) {
+        // Direct download from Firebase Storage
+        window.open(mat.firebaseUrl || mat.firebase_url, '_blank');
+      } else {
+        // Text / Generated blob fallback
+        const ext = (mat.ext || mat.fileType || 'pdf').toLowerCase().replace('.', '');
+        const mimeTypes = {
+          pdf: 'application/pdf',
+          fig: 'application/octet-stream',
+          zip: 'application/zip',
+          css: 'text/css',
+          js: 'text/javascript'
+        };
+        const mime = mat.mimeType || mat.mime_type || mimeTypes[ext] || 'application/octet-stream';
+        const content = mat.content || `${mat.title}\nUploaded by: ${mat.author}\nCategory: ${mat.categoryLabel || mat.category}\n\nBlendify Educational Community Material\nDescription: ${mat.desc || ''}`;
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 800);
+      }
 
       mat.downloads = (mat.downloads || 0) + 1;
       saveCommunityMaterials(communityMaterials);
@@ -792,6 +821,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Community download error:', e);
     }
   }
+
 
   // Handle download click in grid
   communityUploadsGrid?.addEventListener('click', (e) => {
@@ -981,7 +1011,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Form submit: Publish Material
-  formUploadMaterial?.addEventListener('submit', (e) => {
+  formUploadMaterial?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = uploadTitleInput?.value.trim();
     if (!title) {
@@ -998,6 +1028,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let size = '2.4 MB';
     let filename = `${title.replace(/[^a-zA-Z0-9-_]/g, '_')}.pdf`;
     let content = `Blendify Community Upload: ${title}\nAuthor: ${author}\nCategory: ${category}\n\n${desc}`;
+    let fileData = null;
+    let mimeType = 'application/pdf';
 
     if (selectedUserFile) {
       const parts = selectedUserFile.name.split('.');
@@ -1006,10 +1038,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       size = `${(selectedUserFile.size / (1024 * 1024)).toFixed(1)} MB`;
       filename = selectedUserFile.name;
+      mimeType = selectedUserFile.type || 'application/octet-stream';
+
+      try {
+        fileData = await readFileAsDataURL(selectedUserFile);
+        content = fileData; // store data URL as content for seamless download
+      } catch (fErr) {
+        console.warn('FileReader error:', fErr);
+      }
     } else {
-      if (category === 'ui-ux') ext = 'FIG';
-      else if (category === 'code') ext = 'ZIP';
-      else if (category === 'webflow') ext = 'PDF';
+      if (category === 'ui-ux') { ext = 'FIG'; mimeType = 'application/octet-stream'; }
+      else if (category === 'code') { ext = 'ZIP'; mimeType = 'application/zip'; }
+      else if (category === 'webflow') { ext = 'PDF'; mimeType = 'application/pdf'; }
+    }
+
+    // Firebase Storage upload if configured
+    let firebaseUrl = null;
+    if (selectedUserFile && isFirebaseConfigured()) {
+      try {
+        const dest = `community_materials/${Date.now()}_${filename}`;
+        const fbRes = await firebaseUploadFile(selectedUserFile, dest);
+        if (fbRes.success) {
+          firebaseUrl = fbRes.downloadUrl;
+          console.log('[Blendify Firebase] Material saved to Cloud Storage:', firebaseUrl);
+        }
+      } catch (fbErr) {
+        console.warn('[Blendify Firebase] Storage upload error:', fbErr);
+      }
     }
 
     const categoryLabels = {
@@ -1033,25 +1088,46 @@ document.addEventListener('DOMContentLoaded', async () => {
       authorRole: 'Community Contributor',
       time: 'Just now',
       filename,
-      content
+      content,
+      fileData,
+      mimeType,
+      firebaseUrl
     };
 
     communityMaterials.unshift(newMaterial);
     saveCommunityMaterials(communityMaterials);
     renderCommunityMaterials(activeMaterialSearchQuery, activeMaterialCategory);
     closeUploadModal();
-    showToast(`Published "${title}" to Community Learning Materials!`);
+    showToast(`Published "${title}" to Community Learning Materials (Saved in SQLite${firebaseUrl ? ' & Firebase' : ''})!`);
 
-    // Persist to SQLite learning_materials table
+    // 1. Persist to SQLite learning_materials table
     addSqlMaterial({
       title,
       category: categoryLabels[category] || category,
       author,
       fileSize: size,
       fileType: ext,
-      badgeClass: `badge-${ext.toLowerCase()}`
+      badgeClass: `badge-${ext.toLowerCase()}`,
+      fileData,
+      fileName: filename,
+      mimeType,
+      firebaseUrl
     }).catch(e => console.warn('[SQLite] addSqlMaterial error:', e));
+
+    // 2. Persist to SQLite dedicated uploaded_files repository if actual file attached
+    if (fileData) {
+      saveUploadedFile({
+        name: filename,
+        fileData,
+        mimeType,
+        fileSize: size,
+        uploadedBy: author,
+        portalTag: state.activeTag,
+        firebaseUrl
+      }).catch(e => console.warn('[SQLite] saveUploadedFile error:', e));
+    }
   });
+
 
   // Initial render of community materials
   renderCommunityMaterials();

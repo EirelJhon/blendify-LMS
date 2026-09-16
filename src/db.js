@@ -105,6 +105,8 @@ export async function getDatabase() {
 
     // Initialize Schema
     initSchema(dbInstance);
+    // Run safe schema migrations for existing stored databases
+    migrateSchema(dbInstance);
     // Seed initial records if empty
     seedInitialData(dbInstance);
     // Save state
@@ -126,6 +128,8 @@ function initSchema(db) {
       email TEXT UNIQUE NOT NULL,
       name TEXT NOT NULL,
       role TEXT NOT NULL CHECK(role IN ('student', 'teacher')),
+      password TEXT,
+      avatar TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -149,6 +153,22 @@ function initSchema(db) {
       file_type TEXT NOT NULL,
       badge_class TEXT NOT NULL,
       downloads_count INTEGER DEFAULT 0,
+      file_data TEXT,
+      file_name TEXT,
+      mime_type TEXT,
+      firebase_url TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS uploaded_files (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      file_data TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      file_size TEXT NOT NULL,
+      uploaded_by TEXT NOT NULL,
+      portal_tag TEXT,
+      firebase_url TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -173,17 +193,54 @@ function initSchema(db) {
 }
 
 /**
+ * Migrate existing schema safely without data loss
+ */
+function migrateSchema(db) {
+  // Ensure 'password' and 'avatar' columns in users
+  try { db.run("ALTER TABLE users ADD COLUMN password TEXT"); } catch (e) {}
+  try { db.run("ALTER TABLE users ADD COLUMN avatar TEXT"); } catch (e) {}
+  
+  // Ensure file columns in learning_materials
+  try { db.run("ALTER TABLE learning_materials ADD COLUMN file_data TEXT"); } catch (e) {}
+  try { db.run("ALTER TABLE learning_materials ADD COLUMN file_name TEXT"); } catch (e) {}
+  try { db.run("ALTER TABLE learning_materials ADD COLUMN mime_type TEXT"); } catch (e) {}
+  try { db.run("ALTER TABLE learning_materials ADD COLUMN firebase_url TEXT"); } catch (e) {}
+
+  // Ensure uploaded_files table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS uploaded_files (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      file_data TEXT NOT NULL,
+      mime_type TEXT NOT NULL,
+      file_size TEXT NOT NULL,
+      uploaded_by TEXT NOT NULL,
+      portal_tag TEXT,
+      firebase_url TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+}
+
+/**
  * Seed initial records into SQLite tables
  */
 function seedInitialData(db) {
   // Seed Users
   const userCount = db.exec("SELECT COUNT(*) as count FROM users")[0]?.values[0][0] || 0;
   if (userCount === 0) {
-    const stmt = db.prepare("INSERT INTO users (email, name, role) VALUES (?, ?, ?)");
-    stmt.run(['alex.student@gmail.com', 'Alex Rivers', 'student']);
-    stmt.run(['harsh.teacher@blendify.edu', 'Harsh Vardhan', 'teacher']);
-    stmt.run(['elena.design@gmail.com', 'Elena Rostova', 'teacher']);
+    const stmt = db.prepare("INSERT INTO users (email, name, role, password) VALUES (?, ?, ?, ?)");
+    stmt.run(['alex.student@gmail.com', 'Alex Rivers', 'student', 'student123']);
+    stmt.run(['harsh.teacher@blendify.edu', 'Harsh Vardhan', 'teacher', 'teacher123']);
+    stmt.run(['elena.design@gmail.com', 'Elena Rostova', 'teacher', 'teacher123']);
     stmt.free();
+  } else {
+    // Backfill default passwords for seed accounts if previously empty
+    try {
+      db.run("UPDATE users SET password = 'student123' WHERE email = 'alex.student@gmail.com' AND (password IS NULL OR password = '')");
+      db.run("UPDATE users SET password = 'teacher123' WHERE email = 'harsh.teacher@blendify.edu' AND (password IS NULL OR password = '')");
+      db.run("UPDATE users SET password = 'teacher123' WHERE email = 'elena.design@gmail.com' AND (password IS NULL OR password = '')");
+    } catch (e) {}
   }
 
   // Seed Portals
@@ -202,16 +259,16 @@ function seedInitialData(db) {
   if (matCount === 0) {
     const stmt = db.prepare(`
       INSERT INTO learning_materials 
-      (title, category, author, date_uploaded, file_size, file_type, badge_class, downloads_count) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      (title, category, author, date_uploaded, file_size, file_type, badge_class, downloads_count, file_name) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     const initialMaterials = [
-      ['Figma Responsive Auto-Layout Breakpoint Kit', 'UI Design', 'Alex R. (Student)', 'Sep 08, 2026', '14.2 MB', 'FIG', 'badge-figma', 42],
-      ['Webflow Fluid Responsive CSS Clamping Reference Sheet', 'Webflow', 'Kavita M. (Mentor)', 'Sep 06, 2026', '2.8 MB', 'PDF', 'badge-pdf', 89],
-      ['Mobile-First Design System Starter Tokens (JSON & CSS)', 'Tokens', 'Design Guild', 'Sep 04, 2026', '4.1 MB', 'ZIP', 'badge-zip', 56],
-      ['Interactive Mobile Navbar Navigation Component Code', 'Components', 'Elena R. (Instructor)', 'Sep 02, 2026', '620 KB', 'JS / HTML', 'badge-code', 118],
-      ['Complete Cohort 4 Typography & Spacing Guidelines', 'Typography', 'Sarah Chen', 'Aug 29, 2026', '8.4 MB', 'PDF', 'badge-pdf', 67],
-      ['Wireframe Flowchart Kits for Multi-Device UX', 'Wireframing', 'Devon Vance', 'Aug 26, 2026', '18.9 MB', 'FIG', 'badge-figma', 93]
+      ['Figma Responsive Auto-Layout Breakpoint Kit', 'UI Design', 'Alex R. (Student)', 'Sep 08, 2026', '14.2 MB', 'FIG', 'badge-figma', 42, 'figma_auto_layout_kit.fig'],
+      ['Webflow Fluid Responsive CSS Clamping Reference Sheet', 'Webflow', 'Kavita M. (Mentor)', 'Sep 06, 2026', '2.8 MB', 'PDF', 'badge-pdf', 89, 'webflow_fluid_clamping.pdf'],
+      ['Mobile-First Design System Starter Tokens (JSON & CSS)', 'Tokens', 'Design Guild', 'Sep 04, 2026', '4.1 MB', 'ZIP', 'badge-zip', 56, 'design_tokens_starter.zip'],
+      ['Interactive Mobile Navbar Navigation Component Code', 'Components', 'Elena R. (Instructor)', 'Sep 02, 2026', '620 KB', 'JS / HTML', 'badge-code', 118, 'mobile_navbar.js'],
+      ['Complete Cohort 4 Typography & Spacing Guidelines', 'Typography', 'Sarah Chen', 'Aug 29, 2026', '8.4 MB', 'PDF', 'badge-pdf', 67, 'typography_spacing_guide.pdf'],
+      ['Wireframe Flowchart Kits for Multi-Device UX', 'Wireframing', 'Devon Vance', 'Aug 26, 2026', '18.9 MB', 'FIG', 'badge-figma', 93, 'wireframe_flowcharts.fig']
     ];
     for (const mat of initialMaterials) {
       stmt.run(mat);
@@ -285,6 +342,49 @@ export async function getUserByEmail(email) {
   return await sqlQueryOne("SELECT * FROM users WHERE LOWER(email) = LOWER(?)", [email.trim()]);
 }
 
+export async function getAllUsers() {
+  return await sqlQueryAll("SELECT id, email, name, role, created_at FROM users ORDER BY id ASC");
+}
+
+export async function registerSqlUser({ email, name, role = 'student', password = '' }) {
+  if (!email) throw new Error('Email is required.');
+  const cleanEmail = email.trim().toLowerCase();
+  const existing = await getUserByEmail(cleanEmail);
+  if (existing) {
+    throw new Error(`An account with email "${cleanEmail}" is already registered.`);
+  }
+  const cleanName = name?.trim() || cleanEmail.split('@')[0];
+  await sqlRun(
+    "INSERT INTO users (email, name, role, password) VALUES (?, ?, ?, ?)",
+    [cleanEmail, cleanName, role, password]
+  );
+  return await getUserByEmail(cleanEmail);
+}
+
+export async function authenticateSqlUser(identifier, password) {
+  if (!identifier) return null;
+  const clean = identifier.trim().toLowerCase();
+
+  // Try exact email match
+  let user = await sqlQueryOne("SELECT * FROM users WHERE LOWER(email) = ?", [clean]);
+
+  // If not found, try username match (e.g. before @ or name)
+  if (!user) {
+    user = await sqlQueryOne("SELECT * FROM users WHERE LOWER(email) LIKE ?", [`${clean}@%`]);
+  }
+  if (!user) {
+    user = await sqlQueryOne("SELECT * FROM users WHERE LOWER(name) = ?", [clean]);
+  }
+
+  if (!user) return null;
+
+  if (user.password && user.password !== password) {
+    return { success: false, reason: 'invalid_password' };
+  }
+
+  return { success: true, user };
+}
+
 export async function saveUserRole(email, role, name = null) {
   if (!email || !role) return;
   const existing = await getUserByEmail(email);
@@ -312,7 +412,7 @@ export async function addJoinedPortal(tag, title, instructor = 'Community Class'
   return await getJoinedPortals();
 }
 
-// --- Learning Materials ---
+// --- Learning Materials & File Storage ---
 export async function getMaterials(searchQuery = '', category = 'all') {
   let sql = "SELECT * FROM learning_materials WHERE 1=1";
   const params = [];
@@ -332,18 +432,72 @@ export async function getMaterials(searchQuery = '', category = 'all') {
   return await sqlQueryAll(sql, params);
 }
 
-export async function addMaterial({ title, category, author, fileSize, fileType, badgeClass }) {
+export async function getMaterialById(id) {
+  return await sqlQueryOne("SELECT * FROM learning_materials WHERE id = ?", [id]);
+}
+
+export async function addMaterial({
+  title,
+  category,
+  author,
+  fileSize,
+  fileType,
+  badgeClass,
+  fileData = null,
+  fileName = null,
+  mimeType = null,
+  firebaseUrl = null
+}) {
   const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
   await sqlRun(
-    `INSERT INTO learning_materials (title, category, author, date_uploaded, file_size, file_type, badge_class, downloads_count) 
-     VALUES (?, ?, ?, ?, ?, ?, ?, 0)`,
-    [title, category, author, dateStr, fileSize, fileType, badgeClass]
+    `INSERT INTO learning_materials 
+     (title, category, author, date_uploaded, file_size, file_type, badge_class, downloads_count, file_data, file_name, mime_type, firebase_url) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)`,
+    [title, category, author, dateStr, fileSize, fileType, badgeClass, fileData, fileName, mimeType, firebaseUrl]
   );
   return await getMaterials();
 }
 
 export async function incrementMaterialDownload(id) {
   await sqlRun("UPDATE learning_materials SET downloads_count = downloads_count + 1 WHERE id = ?", [id]);
+}
+
+// --- Uploaded Files Repository (Dedicated File Store) ---
+export async function saveUploadedFile({
+  name,
+  fileData,
+  mimeType = 'application/octet-stream',
+  fileSize = '0 KB',
+  uploadedBy = 'Anonymous',
+  portalTag = null,
+  firebaseUrl = null
+}) {
+  await sqlRun(
+    `INSERT INTO uploaded_files (name, file_data, mime_type, file_size, uploaded_by, portal_tag, firebase_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [name, fileData, mimeType, fileSize, uploadedBy, portalTag, firebaseUrl]
+  );
+  return await sqlQueryOne("SELECT * FROM uploaded_files ORDER BY id DESC LIMIT 1");
+}
+
+export async function getUploadedFileById(id) {
+  return await sqlQueryOne("SELECT * FROM uploaded_files WHERE id = ?", [id]);
+}
+
+export async function getAllUploadedFiles(portalTag = null) {
+  if (portalTag) {
+    return await sqlQueryAll(
+      "SELECT id, name, mime_type, file_size, uploaded_by, portal_tag, firebase_url, created_at FROM uploaded_files WHERE portal_tag = ? ORDER BY id DESC",
+      [portalTag]
+    );
+  }
+  return await sqlQueryAll(
+    "SELECT id, name, mime_type, file_size, uploaded_by, portal_tag, firebase_url, created_at FROM uploaded_files ORDER BY id DESC"
+  );
+}
+
+export async function deleteUploadedFile(id) {
+  await sqlRun("DELETE FROM uploaded_files WHERE id = ?", [id]);
 }
 
 // --- Quizzes & Activities ---
@@ -373,6 +527,7 @@ export async function addActivity({ studentName, action, portalTag }) {
   );
   return await getActivities();
 }
+
 
 /**
  * Execute raw SQL query from the Interactive Explorer
@@ -423,7 +578,7 @@ export async function executeRawSql(sql) {
  */
 export async function getTableStats() {
   const db = await getDatabase();
-  const tables = ['users', 'classroom_portals', 'learning_materials', 'quizzes', 'student_activities'];
+  const tables = ['users', 'classroom_portals', 'learning_materials', 'uploaded_files', 'quizzes', 'student_activities'];
   const stats = {};
   for (const t of tables) {
     try {
@@ -445,6 +600,7 @@ export async function resetDatabaseToSeed() {
     DROP TABLE IF EXISTS users;
     DROP TABLE IF EXISTS classroom_portals;
     DROP TABLE IF EXISTS learning_materials;
+    DROP TABLE IF EXISTS uploaded_files;
     DROP TABLE IF EXISTS quizzes;
     DROP TABLE IF EXISTS student_activities;
   `);
@@ -453,3 +609,4 @@ export async function resetDatabaseToSeed() {
   persistDatabase();
   return await getTableStats();
 }
+
