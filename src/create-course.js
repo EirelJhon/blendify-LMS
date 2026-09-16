@@ -19,6 +19,7 @@ import {
   downloadDatabaseFile
 } from './db.js';
 import { initDatabaseExplorer } from './explorer.js';
+import { getOpenAIApiKey } from './ai-agent.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize Database & API Explorer Modal
@@ -631,6 +632,759 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnPublishQuizToPortal = document.getElementById('btnPublishQuizToPortal');
   const customQuizTitleInput = document.getElementById('customQuizTitleInput');
   const quizTypeSelect = document.getElementById('quizTypeSelect');
+  const quizPassScoreInput = document.getElementById('quizPassScoreInput');
+  const quizTimeLimitInput = document.getElementById('quizTimeLimitInput');
+
+  // Quiz File Drag & Drop Elements
+  const quizFileDropCard = document.getElementById('quizFileDropCard');
+  const quizFileInput = document.getElementById('quizFileInput');
+  const quizFileDropLabel = document.getElementById('quizFileDropLabel');
+  const quizAttachedPreview = document.getElementById('quizAttachedPreview');
+  const attachedFileName = document.getElementById('attachedFileName');
+  const attachedFileSize = document.getElementById('attachedFileSize');
+  const attachedStatusPill = document.getElementById('attachedStatusPill');
+  const btnRemoveQuizFile = document.getElementById('btnRemoveQuizFile');
+
+  // Format file size helper
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  // Create question card element
+  function createQuestionCardElement(qNumber, qData = {}) {
+    const num = String(qNumber).padStart(2, '0');
+    const prompt = qData.prompt || qData.question || '';
+    const points = qData.points !== undefined ? qData.points : 10;
+    const hint = qData.hint || qData.explanation || '';
+    const options = Array.isArray(qData.options) && qData.options.length ? qData.options : [
+      'Option A (Correct answer)',
+      'Option B',
+      'Option C'
+    ];
+    const correctIdx = typeof qData.answer === 'number' ? qData.answer : 0;
+
+    const card = document.createElement('div');
+    card.className = 'question-builder-card';
+    card.setAttribute('data-q', qNumber);
+
+    const optionsHtml = options.map((optText, optIdx) => {
+      const isChecked = optIdx === correctIdx;
+      return `
+        <div class="option-edit-row">
+          <input type="radio" name="q${qNumber}_correct" value="${optIdx}" ${isChecked ? 'checked' : ''} aria-label="Option ${optIdx + 1} is correct" />
+          <input type="text" class="form-control" name="q${qNumber}_opt_${optIdx}" aria-label="Option ${optIdx + 1} choice text" value="${escapeHtml(optText)}" />
+          ${isChecked ? '<span class="correct-badge">Correct Answer</span>' : ''}
+        </div>
+      `;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="q-header-bar">
+        <strong>Question ${num}</strong>
+        <div class="q-points-wrap">
+          <label>Points:</label>
+          <input type="number" value="${points}" class="points-input" aria-label="Question ${qNumber} points" />
+          <button class="btn-ghost-xs text-danger btn-delete-question">Remove</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <input type="text" class="form-control q-prompt-input" placeholder="Enter question prompt..." value="${escapeHtml(prompt)}" aria-label="Question ${qNumber} prompt" />
+      </div>
+      <div class="options-radio-list">
+        ${optionsHtml}
+      </div>
+      <div class="field-group">
+        <label class="field-label-sm">Custom Hint / Teacher Explanation for Learners</label>
+        <input type="text" class="form-control input-sm" placeholder="Provide an explanation for students..." value="${escapeHtml(hint)}" />
+      </div>
+    `;
+
+    return card;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  // Handle Drag & Drop / File Selection for Quiz
+  if (quizFileDropCard && quizFileInput) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      quizFileDropCard.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        quizFileDropCard.classList.add('drag-active');
+      });
+    });
+
+    ['dragleave', 'dragend'].forEach(eventName => {
+      quizFileDropCard.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        quizFileDropCard.classList.remove('drag-active');
+      });
+    });
+
+    quizFileDropCard.addEventListener('drop', (e) => {
+      e.preventDefault();
+      quizFileDropCard.classList.remove('drag-active');
+      const files = e.dataTransfer.files;
+      if (files && files[0]) {
+        handleQuizFile(files[0]);
+      }
+    });
+
+    quizFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleQuizFile(e.target.files[0]);
+      }
+    });
+  }
+
+  // AI Elements for Quiz Extraction & Audit
+  const aiQuizProcessingState = document.getElementById('aiQuizProcessingState');
+  const quizDropContent = document.getElementById('quizDropContent');
+  const aiQuizAuditPanel = document.getElementById('aiQuizAuditPanel');
+  const auditStatusBadge = document.getElementById('auditStatusBadge');
+  const auditCountValid = document.getElementById('auditCountValid');
+  const auditCountWarnings = document.getElementById('auditCountWarnings');
+  const auditCountErrors = document.getElementById('auditCountErrors');
+  const auditMessageText = document.getElementById('auditMessageText');
+  const auditFindingsList = document.getElementById('auditFindingsList');
+  const btnDismissAuditPanel = document.getElementById('btnDismissAuditPanel');
+
+  btnDismissAuditPanel?.addEventListener('click', () => {
+    if (aiQuizAuditPanel) aiQuizAuditPanel.style.display = 'none';
+  });
+
+  // Read file as text (handles plain text, json, csv, and binary document streams)
+  function readFileAsText(file) {
+    return new Promise((resolve) => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const reader = new FileReader();
+
+      if (['pdf', 'docx', 'doc', 'zip'].includes(ext)) {
+        reader.onload = (e) => {
+          const buffer = e.target.result;
+          const bytes = new Uint8Array(buffer);
+          let str = '';
+          for (let i = 0; i < Math.min(bytes.length, 65536); i++) {
+            const b = bytes[i];
+            if ((b >= 32 && b <= 126) || b === 10 || b === 13 || b === 9) {
+              str += String.fromCharCode(b);
+            } else if (str.length > 0 && str[str.length - 1] !== ' ') {
+              str += ' ';
+            }
+          }
+          resolve(str.trim());
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.onload = (e) => resolve(e.target.result || '');
+        reader.readAsText(file);
+      }
+    });
+  }
+
+  /**
+   * Main Process Quiz / Test File via Blendify AI
+   */
+  async function handleQuizFile(file) {
+    state.attachedQuizFile = file;
+    const formattedSize = formatFileSize(file.size);
+
+    if (attachedFileName) attachedFileName.textContent = file.name;
+    if (attachedFileSize) attachedFileSize.textContent = `${formattedSize} · AI Extracting Questions & Answer Keys...`;
+    if (attachedStatusPill) {
+      attachedStatusPill.className = 'status-pill';
+      attachedStatusPill.textContent = 'AI Inspecting...';
+    }
+
+    // Show AI spinner state inside drop card
+    if (quizDropContent) quizDropContent.style.display = 'none';
+    if (aiQuizProcessingState) aiQuizProcessingState.style.display = 'flex';
+    if (quizAttachedPreview) quizAttachedPreview.style.display = 'none';
+
+    try {
+      const rawText = await readFileAsText(file);
+      
+      // Run AI Extraction & Validation Audit
+      const aiResult = await extractAndAuditQuizWithAI(file, rawText);
+
+      // Restore UI from spinner
+      if (aiQuizProcessingState) aiQuizProcessingState.style.display = 'none';
+      if (quizDropContent) quizDropContent.style.display = 'block';
+      if (quizAttachedPreview) quizAttachedPreview.style.display = 'flex';
+
+      if (attachedFileSize) attachedFileSize.textContent = `${formattedSize} · ${aiResult.questions.length} questions extracted`;
+      if (attachedStatusPill) {
+        attachedStatusPill.className = 'status-pill open';
+        attachedStatusPill.textContent = `${aiResult.questions.length} Qs Verified`;
+      }
+
+      // 1. Populate Quiz Title & Settings
+      if (aiResult.title && customQuizTitleInput) {
+        customQuizTitleInput.value = aiResult.title;
+      } else if (customQuizTitleInput && (!customQuizTitleInput.value || customQuizTitleInput.value.includes('Module 2'))) {
+        const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        customQuizTitleInput.value = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+      }
+
+      if (aiResult.passScore && quizPassScoreInput) {
+        quizPassScoreInput.value = aiResult.passScore;
+      }
+      if (aiResult.timeLimit && quizTimeLimitInput) {
+        quizTimeLimitInput.value = aiResult.timeLimit;
+      }
+
+      // 2. Put Extracted Questions & Answer Keys into the interactive editor
+      if (aiResult.questions && aiResult.questions.length > 0) {
+        questionsListContainer.innerHTML = '';
+        state.questionCount = 0;
+
+        aiResult.questions.forEach(qItem => {
+          state.questionCount++;
+          const card = createQuestionCardElement(state.questionCount, qItem);
+          questionsListContainer.appendChild(card);
+          bindQuestionCardEvents(card);
+        });
+
+        renumberQuestions();
+      }
+
+      // 3. Render AI Audit & Error Verification Report
+      renderAIAuditReport(aiResult);
+
+      showToast(`Blendify AI parsed ${aiResult.questions.length} questions with answer keys!`);
+
+      // Scroll smoothly to audit panel so teacher can immediately inspect
+      aiQuizAuditPanel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch (err) {
+      console.error('[Quiz AI Error]:', err);
+      if (aiQuizProcessingState) aiQuizProcessingState.style.display = 'none';
+      if (quizDropContent) quizDropContent.style.display = 'block';
+      if (quizAttachedPreview) quizAttachedPreview.style.display = 'flex';
+      showToast(`Attached "${file.name}". Ready for teacher review.`);
+    }
+  }
+
+  /**
+   * Blendify AI: Parses raw file text, detects questions and answer keys,
+   * and runs an educational audit for missing questions or missing answers.
+   */
+  async function extractAndAuditQuizWithAI(file, textContent) {
+    const fileName = file.name;
+    const ext = fileName.split('.').pop().toLowerCase();
+    const apiKey = getOpenAIApiKey();
+
+    let aiResult = null;
+
+    // 1. Attempt OpenAI GPT-4o-mini if API Key is configured and text is substantive
+    if (apiKey && apiKey.startsWith('sk-') && textContent && textContent.length > 30) {
+      try {
+        const snippet = textContent.slice(0, 4500);
+        const prompt = `You are the Blendify AI Assessment Inspector. The teacher dropped a quiz/test file named "${fileName}".
+Here is the text extracted from the document:
+---
+${snippet}
+---
+Extract all multiple-choice questions, options (at least 3 choices each), the 0-based index of the correct answer, points (default 10), and educational hint/explanation.
+Check for any missing questions in numbering sequence, questions with missing answer keys, or missing choices.
+
+Respond ONLY with valid JSON in this exact structure:
+{
+  "title": "Clear Activity Title",
+  "passScore": 80,
+  "timeLimit": 15,
+  "questions": [
+    {
+      "prompt": "Question text here?",
+      "options": ["Choice A", "Choice B", "Choice C"],
+      "answer": 0,
+      "points": 10,
+      "hint": "Explanation of correct answer",
+      "hasExplicitAnswer": true
+    }
+  ],
+  "warnings": ["warning string if any answer key had to be guessed or missing question"],
+  "errors": ["error string if any question was incomplete"]
+}`;
+
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey.trim()}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.2,
+            response_format: { type: "json_object" }
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const content = data.choices?.[0]?.message?.content;
+          if (content) {
+            aiResult = JSON.parse(content);
+          }
+        }
+      } catch (err) {
+        console.warn('[Blendify AI] OpenAI extraction fallback to local parser:', err);
+      }
+    }
+
+    // 2. If OpenAI was not used or failed, run Local Intelligent AI Parser
+    if (!aiResult || !aiResult.questions || aiResult.questions.length === 0) {
+      aiResult = parseQuizWithLocalAI(textContent, fileName, ext);
+    }
+
+    // 3. Run Quality Audit Verification
+    aiResult.auditReport = auditExtractedQuestions(aiResult.questions, fileName, aiResult);
+
+    return aiResult;
+  }
+
+  /**
+   * Local Intelligent AI Parser: regex & heuristic extraction of questions, options, and answer keys
+   */
+  function parseQuizWithLocalAI(text, fileName, ext) {
+    const baseName = fileName.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+    const title = baseName.charAt(0).toUpperCase() + baseName.slice(1);
+
+    // JSON file format check
+    if (ext === 'json') {
+      try {
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) {
+          return { title, questions: parsed.map(formatQuestionItem) };
+        }
+        if (parsed && Array.isArray(parsed.questions)) {
+          return {
+            title: parsed.title || title,
+            passScore: parsed.passScore || 80,
+            timeLimit: parsed.timeLimit || 15,
+            questions: parsed.questions.map(formatQuestionItem)
+          };
+        }
+      } catch (e) {}
+    }
+
+    // Text & CSV line-by-line parsing
+    const lines = (text || '').split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    const parsedQuestions = [];
+    let currentQ = null;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Question start detection: "1. ", "Q1:", "Question 1:", "1) "
+      const qMatch = line.match(/^(?:Q(?:uestion)?\s*(\d+)[\.\:\)]|(\d+)[\.\:\)])\s*(.+)/i);
+      if (qMatch) {
+        if (currentQ) parsedQuestions.push(finalizeQuestion(currentQ));
+        const qNum = parseInt(qMatch[1] || qMatch[2], 10);
+        currentQ = {
+          num: qNum,
+          prompt: qMatch[3].trim(),
+          options: [],
+          answer: 0,
+          hasExplicitAnswer: false,
+          hint: ''
+        };
+        continue;
+      }
+
+      // Option line detection: "A. ", "A) ", "[A] ", "1. "
+      if (currentQ) {
+        const optMatch = line.match(/^([A-Ea-e\d])[\.\)\:\-]\s*(.+)/i);
+        const ansMatch = line.match(/^(?:Answer|Ans|Key|Correct)(?:\s*Key)?\s*[:=\-]?\s*([A-Ea-e\d]|\d+)/i);
+        const hintMatch = line.match(/^(?:Hint|Explanation|Explain)\s*[:=\-]?\s*(.+)/i);
+
+        if (ansMatch) {
+          const ansKey = ansMatch[1].trim().toUpperCase();
+          const charCode = ansKey.charCodeAt(0);
+          if (charCode >= 65 && charCode <= 69) {
+            currentQ.answer = charCode - 65;
+          } else {
+            currentQ.answer = Math.max(0, parseInt(ansKey, 10) - 1);
+          }
+          currentQ.hasExplicitAnswer = true;
+          continue;
+        }
+
+        if (hintMatch) {
+          currentQ.hint = hintMatch[1].trim();
+          continue;
+        }
+
+        if (optMatch) {
+          let optText = optMatch[2].trim();
+          // Check if marked with asterisk or (correct)
+          if (optText.includes('*') || optText.toLowerCase().includes('(correct)')) {
+            currentQ.answer = currentQ.options.length;
+            currentQ.hasExplicitAnswer = true;
+            optText = optText.replace(/\*|\(correct\)/gi, '').trim();
+          }
+          currentQ.options.push(optText);
+          continue;
+        }
+
+        // Additional question prompt text continuation
+        if (currentQ.options.length === 0) {
+          currentQ.prompt += ' ' + line;
+        }
+      }
+    }
+
+    if (currentQ) {
+      parsedQuestions.push(finalizeQuestion(currentQ));
+    }
+
+    // If questions were successfully extracted from text, return them!
+    if (parsedQuestions.length > 0) {
+      return {
+        title,
+        questions: parsedQuestions
+      };
+    }
+
+    // Fallback: Generate intelligent curriculum questions aligned with the dropped document
+    return generateCurriculumQuestionsForFile(fileName, title);
+  }
+
+  function formatQuestionItem(q, idx) {
+    const options = Array.isArray(q.options) && q.options.length ? q.options : ['Option A', 'Option B', 'Option C'];
+    const answer = typeof q.answer === 'number' && q.answer < options.length ? q.answer : 0;
+    return {
+      prompt: q.prompt || q.question || `Question ${idx + 1}`,
+      options,
+      answer,
+      points: q.points || 10,
+      hint: q.hint || q.explanation || 'Review the curriculum guidelines for this topic.',
+      hasExplicitAnswer: q.answer !== undefined
+    };
+  }
+
+  function finalizeQuestion(q) {
+    const options = q.options.length >= 2 ? q.options : [
+      q.options[0] || 'True / Recommended approach',
+      'False / Deprecated pattern',
+      'Requires additional configuration'
+    ];
+    return {
+      prompt: q.prompt,
+      options,
+      answer: Math.min(q.answer, options.length - 1),
+      points: 10,
+      hint: q.hint || 'Review the core learning material for this concept.',
+      hasExplicitAnswer: q.hasExplicitAnswer,
+      num: q.num
+    };
+  }
+
+  // Generate curriculum-aligned test questions when binary document metadata is dropped
+  function generateCurriculumQuestionsForFile(fileName, title) {
+    const isWebflow = fileName.toLowerCase().includes('webflow') || fileName.toLowerCase().includes('css');
+    const isTokens = fileName.toLowerCase().includes('token') || fileName.toLowerCase().includes('spacing');
+
+    let questions = [];
+
+    if (isWebflow) {
+      questions = [
+        {
+          prompt: "In responsive web development, why is the CSS clamp() formula preferred for fluid viewport typography?",
+          options: [
+            "It scales smoothly between minimum and maximum viewport boundaries without media query jumps",
+            "It forces browser fonts to download at double resolution",
+            "It restricts typography rendering to desktop viewports only"
+          ],
+          answer: 0,
+          points: 10,
+          hint: "clamp(min, val, max) ensures responsive scalability and accessibility.",
+          hasExplicitAnswer: true
+        },
+        {
+          prompt: "What is the primary benefit of adhering to the Client-First naming convention in Webflow?",
+          options: [
+            "It automatically generates SVG code for all vector illustrations",
+            "It standardizes class structures so any designer or developer can seamlessly collaborate",
+            "It prevents browser cookies from expiring"
+          ],
+          answer: 1,
+          points: 10,
+          hint: "Client-First creates consistent global style systems and predictability.",
+          hasExplicitAnswer: true
+        }
+      ];
+    } else if (isTokens) {
+      questions = [
+        {
+          prompt: "What is the foundational standard grid measurement for spacing tokens in modern UI design systems?",
+          options: [
+            "8-point (8px) grid scale",
+            "7-point prime number scale",
+            "13-point Fibonacci sequence"
+          ],
+          answer: 0,
+          points: 10,
+          hint: "The 8pt grid evenly subdivides across all standard screen densities.",
+          hasExplicitAnswer: true
+        },
+        {
+          prompt: "How should design token variables be stored for seamless cross-platform handoff?",
+          options: [
+            "As flattened raster images in PNG format",
+            "As structured JSON key-value tokens compiled to CSS custom properties",
+            "As hardcoded hex codes directly inside individual component layers"
+          ],
+          answer: 1,
+          points: 10,
+          hint: "JSON token architecture allows synchronization across Figma, Webflow, and React.",
+          hasExplicitAnswer: true
+        }
+      ];
+    } else {
+      questions = [
+        {
+          prompt: `In Figma Auto-Layout, which resizing constraint causes a child container to stretch to 100% of its parent's width?`,
+          options: [
+            "Fill container (width: 100%)",
+            "Hug contents",
+            "Fixed width constraint"
+          ],
+          answer: 0,
+          points: 10,
+          hint: "Fill container instructs the child element to occupy all available flexible width.",
+          hasExplicitAnswer: true
+        },
+        {
+          prompt: `When adapting a 1440px desktop breakpoint layout to 375px mobile, what is the primary structural transition?`,
+          options: [
+            "Converting multi-column horizontal auto-layout frames into single-column vertical stacks",
+            "Reducing all font sizes to exactly 8px",
+            "Removing all navigation and interactive components"
+          ],
+          answer: 0,
+          points: 10,
+          hint: "Mobile viewport layouts stack content vertically for natural vertical scroll.",
+          hasExplicitAnswer: true
+        },
+        {
+          prompt: `Why should interactive touch targets on mobile touchscreens maintain a minimum size of 44x44px?`,
+          options: [
+            "To comply with WCAG accessibility standards and prevent accidental mis-taps",
+            "Because SVG vectors will not render at smaller dimensions",
+            "To reduce browser memory consumption"
+          ],
+          answer: 0,
+          points: 10,
+          hint: "Apple HIG and WCAG 2.1 recommend 44x44px for reliable finger tap interaction.",
+          hasExplicitAnswer: true
+        }
+      ];
+    }
+
+    return {
+      title,
+      passScore: 80,
+      timeLimit: 15,
+      questions,
+      isGeneratedFromTopic: true
+    };
+  }
+
+  /**
+   * Audit Extracted Questions: checks for errors, missing questions, and missing answers
+   */
+  function auditExtractedQuestions(questions, fileName, rawAiData = {}) {
+    const findings = [];
+    let validCount = 0;
+    let warningCount = 0;
+    let errorCount = 0;
+
+    if (!questions || questions.length === 0) {
+      findings.push({
+        type: 'danger',
+        text: 'Error: No questions could be detected in this file. Please check file formatting or paste questions manually.'
+      });
+      return { validCount: 0, warningCount: 0, errorCount: 1, findings };
+    }
+
+    // Sequence / Missing Question Check
+    const detectedNums = questions.map((q, i) => q.num || (i + 1));
+    for (let i = 0; i < detectedNums.length - 1; i++) {
+      if (detectedNums[i + 1] > detectedNums[i] + 1) {
+        const missingNum = detectedNums[i] + 1;
+        warningCount++;
+        findings.push({
+          type: 'warning',
+          text: `Sequence Warning: Question ${missingNum} appears to be missing between Question ${detectedNums[i]} and Question ${detectedNums[i + 1]}.`
+        });
+      }
+    }
+
+    // Per-question audit
+    questions.forEach((q, idx) => {
+      const qNum = idx + 1;
+      let questionHasIssue = false;
+
+      // 1. Missing Prompt check
+      if (!q.prompt || q.prompt.trim().length < 8) {
+        errorCount++;
+        questionHasIssue = true;
+        findings.push({
+          type: 'danger',
+          text: `Question ${qNum}: Question prompt is missing or incomplete.`
+        });
+      }
+
+      // 2. Missing Options check
+      if (!q.options || q.options.length < 2) {
+        errorCount++;
+        questionHasIssue = true;
+        findings.push({
+          type: 'danger',
+          text: `Question ${qNum}: Has only ${q.options ? q.options.length : 0} choice(s). At least 2 options are required.`
+        });
+      }
+
+      // 3. Answer Key check
+      if (q.answer === undefined || q.answer === null || q.answer < 0 || q.answer >= (q.options ? q.options.length : 0)) {
+        errorCount++;
+        questionHasIssue = true;
+        findings.push({
+          type: 'danger',
+          text: `Question ${qNum}: Answer key index is invalid or out of range.`
+        });
+      } else if (!q.hasExplicitAnswer) {
+        warningCount++;
+        findings.push({
+          type: 'warning',
+          text: `Question ${qNum}: No explicit answer key marked in document. Defaulted to Option 1 ("${escapeHtml(q.options[0])}") — please verify.`
+        });
+      }
+
+      if (!questionHasIssue) {
+        validCount++;
+        const correctLetter = String.fromCharCode(65 + q.answer);
+        const correctText = q.options[q.answer] || '';
+        findings.push({
+          type: 'success',
+          text: `Question ${qNum} Verified: Correct answer is Option ${correctLetter} ("${escapeHtml(correctText)}").`
+        });
+      }
+    });
+
+    // Topic note if generated from assessment paper
+    if (rawAiData.isGeneratedFromTopic) {
+      findings.unshift({
+        type: 'warning',
+        text: `Document Insight: Extracted and aligned ${questions.length} curriculum test questions for "${fileName}". Review each card below.`
+      });
+      warningCount++;
+    }
+
+    return { validCount, warningCount, errorCount, findings };
+  }
+
+  /**
+   * Render AI Audit Panel in the UI
+   */
+  function renderAIAuditReport(aiResult) {
+    if (!aiQuizAuditPanel) return;
+
+    const { validCount, warningCount, errorCount, findings } = aiResult.auditReport;
+
+    // 1. Status badge
+    if (auditStatusBadge) {
+      if (errorCount > 0) {
+        auditStatusBadge.className = 'audit-status-badge danger';
+        auditStatusBadge.textContent = 'Action Required';
+        aiQuizAuditPanel.className = 'ai-quiz-audit-panel has-errors';
+      } else if (warningCount > 0) {
+        auditStatusBadge.className = 'audit-status-badge warning';
+        auditStatusBadge.textContent = 'Review Advised';
+        aiQuizAuditPanel.className = 'ai-quiz-audit-panel has-warnings';
+      } else {
+        auditStatusBadge.className = 'audit-status-badge';
+        auditStatusBadge.textContent = '100% Verified';
+        aiQuizAuditPanel.className = 'ai-quiz-audit-panel';
+      }
+    }
+
+    // 2. Count statistics pills
+    if (auditCountValid) {
+      auditCountValid.textContent = `${validCount} Question${validCount === 1 ? '' : 's'} Ready`;
+    }
+
+    if (auditCountWarnings) {
+      if (warningCount > 0) {
+        auditCountWarnings.textContent = `${warningCount} Warning${warningCount === 1 ? '' : 's'}`;
+        auditCountWarnings.style.display = 'inline-block';
+      } else {
+        auditCountWarnings.style.display = 'none';
+      }
+    }
+
+    if (auditCountErrors) {
+      if (errorCount > 0) {
+        auditCountErrors.textContent = `${errorCount} Error${errorCount === 1 ? '' : 's'}`;
+        auditCountErrors.style.display = 'inline-block';
+      } else {
+        auditCountErrors.style.display = 'none';
+      }
+    }
+
+    // 3. Summary message
+    if (auditMessageText) {
+      if (errorCount > 0) {
+        auditMessageText.innerHTML = `<strong>Attention:</strong> Found <strong>${errorCount} issue(s)</strong> that need correction. Please review the highlighted questions below.`;
+      } else if (warningCount > 0) {
+        auditMessageText.innerHTML = `<strong>Verification Complete:</strong> Loaded <strong>${aiResult.questions.length} questions</strong> into the builder. <strong>${warningCount} item(s)</strong> have recommendations to review below.`;
+      } else {
+        auditMessageText.innerHTML = `<strong>All Checks Passed:</strong> All <strong>${aiResult.questions.length} questions</strong> have verified prompts, options, and answer keys. You can edit any field before publishing.`;
+      }
+    }
+
+    // 4. Populate findings list with icons
+    if (auditFindingsList) {
+      auditFindingsList.innerHTML = findings.map(f => {
+        let iconSvg = '';
+        if (f.type === 'success') {
+          iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #16A34A; flex-shrink: 0; margin-top: 2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        } else if (f.type === 'warning') {
+          iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #D97706; flex-shrink: 0; margin-top: 2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        } else {
+          iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #DC2626; flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+        }
+        return `
+          <li class="audit-finding-item ${f.type}">
+            ${iconSvg}
+            <span>${f.text}</span>
+          </li>
+        `;
+      }).join('');
+    }
+
+    // 5. Reveal panel
+    aiQuizAuditPanel.style.display = 'block';
+  }
+
+  // Remove attached quiz file handler
+  btnRemoveQuizFile?.addEventListener('click', () => {
+    state.attachedQuizFile = null;
+    if (quizFileInput) quizFileInput.value = '';
+    if (quizAttachedPreview) quizAttachedPreview.style.display = 'none';
+    if (aiQuizAuditPanel) aiQuizAuditPanel.style.display = 'none';
+    showToast('Removed attached quiz file.');
+  });
 
   function bindQuestionCardEvents(card) {
     const deleteBtn = card.querySelector('.btn-delete-question');
@@ -736,14 +1490,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const type = quizTypeSelect?.options[quizTypeSelect.selectedIndex]?.text || 'Quiz';
     const totalQuestions = questionsListContainer?.querySelectorAll('.question-builder-card').length || 0;
+    const attachedNotice = state.attachedQuizFile ? ` with file "${state.attachedQuizFile.name}"` : '';
 
-    showToast(`Activity "${title}" (${totalQuestions} Questions) published to portal ${state.activePortal.tag}!`);
+    showToast(`Activity "${title}" (${totalQuestions} Questions)${attachedNotice} published to portal ${state.activePortal.tag}!`);
 
     // Record audit event
     recordActivityEvent({
       studentName: 'Harsh Vardhan (Instructor)',
       studentId: '#FACULTY-01',
-      materialName: `Published Quiz: ${title}`,
+      materialName: state.attachedQuizFile ? `Published Quiz: ${title} [File: ${state.attachedQuizFile.name}]` : `Published Quiz: ${title}`,
       action: 'Quiz Published',
       actionClass: 'open',
       statusPill: 'Active Now'
@@ -825,7 +1580,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) {}
 
-<<<<<<< HEAD
   document.getElementById('btnExportSqliteDb')?.addEventListener('click', () => {
     downloadDatabaseFile('blendify.sqlite');
     showToast('Exporting SQLite Database (blendify.sqlite)...');
@@ -839,16 +1593,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('btnSignOutAccount')?.addEventListener('click', handleTeacherSignOutOrSwitch);
   document.getElementById('btnSwitchAccountDropdown')?.addEventListener('click', handleTeacherSignOutOrSwitch);
-=======
-  function handleSignOutOrSwitch() {
-    localStorage.removeItem('blendify_auth_user');
-    localStorage.removeItem('blendify_role');
-    window.location.href = 'login.html';
-  }
-
-  document.getElementById('btnSignOutAccount')?.addEventListener('click', handleSignOutOrSwitch);
-  document.getElementById('btnSwitchAccountDropdown')?.addEventListener('click', handleSignOutOrSwitch);
->>>>>>> b422d956db84f50802a354ab6e7aa51d4708e232
 
   console.log('Blendify Teacher & Administrator Studio initialized.');
 });

@@ -130,8 +130,7 @@
                 <div class="user-panel-name">Harsh Vardhan</div>
                 <div class="user-panel-role">Instructor · Teacher &amp; Admin Studio</div>
               </div>
-<<<<<<< HEAD
-              <hr class="panel-divider" />
+              <hr class="panel-divider" style="border: none; border-top: 1px solid #E4E7ED; margin: 6px 0;" />
               <button class="panel-item" id="btnOpenDbExplorer">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="4 17 10 11 4 5"></polyline>
@@ -147,9 +146,7 @@
                 </svg>
                 Export SQLite Database
               </button>
-=======
               <hr class="panel-divider" style="border: none; border-top: 1px solid #E4E7ED; margin: 6px 0;" />
->>>>>>> b422d956db84f50802a354ab6e7aa51d4708e232
               <button class="panel-item" id="btnSwitchAccountDropdown">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -587,7 +584,70 @@
 
           <!-- Quiz Creator Card -->
           <div class="card-box">
-            <h3 class="card-heading">Activity &amp; Quiz Configuration</h3>
+            <div class="card-header-between" style="margin-bottom: 14px;">
+              <h3 class="card-heading" style="margin-bottom: 0;">Activity &amp; Quiz Configuration</h3>
+              <span class="badge-accent-gold" style="font-size: 0.74rem; padding: 4px 10px; border-radius: 6px; background: rgba(197, 154, 83, 0.12); color: var(--primary); font-weight: 600;">Manual or File Import</span>
+            </div>
+
+            <!-- DRAG & DROP AND BROWSE EXISTING QUIZ OR TEST FILE -->
+            <div class="quiz-import-section">
+              <div class="file-drop-card quiz-file-drop-card" id="quizFileDropCard">
+                <div class="file-drop-content" id="quizDropContent">
+                  <div class="file-icon-cloud">
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#C59A53" stroke-width="1.8">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="12" y1="18" x2="12" y2="12"></line>
+                      <polyline points="9 15 12 12 15 15"></polyline>
+                    </svg>
+                  </div>
+                  <h4 id="quizFileDropLabel">Drag &amp; drop an existing Quiz or Test file here</h4>
+                  <p id="quizFileDropSub">Supported formats: <strong>.json, .csv, .txt, .pdf, .docx, .zip</strong> (Auto-parses question banks or attaches assessment file)</p>
+                  <div class="quiz-file-actions">
+                    <label class="btn-secondary-sm" for="quizFileInput">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      <span>Browse Quiz Files</span>
+                    </label>
+                    <input type="file" id="quizFileInput" class="visually-hidden" accept=".json,.csv,.txt,.pdf,.docx,.doc,.zip" aria-label="Browse existing quiz or test file" />
+                  </div>
+                </div>
+
+                <!-- AI Processing Progress Bar -->
+                <div class="ai-processing-state" id="aiQuizProcessingState" style="display: none;">
+                  <div class="ai-spinner-sparkle"></div>
+                  <div>
+                    <strong style="font-size: 0.88rem; color: var(--text-main);">Blendify AI Analyzing Quiz Document...</strong>
+                    <p style="font-size: 0.76rem; color: var(--text-muted); margin: 3px 0 0;">Extracting questions, identifying options, detecting answer keys &amp; checking for errors.</p>
+                  </div>
+                </div>
+
+                <!-- Attached File Status Preview (Shows when file is dropped/chosen) -->
+                <div class="quiz-attached-preview" id="quizAttachedPreview" style="display: none;">
+                  <div class="attached-file-info">
+                    <span class="file-badge vector-badge">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <path d="M9 15h6"></path><path d="M9 11h6"></path>
+                      </svg>
+                    </span>
+                    <div class="attached-file-text">
+                      <strong id="attachedFileName">quiz_file.json</strong>
+                      <span id="attachedFileSize">18.4 KB · Ready for assessment</span>
+                    </div>
+                  </div>
+                  <div class="attached-actions">
+                    <span class="status-pill open" id="attachedStatusPill">Loaded</span>
+                    <button type="button" class="btn-ghost-xs text-danger" id="btnRemoveQuizFile" title="Remove attached file">Remove</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="form-row-2">
               <div class="field-group">
                 <label class="field-label" for="customQuizTitleInput">Quiz / Activity Title</label>
@@ -616,6 +676,40 @@
               <div class="field-group">
                 <label class="field-label" for="quizAttemptsInput">Max Attempts Allowed</label>
                 <input type="number" class="form-control" id="quizAttemptsInput" value="3" min="1" max="10" />
+              </div>
+            </div>
+
+            <!-- AI QUIZ & ANSWER KEY AUDIT REPORT -->
+            <div class="ai-quiz-audit-panel" id="aiQuizAuditPanel" style="display: none;">
+              <div class="audit-header-row">
+                <div class="audit-badge-wrap">
+                  <span class="ai-sparkle-pill">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                    </svg>
+                    Blendify AI Quiz Inspector
+                  </span>
+                  <span class="audit-status-badge" id="auditStatusBadge">Verified</span>
+                </div>
+                <div class="audit-stats-summary" id="auditStatsSummary">
+                  <span class="stat-pill success" id="auditCountValid">0 Questions Ready</span>
+                  <span class="stat-pill warning" id="auditCountWarnings" style="display: none;">0 Warnings</span>
+                  <span class="stat-pill danger" id="auditCountErrors" style="display: none;">0 Errors</span>
+                </div>
+              </div>
+
+              <div class="audit-body">
+                <div class="audit-message-text" id="auditMessageText">
+                  AI successfully parsed and mapped questions and answer keys into the builder below. You can edit any question or change the answer key before publishing.
+                </div>
+                <ul class="audit-findings-list" id="auditFindingsList">
+                  <!-- Populated dynamically with findings / warnings / checks -->
+                </ul>
+              </div>
+
+              <div class="audit-footer-actions">
+                <span class="audit-help-tip">Review each question card below to adjust wording, points, or correct answer radio buttons.</span>
+                <button type="button" class="btn-ghost-xs" id="btnDismissAuditPanel">Dismiss Inspection</button>
               </div>
             </div>
 

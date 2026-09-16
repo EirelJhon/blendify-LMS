@@ -457,8 +457,121 @@ button {
 }
 
 /* ==========================================================================
-   LOGIN FORM: EMAIL & PASSWORD
+   AUTH ERROR NOTIFICATION & VALIDATION FEEDBACK
    ========================================================================== */
+.auth-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #FEF2F2;
+  border: 1.5px solid #FCA5A5;
+  border-left: 4px solid #DC2626;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  color: #991B1B;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
+  animation: authBannerSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1), authErrorShake 0.4s ease;
+  margin-bottom: 2px;
+}
+
+@keyframes authBannerSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes authErrorShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+.auth-error-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #DC2626;
+  margin-top: 1px;
+}
+
+.auth-error-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.auth-error-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #991B1B;
+  letter-spacing: -0.01em;
+}
+
+.auth-error-desc {
+  font-size: 0.78rem;
+  line-height: 1.42;
+  color: #B91C1C;
+  word-break: break-word;
+}
+
+.auth-error-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 3px;
+  color: #991B1B;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.65;
+  transition: all 0.15s ease;
+}
+
+.auth-error-close:hover {
+  opacity: 1;
+  background: rgba(220, 38, 38, 0.12);
+}
+
+/* Input Field Error State */
+.auth-input-wrapper.has-error .auth-input {
+  border-color: #EF4444 !important;
+  background: #FFFDFD !important;
+  box-shadow: 0 0 0 3.5px rgba(239, 68, 68, 0.18) !important;
+}
+
+.auth-input-wrapper.has-error .auth-input-icon {
+  color: #EF4444 !important;
+}
+
+.auth-field-error {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #DC2626;
+  margin-top: 3px;
+  padding-left: 2px;
+  line-height: 1.3;
+}
+
+/* Toast error modifier */
+.toast.toast-error {
+  background: #1C1917;
+  border-left: 4px solid #EF4444;
+}
+
+.toast.toast-error .toast-icon-box {
+  color: #EF4444;
+}
+
 .auth-credentials-form {
   display: flex;
   flex-direction: column;

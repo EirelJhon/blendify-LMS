@@ -20,11 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
-<<<<<<< HEAD
   // STORAGE KEYS & PERSISTENT ROLE SYSTEM (SYNCHRONIZED WITH SQLITE)
-=======
-  // STORAGE KEYS & ROLES PERSISTENCE
->>>>>>> b422d956db84f50802a354ab6e7aa51d4708e232
   // =========================================================================
   const STORAGE_KEY_USER = 'blendify_auth_user';
   const STORAGE_KEY_ROLE = 'blendify_role';
@@ -69,18 +65,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Toast Notification System
   const CHECK_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+  const ERROR_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
   const toastContainer = document.getElementById('toastContainer');
-  function showToast(message, icon = CHECK_SVG) {
+  function showToast(message, icon = CHECK_SVG, isError = false) {
     if (!toastContainer) return;
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = `toast ${isError ? 'toast-error' : ''}`;
     toast.innerHTML = `<span class="toast-icon-box">${icon}</span><span>${message}</span>`;
     toastContainer.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(10px)';
       setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 3200);
   }
 
   // DOM Elements
@@ -97,18 +94,169 @@ document.addEventListener('DOMContentLoaded', async () => {
   const headerUserEmail = document.getElementById('headerUserEmail');
   const btnSwitchAccount = document.getElementById('btnSwitchAccount');
 
-  // Login Form Elements
+  // Login Form & Validation Elements
   const formEmailPassword = document.getElementById('formEmailPassword');
   const inputEmail = document.getElementById('inputEmail');
   const inputPassword = document.getElementById('inputPassword');
+  const wrapperEmail = document.getElementById('wrapperEmail');
+  const wrapperPassword = document.getElementById('wrapperPassword');
+  const emailFieldError = document.getElementById('emailFieldError');
+  const passwordFieldError = document.getElementById('passwordFieldError');
+  const authErrorBanner = document.getElementById('authErrorBanner');
+  const authErrorTitle = document.getElementById('authErrorTitle');
+  const authErrorDesc = document.getElementById('authErrorDesc');
+  const btnDismissAuthError = document.getElementById('btnDismissAuthError');
   const btnTogglePassword = document.getElementById('btnTogglePassword');
   const checkRememberMe = document.getElementById('checkRememberMe');
   const btnForgotPassword = document.getElementById('btnForgotPassword');
 
-  // Quick Demo Account Buttons
-  const demoChipStudent = document.getElementById('demoChipStudent');
-  const demoChipTeacher = document.getElementById('demoChipTeacher');
-  const demoChipNew = document.getElementById('demoChipNew');
+  // Registered Credentials Store
+  const DEFAULT_CREDENTIALS = {
+    'alex.student@gmail.com': {
+      password: 'student123',
+      name: 'Alex Rivers',
+      role: 'student',
+      aliases: ['alex', 'alex.student', 'alexrivers', 'student']
+    },
+    'harsh.teacher@blendify.edu': {
+      password: 'teacher123',
+      name: 'Harsh Vardhan',
+      role: 'teacher',
+      aliases: ['harsh', 'harsh.teacher', 'harshvardhan', 'teacher']
+    },
+    'elena.design@gmail.com': {
+      password: 'teacher123',
+      name: 'Elena Rostova',
+      role: 'teacher',
+      aliases: ['elena', 'elena.design', 'elenarostova', 'instructor']
+    }
+  };
+
+  const STORAGE_KEY_REGISTERED = 'blendify_registered_users';
+
+  function getKnownAccounts() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_REGISTERED);
+      if (stored) {
+        return { ...DEFAULT_CREDENTIALS, ...JSON.parse(stored) };
+      }
+    } catch (e) {}
+    return { ...DEFAULT_CREDENTIALS };
+  }
+
+  function findAccountByIdentifier(identifier) {
+    if (!identifier) return null;
+    const clean = identifier.trim().toLowerCase();
+    const accounts = getKnownAccounts();
+
+    // 1. Direct email match
+    if (accounts[clean]) {
+      return { email: clean, ...accounts[clean] };
+    }
+
+    // 2. Check aliases or username matching
+    for (const [accEmail, acc] of Object.entries(accounts)) {
+      if (accEmail.toLowerCase() === clean) {
+        return { email: accEmail, ...acc };
+      }
+      const username = accEmail.split('@')[0].toLowerCase();
+      if (username === clean) {
+        return { email: accEmail, ...acc };
+      }
+      if (acc.aliases && acc.aliases.some(a => a.toLowerCase() === clean)) {
+        return { email: accEmail, ...acc };
+      }
+    }
+
+    return null;
+  }
+
+  // =========================================================================
+  // ERROR NOTIFICATION & FIELD FEEDBACK SYSTEM
+  // =========================================================================
+  function showAuthError(title, description, targetField = 'all') {
+    if (authErrorBanner) {
+      if (authErrorTitle) authErrorTitle.textContent = title;
+      if (authErrorDesc) authErrorDesc.textContent = description;
+      authErrorBanner.style.display = 'flex';
+      // Re-trigger shake animation for instant tactile feedback
+      authErrorBanner.style.animation = 'none';
+      void authErrorBanner.offsetHeight;
+      authErrorBanner.style.animation = 'authBannerSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1), authErrorShake 0.4s ease';
+    }
+
+    if (targetField === 'email' || targetField === 'all') {
+      wrapperEmail?.classList.add('has-error');
+      if (emailFieldError) {
+        emailFieldError.textContent = description;
+        emailFieldError.style.display = 'block';
+      }
+      inputEmail?.focus();
+    }
+
+    if (targetField === 'password' || targetField === 'all') {
+      wrapperPassword?.classList.add('has-error');
+      if (passwordFieldError) {
+        passwordFieldError.textContent = description;
+        passwordFieldError.style.display = 'block';
+      }
+      if (targetField === 'password') {
+        inputPassword?.focus();
+      }
+    }
+
+    showToast(description, ERROR_SVG, true);
+  }
+
+  function clearAuthErrors(field = null) {
+    if (!field || field === 'all') {
+      if (authErrorBanner) authErrorBanner.style.display = 'none';
+      wrapperEmail?.classList.remove('has-error');
+      wrapperPassword?.classList.remove('has-error');
+      if (emailFieldError) {
+        emailFieldError.textContent = '';
+        emailFieldError.style.display = 'none';
+      }
+      if (passwordFieldError) {
+        passwordFieldError.textContent = '';
+        passwordFieldError.style.display = 'none';
+      }
+      return;
+    }
+
+    if (field === 'email') {
+      wrapperEmail?.classList.remove('has-error');
+      if (emailFieldError) {
+        emailFieldError.textContent = '';
+        emailFieldError.style.display = 'none';
+      }
+    }
+
+    if (field === 'password') {
+      wrapperPassword?.classList.remove('has-error');
+      if (passwordFieldError) {
+        passwordFieldError.textContent = '';
+        passwordFieldError.style.display = 'none';
+      }
+    }
+
+    if (!wrapperEmail?.classList.contains('has-error') && !wrapperPassword?.classList.contains('has-error')) {
+      if (authErrorBanner) authErrorBanner.style.display = 'none';
+    }
+  }
+
+  btnDismissAuthError?.addEventListener('click', () => {
+    clearAuthErrors('all');
+  });
+
+  inputEmail?.addEventListener('input', () => {
+    clearAuthErrors('email');
+  });
+
+  inputPassword?.addEventListener('input', () => {
+    clearAuthErrors('password');
+  });
+
 
   // Google SSO Elements
   const btnGoogleSignIn = document.getElementById('btnGoogleSignIn');
@@ -261,67 +409,77 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
-  // EMAIL & PASSWORD FORM SUBMISSION
+  // EMAIL / USERNAME & PASSWORD FORM SUBMISSION
   // =========================================================================
   formEmailPassword?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const email = inputEmail?.value.trim();
+    clearAuthErrors('all');
+
+    const identifier = inputEmail?.value.trim();
     const password = inputPassword?.value;
 
-    if (!email || !email.includes('@')) {
-      showToast('Please enter a valid email address.');
-      inputEmail?.focus();
+    // 1. Validate Username / Email format
+    if (!identifier) {
+      showAuthError('Invalid Username or Email', 'Please enter your email address or username.', 'email');
       return;
     }
 
-    if (!password || password.length < 3) {
-      showToast('Please enter a password with at least 3 characters.');
-      inputPassword?.focus();
+    const isEmailFormat = identifier.includes('@');
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (isEmailFormat && !emailPattern.test(identifier)) {
+      showAuthError('Invalid Email Format', 'Please enter a valid email address (e.g. name@example.com).', 'email');
       return;
     }
 
-    // Derive display name from email or preset accounts
-    let name = '';
-    const lowerEmail = email.toLowerCase();
-    if (lowerEmail === 'alex.student@gmail.com') {
-      name = 'Alex Rivers';
-    } else if (lowerEmail === 'harsh.teacher@blendify.edu') {
-      name = 'Harsh Vardhan';
-    } else if (lowerEmail === 'elena.design@gmail.com') {
-      name = 'Elena Rostova';
-    } else {
-      const prefix = email.split('@')[0];
-      name = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+    if (!isEmailFormat && identifier.length < 3) {
+      showAuthError('Invalid Username', 'Username must contain at least 3 characters.', 'email');
+      return;
     }
+
+    // 2. Validate Password format
+    if (!password) {
+      showAuthError('Invalid Password', 'Please enter your password.', 'password');
+      return;
+    }
+
+    if (password.length < 6) {
+      showAuthError('Invalid Password', 'Password must be at least 6 characters long.', 'password');
+      return;
+    }
+
+    // 3. Lookup Account in registered users
+    const account = findAccountByIdentifier(identifier);
+    if (!account) {
+      showAuthError(
+        'Account Not Found',
+        `No Blendify account matches "${identifier}". Please check your credentials or sign in with Google.`,
+        'email'
+      );
+      return;
+    }
+
+    // 4. Verify Password
+    if (account.password && account.password !== password) {
+      showAuthError(
+        'Incorrect Password',
+        'The password you entered is incorrect. Please verify your credentials and try again.',
+        'password'
+      );
+      return;
+    }
+
+    // 5. Successful Authentication
+    clearAuthErrors('all');
 
     processAuthentication({
-      name,
-      email,
+      name: account.name || identifier.split('@')[0],
+      email: account.email || identifier,
+      role: account.role || getSavedRoleForEmail(account.email),
       remember: checkRememberMe ? checkRememberMe.checked : true
     });
   });
 
-  // =========================================================================
-  // QUICK DEMO ACCOUNTS HELPER
-  // =========================================================================
-  demoChipStudent?.addEventListener('click', () => {
-    if (inputEmail) inputEmail.value = 'alex.student@gmail.com';
-    if (inputPassword) inputPassword.value = 'student123';
-    showToast('Loaded Student demo account credentials.');
-  });
-
-  demoChipTeacher?.addEventListener('click', () => {
-    if (inputEmail) inputEmail.value = 'harsh.teacher@blendify.edu';
-    if (inputPassword) inputPassword.value = 'teacher123';
-    showToast('Loaded Teacher demo account credentials.');
-  });
-
-  demoChipNew?.addEventListener('click', () => {
-    const randomId = Math.floor(100 + Math.random() * 900);
-    if (inputEmail) inputEmail.value = `student${randomId}@blendify.io`;
-    if (inputPassword) inputPassword.value = 'welcome123';
-    showToast('Generated fresh first-time user credentials.');
-  });
 
   // =========================================================================
   // GOOGLE SIGN-IN MODAL (SSO ALTERNATIVE)
