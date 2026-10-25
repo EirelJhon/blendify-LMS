@@ -8,27 +8,65 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
-  // STATE MANAGEMENT
+  // STATE MANAGEMENT (PERSISTENT ACROSS SESSIONS)
   // =========================================================================
+  const DEFAULT_CHAT_HISTORY = {
+    alex: [
+      { sender: 'agent', text: "Hello Harsh! I'm Alex, your personalized AI design system mentor. I specialize in visual hierarchy, auto-layout constraints, and token architecture. What design challenge are we tackling today?" }
+    ],
+    kavita: [
+      { sender: 'agent', text: "Hi Harsh! I'm Kavita, your Webflow & CSS code specialist. Whether you need help converting Figma frames to CSS Grid or debugging 100vw horizontal overflow, let's solve it together." }
+    ],
+    socrates: [
+      { sender: 'agent', text: "Greetings Harsh. I am Socrates, your conceptual thinking coach. Tell me: when you shrink a screen from desktop to mobile, why does layout priority change?" }
+    ]
+  };
+
+  function getStoredProgress() {
+    try {
+      const raw = localStorage.getItem('blendify_student_progress');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return { completedMaterials: 9, isMaterialCompleted: false };
+  }
+
+  function saveProgress(prog) {
+    try {
+      localStorage.setItem('blendify_student_progress', JSON.stringify(prog));
+    } catch(e) {}
+  }
+
+  function getStoredChatHistory() {
+    try {
+      const raw = localStorage.getItem('blendify_ai_chat_history');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return DEFAULT_CHAT_HISTORY;
+  }
+
+  function saveChatHistory(history) {
+    try {
+      localStorage.setItem('blendify_ai_chat_history', JSON.stringify(history));
+    } catch(e) {}
+  }
+
+  const initialProg = getStoredProgress();
+  const initialChat = getStoredChatHistory();
+  const initialStudentView = (function() {
+    try {
+      return localStorage.getItem('blendify_student_active_view') || 'home';
+    } catch(e) { return 'home'; }
+  })();
+
   const state = {
-    activeView: 'home',
+    activeView: initialStudentView,
     activeTag: '#PORTAL-FIGMA-101',
     activePortalName: 'UI/UX Cohort 4 — Webflow Breakpoints Lab',
-    completedMaterials: 9,
+    completedMaterials: initialProg.completedMaterials || 9,
     totalMaterials: 20,
-    isMaterialCompleted: false,
+    isMaterialCompleted: !!initialProg.isMaterialCompleted,
     activePersona: 'alex',
-    chatHistory: {
-      alex: [
-        { sender: 'agent', text: "Hello Harsh! I'm Alex, your personalized AI design system mentor. I specialize in visual hierarchy, auto-layout constraints, and token architecture. What design challenge are we tackling today?" }
-      ],
-      kavita: [
-        { sender: 'agent', text: "Hi Harsh! I'm Kavita, your Webflow & CSS code specialist. Whether you need help converting Figma frames to CSS Grid or debugging 100vw horizontal overflow, let's solve it together." }
-      ],
-      socrates: [
-        { sender: 'agent', text: "Greetings Harsh. I am Socrates, your conceptual thinking coach. Tell me: when you shrink a screen from desktop to mobile, why does layout priority change?" }
-      ]
-    }
+    chatHistory: initialChat
   };
 
   // Toast System
@@ -64,6 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function switchView(viewName) {
     state.activeView = viewName;
+    try {
+      localStorage.setItem('blendify_student_active_view', viewName);
+    } catch (e) {}
 
     // Toggle active state across all nav links (in top header & mobile drawer)
     document.querySelectorAll('.nav-link').forEach(link => {
@@ -161,6 +202,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (btnMarkComplete) {
+    if (state.isMaterialCompleted) {
+      btnMarkComplete.classList.add('completed-state');
+      if (markCompleteText) markCompleteText.textContent = 'Material Studied';
+    }
+    updateMaterialsProgressUI();
+
     btnMarkComplete.addEventListener('click', () => {
       state.isMaterialCompleted = !state.isMaterialCompleted;
       if (state.isMaterialCompleted) {
@@ -174,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         markCompleteText.textContent = 'Mark Completed';
         showToast('Material status reverted.');
       }
+      saveProgress({ completedMaterials: state.completedMaterials, isMaterialCompleted: state.isMaterialCompleted });
       updateMaterialsProgressUI();
     });
   }
@@ -1539,6 +1587,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.chatHistory[state.activePersona].push({ sender: 'user', text });
     if (!overrideText && aiMessageInput) aiMessageInput.value = '';
     renderChatHistory();
+    saveChatHistory(state.chatHistory);
 
     // Show simulated typing status
     const currentP = personas[state.activePersona];
@@ -1548,6 +1597,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const reply = generateAIResponse(text, state.activePersona);
       state.chatHistory[state.activePersona].push({ sender: 'agent', text: reply });
       renderChatHistory();
+      saveChatHistory(state.chatHistory);
       if (aiStatusText) aiStatusText.textContent = currentP.status;
     }, 600);
   }
@@ -1565,6 +1615,7 @@ document.addEventListener('DOMContentLoaded', () => {
       { sender: 'agent', text: `Chat cleared. How can I help you with your learning goals today?` }
     ];
     renderChatHistory();
+    saveChatHistory(state.chatHistory);
     showToast('Conversation cleared.');
   });
 
@@ -1690,6 +1741,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sidebarToggle')?.addEventListener('click', openMobileDrawer);
   document.getElementById('mobileDrawerClose')?.addEventListener('click', closeMobileDrawer);
   mobileDrawerOverlay?.addEventListener('click', closeMobileDrawer);
+
+  // Restore student saved view & AI chat on startup
+  if (state.activeView && views[state.activeView]) {
+    switchView(state.activeView);
+  }
+  renderChatHistory();
 
   console.log('Blendify LMS active: Learning Materials, Classroom Workplaces & AI Agent ready.');
 });

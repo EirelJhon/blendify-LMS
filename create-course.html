@@ -17,7 +17,8 @@
         var savedRole = localStorage.getItem('blendify_role');
         var rawUser = localStorage.getItem('blendify_auth_user');
         if (!savedRole || !rawUser) {
-          // First-time visit: redirect to login screen
+          // First-time visit or direct link: save intended destination
+          try { sessionStorage.setItem('blendify_redirect_target', 'create-course.html'); } catch(e) {}
           window.location.replace('login.html');
         } else if (savedRole === 'student') {
           // Student choice saved: redirect to student portal
@@ -108,6 +109,20 @@
           <button class="mobile-toggle" id="sidebarToggle" aria-label="Toggle navigation menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
           </button>
+
+          <!-- Auto-save Live Indicator -->
+          <div class="auto-save-pill" id="autoSaveIndicator" title="All actions and course creation steps are automatically saved to local storage">
+            <span class="save-status-dot"></span>
+            <span class="save-status-text">All progress saved</span>
+          </div>
+
+          <!-- Active Portal Switcher -->
+          <div class="portal-switcher-pill" title="Currently selected active classroom portal">
+            <span class="pill-label">Portal:</span>
+            <select id="headerPortalSelect" class="portal-select-dropdown" aria-label="Active Classroom Portal">
+              <!-- Dynamically populated from saved portals state -->
+            </select>
+          </div>
         </div>
 
         <div class="header-right">
@@ -131,6 +146,13 @@
                 <div class="user-panel-role">Instructor · Teacher &amp; Admin Studio</div>
               </div>
               <hr class="panel-divider" style="border: none; border-top: 1px solid #E4E7ED; margin: 6px 0;" />
+              <button class="panel-item" id="btnResetStudioData" style="color: #6B7280;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                  <path d="M3 3v5h5"></path>
+                </svg>
+                Reset Demo Data
+              </button>
               <button class="panel-item" id="btnSwitchAccountDropdown">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
